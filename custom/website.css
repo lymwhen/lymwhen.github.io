@@ -27,6 +27,7 @@ article h1{
     transition-property: background;
     transition-timing-function: ease-out;
     transition-duration: .3s;
+    padding-left: 15px;
 }
 .app-sub-sidebar li:hover{
     background: rgba(0,0,0,.07) !important;
