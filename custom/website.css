@@ -1,0 +1,61 @@
+article h1,h2,h3,h4,h5,h6{
+    transition-property: background;
+    transition-duration: .3s;
+}
+article h1{
+    border-left: 4px solid #FF4081;
+    padding-left: 15px;
+}
+.sidebar ul:first-child{
+    margin: 0 0 0 0px;
+}
+
+.sidebar-nav a:not(.app-sub-sidebar a){
+    transition-property: background;
+    transition-timing-function: ease-out;
+    transition-duration: .3s;
+    padding-left: 15px;
+}
+.sidebar-nav a:not(.app-sub-sidebar a):hover{
+    background: rgba(0,0,0,.07) !important;
+}
+.sidebar-nav li.active>a:not(.app-sub-sidebar a):first-child{
+    background: rgba(0,0,0,.07) !important;
+}
+
+.app-sub-sidebar li{
+    transition-property: background;
+    transition-timing-function: ease-out;
+    transition-duration: .3s;
+}
+.app-sub-sidebar li:hover{
+    background: rgba(0,0,0,.07) !important;
+}
+.app-sub-sidebar li.active{
+    background: rgba(0,0,0,.07) !important;
+}
+h1:hover,h2:hover,h3:hover,h4:hover,h5:hover,h6:hover{
+    background: #00000007;
+}
+img:hover {  
+    transform: scale(1.02);  
+    transition: all 0.5s ease 0s;
+}
+.book-summary ul.summary li.active>a {
+    color: #FF4081;
+    background: #00000009;
+    border-left: 4px solid;
+}
+.book .book-summary .exc-trigger {
+    left: 9px;
+    top: 10px;
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
+    text-align: center;
+    border-radius: 2px;
+}
+.book .book-summary .exc-trigger:hover {
+    font-weight: bold;
+    color: #FF4081;
+}
