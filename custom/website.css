@@ -1,11 +1,20 @@
+.markdown-section blockquote {
+    border-left: 4px solid var(--theme-color,#42b98350);
+}
+
 article h1,h2,h3,h4,h5,h6{
     transition-property: background;
     transition-duration: .3s;
 }
 article h1{
-    border-left: 4px solid #FF4081;
+    border-left: 4px solid #FF4081C0;
     padding-left: 15px;
 }
+
+.sidebar li{
+    margin: 0;
+}
+
 .sidebar ul:first-child{
     margin: 0 0 0 0px;
 }
@@ -14,7 +23,7 @@ article h1{
     transition-property: background;
     transition-timing-function: ease-out;
     transition-duration: .3s;
-    padding-left: 15px;
+    padding: 4px 0 4px 20px;
 }
 .sidebar-nav a:not(.app-sub-sidebar a):hover{
     background: rgba(0,0,0,.07) !important;
@@ -27,7 +36,10 @@ article h1{
     transition-property: background;
     transition-timing-function: ease-out;
     transition-duration: .3s;
-    padding-left: 15px;
+    padding-left: 20px;
+}
+.app-sub-sidebar li>a{
+    padding: 4px 0;
 }
 .app-sub-sidebar li:hover{
     background: rgba(0,0,0,.07) !important;
