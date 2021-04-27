@@ -1,3 +1,5 @@
+# IE-8 兼容性
+
 # Array.indexOf
 
 ```javascript

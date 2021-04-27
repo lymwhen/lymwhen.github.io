@@ -1,3 +1,5 @@
+# pvf 外网架设
+
 # 更新 yum 源
 
 > CentOS 6 yum 源失效，参看 [CentOS 6 yum 源失效](#point-centos-disabled)

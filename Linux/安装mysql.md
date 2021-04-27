@@ -1,3 +1,5 @@
+# 安装 mysql
+
 # 卸载CentOS7系统自带mariadb
 
 ```bash
