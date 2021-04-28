@@ -171,3 +171,41 @@ public ModelAndView view(ModelAndView modelAndView) {
 重启服务器，打开页面测试
 
 > 视图所在位置在 spring mvc 配置文件中配置的 freemarker 视图解析器模板路径（templateLoaderPath）下，视图名称与控制器中 setViewName 的参数对应
+
+# Freemarker 常用写法
+
+```javascript
+// if 判断，此处 length 判断必须套括号
+<#if user.name??&&(user.name?length()>0)>
+	<div>${user.name}</div>
+</#if>
+// 循环
+<#list users as item>
+	<div>index: ${item_index}</div>
+	<div>name: ${item.name}</div>
+</#list>
+// 循环 map
+<#list map as k, v>
+	<div>index: ${k}</div>
+	<div>name: ${v}</div>
+</#list>
+
+// 字符串，为空时显示 - 
+${user.name!'-'}
+// 时间
+${(leave.endTime?string('yyyy-MM-dd HH:mm'))!}
+// bool
+${user.isEnabled?c}
+// 数字格式化
+?string('#.#')
+// 转为数字型
+?string.number
+// 字符串包含
+<#if userSpecialService?seq_contains(service.id?string.number) >
+// 数组长度
+<#if types??&&(types?size > 8)>
+```
+
+> 由于 Freemarker  运算符优先级问题，判断非空并且xxx，后面的要打括号
+
+> Freemarker 解析优先于页面 html、js等，所以 Freemarker 标签和表达式可以用在页面的任意位置

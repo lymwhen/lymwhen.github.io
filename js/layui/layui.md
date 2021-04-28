@@ -358,7 +358,11 @@ upload.render({
     ,size: 256000 	    //最大允许上传的文件大小
     ,url: '${rc.contextPath}/upload/file2PdfLimited'
     ,data: {
-        type: "doc"
+        type: "doc",
+        // 动态参数
+        arg1: function() {
+            return $('.arg1').val()
+        }
     }
     ,before: function(obj){
         uploadLoading = layer.msg('正在上传附件...', {

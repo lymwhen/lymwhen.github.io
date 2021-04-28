@@ -8,6 +8,8 @@ Spring Web MVC是一种基于Java的实现了Web MVC设计模式的请求驱动�
 
 # 扫描包
 
+添加扫描包后注解才能生效
+
 ```xml
 <context:component-scan base-package="com.ruiger.controller"/>
 ```
