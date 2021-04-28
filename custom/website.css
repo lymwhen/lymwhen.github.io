@@ -6,9 +6,16 @@ article h1,h2,h3,h4,h5,h6{
     transition-property: background;
     transition-duration: .3s;
 }
-article h1{
+article>h1{
     border-left: 4px solid #FF4081C0;
     padding-left: 15px;
+    margin: 2rem 0 1rem;
+}
+article>h1:first-child{
+    border-left: 0;
+    padding-left: 0px;
+    font-size: 40px;
+    margin-bottom: 30px;
 }
 
 .sidebar li{
