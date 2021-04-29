@@ -174,7 +174,7 @@ public ModelAndView view(ModelAndView modelAndView) {
 
 # Freemarker 常用写法
 
-```javascript
+```java
 // if 判断，此处 length 判断必须套括号
 <#if user.name??&&(user.name?length()>0)>
 	<div>${user.name}</div>
@@ -204,6 +204,9 @@ ${user.isEnabled?c}
 <#if userSpecialService?seq_contains(service.id?string.number) >
 // 数组长度
 <#if types??&&(types?size > 8)>
+
+// 调用实例方法
+${fawen.toString()}
 ```
 
 > 由于 Freemarker  运算符优先级问题，判断非空并且xxx，后面的要打括号

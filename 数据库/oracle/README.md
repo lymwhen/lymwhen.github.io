@@ -83,6 +83,8 @@ modifier：模式（‘i’不区分大小写进行检索；‘c’区分大小�
 # 从字符串的首位（1）开始，以;分割字符串，取分割后的第二个分组
 REGEXP_SUBSTR( '添加|add;修改|edit;删除|del', '[^;]+', 1, 2 )
 修改|edit
+# 正则表达式替换，清空非";"的字符
+REGEXP_REPLACE('[^;]', '')
 ```
 ### length(String)
 

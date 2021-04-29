@@ -20,6 +20,7 @@
 * [Spring_MVC](Spring_MVC/Spring_MVC.md)
 	* [工程搭建](Spring_MVC/工程搭建.md)
 	* [整合Freemarker](Spring_MVC/整合Freemarker.md)
+	* [前台调用后台静态方法和属性](Spring_MVC/前台调用后台静态方法和属性.md)
 	* [整合Mybatis](Spring_MVC/整合Mybatis.md)
 	* [jUnit单元测试](Spring_MVC/jUnit单元测试.md)
 	* [启动时执行](Spring_MVC/启动时执行.md)

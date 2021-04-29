@@ -164,6 +164,19 @@ ifnull(null, '1')
 1
 ```
 
+# 行转列
+```sql
+select 
+    count(case type when '数学' then 1 else null end) as shuxueCount, 
+    count(case type when '文学' then 1 else null end) as wenxueCount
+from book
+
+select 
+    sum(case type when '数学' then 1 else 0 end) as shuxueCount, 
+    sum(case type when '文学' then 1 else 0 end) as wenxueCount
+from book
+```
+
 # 排序
 
 ```sql
