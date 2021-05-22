@@ -27,6 +27,7 @@
 	* [静态注入](Spring_MVC/静态注入.md)
 	* [定时任务](Spring_MVC/定时任务.md)
 * [Tomcat配置https](Tomcat配置https.md)
+* [JAVA_WEB禁用HTTP方法](JAVA_WEB禁用HTTP方法.md)
 * [js](js/README.md)
     * [js封装](js/js封装.md)
     * [jQuery](js/jQuery.md)
