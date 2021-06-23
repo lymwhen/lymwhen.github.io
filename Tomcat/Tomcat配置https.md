@@ -79,8 +79,11 @@ Connector 标签中的 redirectPort 属性表示重定向的端口
 		<Certificate certificateKeystoreFile="G:\tomcat.keystore" certificateKeystorePassword="xxx" certificateKeystoreType="PKCS12" />
 	</SSLHostConfig>
 </Connector>
+```
 
-<!--web.xml-->
+# 强制使用 https
+
+```xml
 <security-constraint>
 	<web-resource-collection>
 		<web-resource-name>securedapp</web-resource-name>
@@ -92,7 +95,9 @@ Connector 标签中的 redirectPort 属性表示重定向的端口
 </security-constraint>
 ```
 
-Openssl 生成证书
+
+
+# Openssl 生成证书
 
 ```bash
 # 生成私钥，输入密码

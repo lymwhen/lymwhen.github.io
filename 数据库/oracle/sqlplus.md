@@ -1,5 +1,13 @@
 # sqlplus
 
+# 安装 Instant Client
+
+下载 Instant Client（plsql 只支持 32 位的 oracle 客户端）
+
+> [Instant Client 下载 | Oracle 中国](https://www.oracle.com/cn/database/technology/instant-client.html)
+
+至少下载 basic 和 sqlplus，下载后合并到一个文件夹
+
 # 创建表空间、用户
 
 ### 查询已有表空间信息
@@ -11,6 +19,7 @@ select * from dba_data_files;
 ### 创建表空间
 
 ```sql
+# 如果不带 datafile 参数则创建在默认位置
 create tablespace TEST2 
 datafile 'E:\APP\ADMINISTRATOR\PRODUCT\11.1.0\DB_1\DATABASE\TEST2' 
 size 10m autoextend on next 10m maxsize unlimited
@@ -88,5 +97,4 @@ file=D:\test2.dmp full=y log=jss.log ignore=y rows=y
 imp 'YNYBJ_EFLOW_TEST/password@192.168.1.124/PLATFORM as sysdba' 
 file=E:\ynybj_oa_20201015.dmp full=y log=jss.log ignore=y rows=y
 ```
-
 
