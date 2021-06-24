@@ -79,6 +79,9 @@ img:hover {
     font-weight: bold;
     color: #FF4081;
 }
+.sidebar ul li.active>a {
+    border-right: 0px;
+}
 #scroll-to-top {
     position: fixed;
     bottom: 10px;
@@ -95,4 +98,12 @@ img:hover {
 #scroll-to-top:hover{
     background: var(--theme-color,#42b983);
     color: #FFFFFF;
+}
+.app-sub-sidebar li:before {
+    content: "▸";
+    padding-top: 5px;
+    padding-right: 1px;
+    float: left;
+    color: var(--theme-color,#42b983);
+    margin-left: -2px;
 }
