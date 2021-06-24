@@ -97,7 +97,7 @@ Connector 标签中的 redirectPort 属性表示重定向的端口
 
 
 
-# Openssl 生成证书
+# Openssl 生成自签名证书
 
 ```bash
 # 生成私钥，输入密码
@@ -137,3 +137,4 @@ openssl pkcs12 -export -clcerts -in G:/openssl_key/chunshu_server.crt -inkey G:/
 >
 > 版权声明：本文为CSDN博主「nklinsirui」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
 > 原文链接：https://blog.csdn.net/nklinsirui/article/details/89432430
+
