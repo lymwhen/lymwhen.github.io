@@ -79,3 +79,20 @@ img:hover {
     font-weight: bold;
     color: #FF4081;
 }
+#scroll-to-top {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    line-height: 38px;
+    border-radius: 0px;
+    background: #00000007;
+    cursor: default;
+    text-align: center;
+    display: none;
+}
+#scroll-to-top:hover{
+    background: var(--theme-color,#42b983);
+    color: #FFFFFF;
+}
