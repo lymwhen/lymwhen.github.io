@@ -100,10 +100,10 @@ img:hover {
     color: #FFFFFF;
 }
 .app-sub-sidebar li:before {
-    content: "▸";
-    padding-top: 5px;
-    padding-right: 1px;
+    content: "-";
+    padding-top: 3px;
+    padding-right: 3px;
     float: left;
     color: var(--theme-color,#42b983);
-    margin-left: -2px;
+    margin-left: -8px;
 }
