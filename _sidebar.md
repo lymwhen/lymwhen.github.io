@@ -1,5 +1,7 @@
 * [Home](/)
 * [java](java/java.md)
+    * [基础知识](java/基础知识/常用代码.md)
+        * [interface](java/基础知识/interface.md)
     * [Office转PDF](java/Office转PDF/Office转PDF.md)
         * [Microsoft_Office](java/Office转PDF/Microsoft_Office/jacob.md)
             * [Word](java/Office转PDF/Microsoft_Office/Word.md)
