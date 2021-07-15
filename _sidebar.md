@@ -53,6 +53,7 @@
 * [Linux](Linux/Linux.md)
 	* [安装JDK](Linux/安装JDK.md)
 	* [安装mysql](Linux/安装mysql.md)
+	* [安装oracle](Linux/安装oracle.md)
 	* [部署Tomcat](Linux/部署Tomcat.md)
 	* [安装Redis](Linux/安装Redis.md)
 	* [安装字体](Linux/安装字体.md)
