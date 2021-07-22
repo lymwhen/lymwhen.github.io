@@ -163,7 +163,9 @@ mkdir /usr/local/oracle/oradata
 mkdir /usr/local/oracle/inventory
 mkdir /usr/local/oracle/fast_recovery_area
 chown -R oracle:oinstall /usr/local/oracle
-chmod -R 775 /data/oracle
+chmod -R 775 /usr/local/oracle
+# 授权安装目录
+chmod -R 775 /usr/local/tools/database
 ```
 
 # 设置 oracle 用户环境变量
@@ -182,6 +184,7 @@ ORACLE_HOME=$ORACLE_BASE/product/11.2.0/db_1
 ORACLE_SID=orcl
 PATH=$PATH:$ORACLE_HOME/bin
 export ORACLE_BASE ORACLE_HOME ORACLE_SID PATH
+# 刷新 .bash_profile
 source .bash_profile
 ```
 
@@ -203,7 +206,7 @@ cd /usr/local/tools/database
 mk response_bak
 cp response/* response_bak 
 # 编辑安装响应文件
-vi db_install_rsp
+vi response/db_install_rsp
 ```
 
 ```properties
@@ -257,8 +260,10 @@ netstat -tnulp | grep 1521
 ```bash
 # 切换到oracle用户
 su -l oracle
-vi /usr/lcoal/tools/database/response/dbca.rsp
+vi /usr/local/tools/database/response/dbca.rsp
 ```
+
+
 
 ```properties
 [GENERAL]
@@ -346,7 +351,7 @@ TOTALMEMORY = "800"
 ### 创建数据库实例
 
 ```bash
-dbca -silent -responseFile /home/oracle/response/dbca.rsp
+dbca -silent -responseFile /usr/local/tools/database/response/dbca.rsp
 ```
 
 打印 100% complete 说明创建完成
@@ -432,6 +437,8 @@ shutdown abort
 
 
 
+
+
 # 删除实例
 
 ### 编辑响应文件
@@ -479,4 +486,19 @@ cd deinstall
 > Oracle官方推荐的做法是使用后者，也就是专门的删除工具。原因是内置的deinstall工具脚本中常常带有很多bug，很多时候不能完全的将其删除干净。特别是Windows环境下的卸载工具，不能正常工作的场景很多。
 >
 > [使用Deinstall专用工具删除Oracle Database_ITPUB博客](http://blog.itpub.net/17203031/viewspace-711809/)
+
+# 疑难问题
+
+### 切换用户报 su: warning: cannot change directory to /home/postgres: No such file or directory
+
+根目录或用户主目录不存在或权限不够
+
+```bash
+# 如oracle主目录/home/oracle不存在
+mkdir /home/oracle
+chmod 755 /home/oracle
+# 初始化
+cp -a /etc/skel/. /home/oracle
+su -l oracle
+```
 
