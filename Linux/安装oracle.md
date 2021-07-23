@@ -483,6 +483,186 @@ cd deinstall
 ./deinstall
 ```
 
+```bash
+[oracle@localhost deinstall]$ ./deinstall
+Checking for required files and bootstrapping ...
+Please wait ...
+Location of logs /tmp/deinstall2021-07-23_02-36-54-PM/logs/
+
+############ ORACLE DEINSTALL & DECONFIG TOOL START ############
+
+
+######################## CHECK OPERATION START ########################
+Install check configuration START
+
+
+Checking for existence of the Oracle home location /usr/local/oracle/product/11.2.0/db_1
+Oracle Home type selected for de-install is: SIDB
+Oracle Base selected for de-install is: /usr/local/oracle
+Checking for existence of central inventory location /usr/local/oracle/inventory
+
+Install check configuration END
+
+
+Network Configuration check config START
+
+Network de-configuration trace file location: /tmp/deinstall2021-07-23_02-36-54-PM/logs/netdc_check3394579112941521867.log
+
+Specify all Single Instance listeners that are to be de-configured [LISTENER]:
+
+Network Configuration check config END
+
+Database Check Configuration START
+
+Database de-configuration trace file location: /tmp/deinstall2021-07-23_02-36-54-PM/logs/databasedc_check435687030908846083.log
+
+Use comma as separator when specifying list of values as input
+
+Specify the list of database names that are configured in this Oracle home [orcl]:
+
+###### For Database 'orcl' ######
+
+Single Instance Database
+The diagnostic destination location of the database: /usr/local/oracle/diag/rdbms/orcl
+Storage type used by the Database: FS
+Database file location: /usr/local/oracle/oradata/ORCL,/usr/local/oracle/flash_recovery_area/ORCL
+Flash recovery area location: /usr/local/oracle/flash_recovery_area/ORCL
+database spfile location: /usr/local/oracle/product/11.2.0/db_1/dbs/spfileorcl.ora
+
+The details of database(s) orcl have been discovered automatically. Do you still want to modify the details of orcl database(s)? [n]: y
+
+
+###### For Database 'orcl' ######
+
+Specify the type of this database (1.Single Instance Database|2.Oracle Restart Enabled Database) [1]:
+Specify the diagnostic destination location of the database [/usr/local/oracle/diag/rdbms/orcl]:
+Specify the storage type used by the Database ASM|FS [FS]:
+
+Specify the list of directories if any database files exist on a shared file system. If 'orcl' subdirectory is found, then it will be deleted. Otherwise, the specified directory will be deleted. Alternatively, you can specify list of database files with full path [/usr/local/oracle/oradata/ORCL,/usr/local/oracle/flash_recovery_area/ORCL]:
+
+Specify the flash recovery area location, if it is configured on the file system. If 'orcl' subdirectory is found, then it will be deleted. [/usr/local/oracle/flash_recovery_area/ORCL]:
+
+Specify the database spfile location [/usr/local/oracle/product/11.2.0/db_1/dbs/spfileorcl.ora]:
+
+Database Check Configuration END
+
+Enterprise Manager Configuration Assistant START
+
+EMCA de-configuration trace file location: /tmp/deinstall2021-07-23_02-36-54-PM/logs/emcadc_check.log
+
+Checking configuration for database orcl
+Enterprise Manager Configuration Assistant END
+Oracle Configuration Manager check START
+OCM check log file location : /tmp/deinstall2021-07-23_02-36-54-PM/logs//ocm_check1858.log
+Oracle Configuration Manager check END
+
+######################### CHECK OPERATION END #########################
+
+
+####################### CHECK OPERATION SUMMARY #######################
+Oracle Home selected for de-install is: /usr/local/oracle/product/11.2.0/db_1
+Inventory Location where the Oracle home registered is: /usr/local/oracle/inventory
+Following Single Instance listener(s) will be de-configured: LISTENER
+The following databases were selected for de-configuration : orcl
+Database unique name : orcl
+Storage used : FS
+No Enterprise Manager configuration to be updated for any database(s)
+No Enterprise Manager ASM targets to update
+No Enterprise Manager listener targets to migrate
+Checking the config status for CCR
+Oracle Home exists with CCR directory, but CCR is not configured
+CCR check is finished
+Do you want to continue (y - yes, n - no)? [n]: y
+A log of this session will be written to: '/tmp/deinstall2021-07-23_02-36-54-PM/logs/deinstall_deconfig2021-07-23_02-37-06-PM.out'
+Any error messages from this session will be written to: '/tmp/deinstall2021-07-23_02-36-54-PM/logs/deinstall_deconfig2021-07-23_02-37-06-PM.err'
+
+######################## CLEAN OPERATION START ########################
+
+Enterprise Manager Configuration Assistant START
+
+EMCA de-configuration trace file location: /tmp/deinstall2021-07-23_02-36-54-PM/logs/emcadc_clean.log
+
+Updating Enterprise Manager ASM targets (if any)
+Updating Enterprise Manager listener targets (if any)
+Enterprise Manager Configuration Assistant END
+Database de-configuration trace file location: /tmp/deinstall2021-07-23_02-36-54-PM/logs/databasedc_clean1510346287528210472.log
+Database Clean Configuration START orcl
+This operation may take few minutes.
+Database Clean Configuration END orcl
+
+Network Configuration clean config START
+
+Network de-configuration trace file location: /tmp/deinstall2021-07-23_02-36-54-PM/logs/netdc_clean8174165085610299592.log
+
+De-configuring Single Instance listener(s): LISTENER
+
+De-configuring listener: LISTENER
+    Stopping listener: LISTENER
+    Listener stopped successfully.
+    Deleting listener: LISTENER
+    Listener deleted successfully.
+Listener de-configured successfully.
+
+De-configuring Naming Methods configuration file...
+Naming Methods configuration file de-configured successfully.
+
+De-configuring backup files...
+Backup files de-configured successfully.
+
+The network configuration has been cleaned up successfully.
+
+Network Configuration clean config END
+
+Oracle Configuration Manager clean START
+OCM clean log file location : /tmp/deinstall2021-07-23_02-36-54-PM/logs//ocm_clean1858.log
+Oracle Configuration Manager clean END
+Oracle Universal Installer clean START
+
+Detach Oracle home '/usr/local/oracle/product/11.2.0/db_1' from the central inventory on the local node : Done
+
+Delete directory '/usr/local/oracle/product/11.2.0/db_1' on the local node : Done
+
+Delete directory '/usr/local/oracle/inventory' on the local node : Done
+
+The Oracle Base directory '/usr/local/oracle' will not be removed on local node. The directory is not empty.
+
+Oracle Universal Installer cleanup was successful.
+
+Oracle Universal Installer clean END
+
+
+Oracle install clean START
+
+Clean install operation removing temporary directory '/tmp/install' on node 'localhost'
+
+Oracle install clean END
+
+
+######################### CLEAN OPERATION END #########################
+
+
+####################### CLEAN OPERATION SUMMARY #######################
+Successfully de-configured the following database instances : orcl
+Following Single Instance listener(s) were de-configured successfully: LISTENER
+Cleaning the config for CCR
+As CCR is not configured, so skipping the cleaning of CCR configuration
+CCR clean is finished
+Successfully detached Oracle home '/usr/local/oracle/product/11.2.0/db_1' from the central inventory on the local node.
+Successfully deleted directory '/usr/local/oracle/product/11.2.0/db_1' on the local node.
+Successfully deleted directory '/usr/local/oracle/inventory' on the local node.
+Oracle Universal Installer cleanup was successful.
+
+Oracle install successfully cleaned up the temporary directories.
+#######################################################################
+
+
+############# ORACLE DEINSTALL & DECONFIG TOOL END #############
+```
+
+> 在 Specify 的地方回车，Do you want 的地方输入 y 回车
+
+
+
 > Oracle官方推荐的做法是使用后者，也就是专门的删除工具。原因是内置的deinstall工具脚本中常常带有很多bug，很多时候不能完全的将其删除干净。特别是Windows环境下的卸载工具，不能正常工作的场景很多。
 >
 > [使用Deinstall专用工具删除Oracle Database_ITPUB博客](http://blog.itpub.net/17203031/viewspace-711809/)

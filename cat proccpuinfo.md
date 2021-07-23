@@ -207,3 +207,6 @@ grant connect to YNTSJY_NEFLOW;
 
 
 
+
+
+show sga;

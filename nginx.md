@@ -83,3 +83,30 @@ nginx -s reload
 ```
 
 > [Nginx的启动、停止与重启 - codingcloud - 博客园 (cnblogs.com)](https://www.cnblogs.com/codingcloud/p/5095066.html)
+
+
+
+负载均衡
+
+```properties
+events {
+    worker_connections  10240;
+}
+
+http {
+   upstream  myserver {
+       server    172.16.10.100:8080;
+       ip_hash;
+   }
+
+   server {
+       listen       8080;
+       server_name  localhost;
+
+       location / {
+           proxy_pass  http://myserver;
+        }
+    }
+}
+```
+
