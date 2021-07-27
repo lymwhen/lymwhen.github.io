@@ -46,13 +46,13 @@ grant resource to TEST2;
 ### 数据库版本
 
 ```sql
-select * from v  &#36;version
+select * from v$version
 ```
 
 ### 实例名
 
 ```sql
-select instance_name from v &#36;instance
+select instance_name from v$instance
 ```
 
 ### 服务名
