@@ -39,10 +39,10 @@ setenforce 0
 # 安装 oracle 11g 依赖包
 
 ```bash
-# 检查未安装的依赖包
-yum install gcc make binutils gcc-c++ compat-libstdc++-33elfutils-libelf-devel elfutils-libelf-devel-static ksh libaio libaio-develnumactl-devel sysstat unixODBC unixODBC-devel pcre-devel –y
 # 安装依赖包
-yum install -y gcc
+yum install gcc make binutils gcc-c++ compat-libstdc++-33elfutils-libelf-devel elfutils-libelf-devel-static ksh libaio libaio-develnumactl-devel sysstat unixODBC unixODBC-devel pcre-devel –y
+# 检查缺失的安装包
+rpm -q --queryformat %-{name}-%{version}-%{release}-%{arch}"\n" \ compat-libstdc++-33 glibc-kernheaders glibc-headers libaio libgcc glibc-devel xorg-x11-deprecated-libs
 ```
 
 > 离线环境参看[Linux/配置本地yum源](Linux/配置本地yum源.md)
@@ -370,7 +370,8 @@ CHARACTERSET = "ZHS16GBK"
 # Description   : total memory in MB to allocate to Oracle
 # oracle内存1638MB,物理内存2G*80%
 # 不，此处应保留默认值800
-TOTALMEMORY = "800" 
+# 不，这里注释即可，让oracle自己选择memory_max_target和memory_target
+# TOTALMEMORY = "800" 
 ```
 
 > GDBNAME 表示服务名，service_name，监听文件为 $ORACLE_HOME/network/admin/tnsnames.ora中可查看，如 plsql 中使用 192.168.3.127:1521/ORCL 连接数据库
@@ -458,15 +459,75 @@ shutdown immediate;
 startup;
 ```
 
-> memory_max_target 和 memory_target 的值不要超过物理内存的 3/4
+> oracle 11g 有自动内存调整，只需调整 memory_max_target 和 memory_target 大小即可，值不要超过物理内存的 3/4，且不能超过 /dev/shm 大小
 
+##### 调整前
 
+```sql
+SQL> show parameter memory
 
-> startup 报：ORA-00845: MEMORY_TARGET not supported on this system
->
-> memory_max_target 大于 shm 分区，shm分区（mounted on /dev/shm）默认为物理内存的一半，可尝试增大该分区🥱
+NAME                                 TYPE        VALUE
+------------------------------------ ----------- ------------------------------
+hi_shared_memory_address             integer     0
+memory_max_target                    big integer 51712M
+memory_target                        big integer 51712M
+shared_memory_address                integer     0
+SQL> show sga
 
-> [oracle调整内存大小 - 落魄运维 - 博客园 (cnblogs.com)](https://www.cnblogs.com/Dev0ps/p/9908997.html)
+Total System Global Area 5.3982E+10 bytes
+Fixed Size                  2218032 bytes
+Variable Size            2.9528E+10 bytes
+Database Buffers         2.4428E+10 bytes
+Redo Buffers               24133632 bytes
+SQL> show parameter sga
+
+NAME                                 TYPE        VALUE
+------------------------------------ ----------- ------------------------------
+lock_sga                             boolean     FALSE
+pre_page_sga                         boolean     FALSE
+sga_max_size                         big integer 51712M
+sga_target                           big integer 0
+SQL> show parameter pga
+
+NAME                                 TYPE        VALUE
+------------------------------------ ----------- ------------------------------
+pga_aggregate_target                 big integer 0
+SQL>
+```
+
+##### 调整后
+
+```sql
+SQL> show parameter memory
+
+NAME                                 TYPE        VALUE
+------------------------------------ ----------- ------------------------------
+hi_shared_memory_address             integer     0
+memory_max_target                    big integer 60G
+memory_target                        big integer 51712M
+shared_memory_address                integer     0
+SQL> show sga
+
+Total System Global Area 6.4137E+10 bytes
+Fixed Size                  2219552 bytes
+Variable Size            3.9997E+10 bytes
+Database Buffers         2.3891E+10 bytes
+Redo Buffers              247029760 bytes
+SQL> show parameter sga
+
+NAME                                 TYPE        VALUE
+------------------------------------ ----------- ------------------------------
+lock_sga                             boolean     FALSE
+pre_page_sga                         boolean     FALSE
+sga_max_size                         big integer 60G
+sga_target                           big integer 0
+SQL> show parameter pga
+
+NAME                                 TYPE        VALUE
+------------------------------------ ----------- ------------------------------
+pga_aggregate_target                 big integer 0
+SQL>
+```
 
 ### 调整内存无法启动解决办法
 
@@ -475,6 +536,8 @@ startup;
 创建实例时响应文件 dbca.ora 时设置了 TOTALMEMORY，经测试，保留默认值800，之后再调整内存可以
 
 ##### ORA-00845: MEMORY_TARGET not supported on this system
+
+> memory_max_target 小于 shm 分区，shm分区（mounted on /dev/shm）默认为物理内存的一半，可尝试增大该分区🥱
 
 重建 spfile
 
@@ -513,6 +576,69 @@ shutdown abort
 
 
 
+# 开机启动监听和实例
+
+### /etc/oratab
+
+$ORACLE_HOME/bin/dbstart 根据 oratab 来启动实例
+
+```bash
+[oracle@localhost /]$  vi /etc/oratab 
+orcl:/usr/local/oracle/product/11.2.0/db_1:Y
+```
+
+### /etc/rc.d/rc.local
+
+在 rc.local 中添加启动监听和实例的命令
+
+```bash
+[root@localhost ~]# cat /etc/rc.d/rc.local
+#!/bin/bash
+# THIS FILE IS ADDED FOR COMPATIBILITY PURPOSES
+#
+# It is highly advisable to create own systemd services or udev rules
+# to run scripts during boot instead of using this file.
+#
+# In contrast to previous versions due to parallel execution during boot
+# this script will NOT be run after all other services.
+#
+# Please note that you must run 'chmod +x /etc/rc.d/rc.local' to ensure
+# that this script will be executed during boot.
+
+touch /var/lock/subsys/local
+su - oracle -c "/usr/local/oracle/product/11.2.0/db_1/bin/lsnrctl start"
+su - oracle -c "/usr/local/oracle/product/11.2.0/db_1/bin/dbstart startup"
+```
+
+
+
+> **oratab**
+>
+> oratab文件是在创建数据库实例时建立的，在安装时使用root用户执行root.sh脚本后得到。（如果忘记也可以直接手动创建。）
+>
+> 在$ORACLE_HOME/bin目录下的$ORACLE_HOME/bin/dbstart和$ORACLE_HOME/bin/dbshut需要调用/etc/oratab文件，如果不存在，dbstart和dbshut将失败，报错信息为/etc/oratab" is notaccessible。
+>
+> oratab的格式为： ORACLE＿SID:ORACLE_HOME:AUTO
+>
+> 如 果需要自动启动数据库，则将AUTO设为Y，在调用dbstart命令才生效。dbstart根据/etc/oratab中的配置来启动相应的数据库，选 项只是能不能用$ORACLE_HOME/bin/dbstart和$ORACLE_HOME/bin/dbshut来启动和关闭数据库的开关。
+>
+> 如果不用dbstart脚本启动数据库，而是用自己的脚本来启动，根本不需要oratab文件。
+>
+> **dbstart**
+>
+> dbstart是安装数据库时自带的启动数据库实例的脚本，默认存放在$oracle_home/bin下。在这里我们通过设置系统开机自动执行dbstart脚本文件来实现，开机自动启动数据实例。
+>
+> **lsnrctl**
+>
+> lsnrctl是安装数据库时自带的启动数据库监听的脚本，默认存放在$oracle_home/bin下。在这里我们通过设置系统开机自动执行lsnrctl脚本文件来实现，开机自动启动数据监听
+>
+> **rc.local**
+>
+> rc.local系统自带的是开机启动程序脚本，默认存放在/etc/rc.d下。我们通过在rc.local脚本中添加执行启动数据库和启动监听的脚本来实现开机自动开启数据库实例和监听。
+
+> 如开机启动失效，参看 [Linux/开机启动](Linux/开机启动.md)
+>
+
 # 删除实例
 
 ### 编辑响应文件
@@ -530,7 +656,7 @@ SYSDBAPASSWORD = "123456"
 ### 删除实例
 
 ```bash
-dbca -silent -responseFile /home/oracle/response/dbca.rsp
+dbca -silent -responseFile /usr/local/tools/database/response/dbca.rsp
 ```
 
 > ORA-00845: MEMORY_TARGET not supported on this system
@@ -538,14 +664,6 @@ dbca -silent -responseFile /home/oracle/response/dbca.rsp
 > 调整内存无法启动解决办法
 
 # 卸载数据库
-
-```bash
-dbca -silent -delete Database -responseFile dbca.rsp
-```
-
-> 测试貌似无用
->
-> [linux安装Oracle11G - 淼淼之森 - 博客园 (cnblogs.com)](https://www.cnblogs.com/mmzs/p/9033112.html)
 
 ### 使用 deinstall 工具卸载
 
@@ -557,185 +675,7 @@ cd deinstall
 ./deinstall
 ```
 
-```bash
-[oracle@localhost deinstall]$ ./deinstall
-Checking for required files and bootstrapping ...
-Please wait ...
-Location of logs /tmp/deinstall2021-07-23_02-36-54-PM/logs/
-
-############ ORACLE DEINSTALL & DECONFIG TOOL START ############
-
-
-######################## CHECK OPERATION START ########################
-Install check configuration START
-
-
-Checking for existence of the Oracle home location /usr/local/oracle/product/11.2.0/db_1
-Oracle Home type selected for de-install is: SIDB
-Oracle Base selected for de-install is: /usr/local/oracle
-Checking for existence of central inventory location /usr/local/oracle/inventory
-
-Install check configuration END
-
-
-Network Configuration check config START
-
-Network de-configuration trace file location: /tmp/deinstall2021-07-23_02-36-54-PM/logs/netdc_check3394579112941521867.log
-
-Specify all Single Instance listeners that are to be de-configured [LISTENER]:
-
-Network Configuration check config END
-
-Database Check Configuration START
-
-Database de-configuration trace file location: /tmp/deinstall2021-07-23_02-36-54-PM/logs/databasedc_check435687030908846083.log
-
-Use comma as separator when specifying list of values as input
-
-Specify the list of database names that are configured in this Oracle home [orcl]:
-
-###### For Database 'orcl' ######
-
-Single Instance Database
-The diagnostic destination location of the database: /usr/local/oracle/diag/rdbms/orcl
-Storage type used by the Database: FS
-Database file location: /usr/local/oracle/oradata/ORCL,/usr/local/oracle/flash_recovery_area/ORCL
-Flash recovery area location: /usr/local/oracle/flash_recovery_area/ORCL
-database spfile location: /usr/local/oracle/product/11.2.0/db_1/dbs/spfileorcl.ora
-
-The details of database(s) orcl have been discovered automatically. Do you still want to modify the details of orcl database(s)? [n]: y
-
-
-###### For Database 'orcl' ######
-
-Specify the type of this database (1.Single Instance Database|2.Oracle Restart Enabled Database) [1]:
-Specify the diagnostic destination location of the database [/usr/local/oracle/diag/rdbms/orcl]:
-Specify the storage type used by the Database ASM|FS [FS]:
-
-Specify the list of directories if any database files exist on a shared file system. If 'orcl' subdirectory is found, then it will be deleted. Otherwise, the specified directory will be deleted. Alternatively, you can specify list of database files with full path [/usr/local/oracle/oradata/ORCL,/usr/local/oracle/flash_recovery_area/ORCL]:
-
-Specify the flash recovery area location, if it is configured on the file system. If 'orcl' subdirectory is found, then it will be deleted. [/usr/local/oracle/flash_recovery_area/ORCL]:
-
-Specify the database spfile location [/usr/local/oracle/product/11.2.0/db_1/dbs/spfileorcl.ora]:
-
-Database Check Configuration END
-
-Enterprise Manager Configuration Assistant START
-
-EMCA de-configuration trace file location: /tmp/deinstall2021-07-23_02-36-54-PM/logs/emcadc_check.log
-
-Checking configuration for database orcl
-Enterprise Manager Configuration Assistant END
-Oracle Configuration Manager check START
-OCM check log file location : /tmp/deinstall2021-07-23_02-36-54-PM/logs//ocm_check1858.log
-Oracle Configuration Manager check END
-
-######################### CHECK OPERATION END #########################
-
-
-####################### CHECK OPERATION SUMMARY #######################
-Oracle Home selected for de-install is: /usr/local/oracle/product/11.2.0/db_1
-Inventory Location where the Oracle home registered is: /usr/local/oracle/inventory
-Following Single Instance listener(s) will be de-configured: LISTENER
-The following databases were selected for de-configuration : orcl
-Database unique name : orcl
-Storage used : FS
-No Enterprise Manager configuration to be updated for any database(s)
-No Enterprise Manager ASM targets to update
-No Enterprise Manager listener targets to migrate
-Checking the config status for CCR
-Oracle Home exists with CCR directory, but CCR is not configured
-CCR check is finished
-Do you want to continue (y - yes, n - no)? [n]: y
-A log of this session will be written to: '/tmp/deinstall2021-07-23_02-36-54-PM/logs/deinstall_deconfig2021-07-23_02-37-06-PM.out'
-Any error messages from this session will be written to: '/tmp/deinstall2021-07-23_02-36-54-PM/logs/deinstall_deconfig2021-07-23_02-37-06-PM.err'
-
-######################## CLEAN OPERATION START ########################
-
-Enterprise Manager Configuration Assistant START
-
-EMCA de-configuration trace file location: /tmp/deinstall2021-07-23_02-36-54-PM/logs/emcadc_clean.log
-
-Updating Enterprise Manager ASM targets (if any)
-Updating Enterprise Manager listener targets (if any)
-Enterprise Manager Configuration Assistant END
-Database de-configuration trace file location: /tmp/deinstall2021-07-23_02-36-54-PM/logs/databasedc_clean1510346287528210472.log
-Database Clean Configuration START orcl
-This operation may take few minutes.
-Database Clean Configuration END orcl
-
-Network Configuration clean config START
-
-Network de-configuration trace file location: /tmp/deinstall2021-07-23_02-36-54-PM/logs/netdc_clean8174165085610299592.log
-
-De-configuring Single Instance listener(s): LISTENER
-
-De-configuring listener: LISTENER
-    Stopping listener: LISTENER
-    Listener stopped successfully.
-    Deleting listener: LISTENER
-    Listener deleted successfully.
-Listener de-configured successfully.
-
-De-configuring Naming Methods configuration file...
-Naming Methods configuration file de-configured successfully.
-
-De-configuring backup files...
-Backup files de-configured successfully.
-
-The network configuration has been cleaned up successfully.
-
-Network Configuration clean config END
-
-Oracle Configuration Manager clean START
-OCM clean log file location : /tmp/deinstall2021-07-23_02-36-54-PM/logs//ocm_clean1858.log
-Oracle Configuration Manager clean END
-Oracle Universal Installer clean START
-
-Detach Oracle home '/usr/local/oracle/product/11.2.0/db_1' from the central inventory on the local node : Done
-
-Delete directory '/usr/local/oracle/product/11.2.0/db_1' on the local node : Done
-
-Delete directory '/usr/local/oracle/inventory' on the local node : Done
-
-The Oracle Base directory '/usr/local/oracle' will not be removed on local node. The directory is not empty.
-
-Oracle Universal Installer cleanup was successful.
-
-Oracle Universal Installer clean END
-
-
-Oracle install clean START
-
-Clean install operation removing temporary directory '/tmp/install' on node 'localhost'
-
-Oracle install clean END
-
-
-######################### CLEAN OPERATION END #########################
-
-
-####################### CLEAN OPERATION SUMMARY #######################
-Successfully de-configured the following database instances : orcl
-Following Single Instance listener(s) were de-configured successfully: LISTENER
-Cleaning the config for CCR
-As CCR is not configured, so skipping the cleaning of CCR configuration
-CCR clean is finished
-Successfully detached Oracle home '/usr/local/oracle/product/11.2.0/db_1' from the central inventory on the local node.
-Successfully deleted directory '/usr/local/oracle/product/11.2.0/db_1' on the local node.
-Successfully deleted directory '/usr/local/oracle/inventory' on the local node.
-Oracle Universal Installer cleanup was successful.
-
-Oracle install successfully cleaned up the temporary directories.
-#######################################################################
-
-
-############# ORACLE DEINSTALL & DECONFIG TOOL END #############
-```
-
-> 在 Specify 的地方回车，Do you want 的地方输入 y 回车
-
-
+> 全部卸载：在 Do you want 或者 y or n 的地方输入 y，其余地方按回车
 
 > Oracle官方推荐的做法是使用后者，也就是专门的删除工具。原因是内置的deinstall工具脚本中常常带有很多bug，很多时候不能完全的将其删除干净。特别是Windows环境下的卸载工具，不能正常工作的场景很多。
 >
@@ -748,9 +688,9 @@ Oracle install successfully cleaned up the temporary directories.
 根目录或用户主目录不存在或权限不够
 
 ```bash
-# 如oracle主目录/home/oracle不存在
-mkdir /home/oracle
-chmod 755 /home/oracle
+# 如oracle主目录/usr/local/oracle不存在
+mkdir /usr/local/oracle
+chmod 775 /usr/local/oracle
 # 初始化
 cp -a /etc/skel/. /home/oracle
 su -l oracle
@@ -758,4 +698,5 @@ su -l oracle
 
 ### ORA-12514:TNS:监听程序当前无法识别连接描述符中请求的服务
 
-服务名不对
+ip、服务名不对
+

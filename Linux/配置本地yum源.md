@@ -22,16 +22,17 @@ reboot
 getenforce 
 ```
 
-# 创建挂载路径
-
-```
-mkdir -p  /mnt/iso
-```
-
 # 创建挂载点
 
 ```
-mount -o loop CentOS-7-x86_64-Everything-2009.iso /mnt/ios
+mkdir -p /mnt/iso
+```
+
+# 挂载
+
+```
+[root@localhost tools]# mount -o loop CentOS-7-x86_64-Everything-2009.iso /mnt/iso
+mount: /dev/loop0 is write-protected, mounting read-only
 ```
 
 # 修改repo文件

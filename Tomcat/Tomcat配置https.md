@@ -128,11 +128,11 @@ openssl pkcs12 -export -clcerts -in G:/openssl_key/chunshu_server.crt -inkey G:/
 
 > 字段	字段含义	示例
 >
-> /C=	Country 国家	CN
-> /ST=	State or Province 省	Guangdong
-> /L=	Location or City 城市	Guangzhou
-> /O=	Organization 组织或企业	xdevops
-> /OU=	Organization Unit 部门	xdevops
+> /C=	Country 国家	CN<br>
+> /ST=	State or Province 省	Guangdong<br>
+> /L=	Location or City 城市	Guangzhou<br>
+> /O=	Organization 组织或企业	xdevops<br>
+> /OU=	Organization Unit 部门	xdevops<br>
 > /CN=	Common Name 域名或IP	gitlab.xdevops.cn
 >
 > 版权声明：本文为CSDN博主「nklinsirui」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。

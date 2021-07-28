@@ -13,6 +13,17 @@ cat /proc/cpuinfo
 cat /proc/meminfo
 ```
 
+### 用户
+
+```bash
+# 切换用户
+su -l oracle
+# 退出用户
+exit
+```
+
+
+
 ### 文件
 
 ```bash
@@ -22,5 +33,19 @@ mv tools tools1
 mv tools test/tools
 # 复制
 cp response/* response_bak
+# 文件列表
+ls
+# 文件列表，列出权限
+ls -l
 ```
 
+### 网络
+
+```bash
+# 查看端口占用
+netstat -nltp | gerp 80
+```
+
+
+
+> yum install net-tools
