@@ -224,7 +224,7 @@ oracle.install.db.OPER_GROUP=dba
 DECLINE_SECURITY_UPDATES=true
 ```
 
-> ORACLE_HOSTNAME 是否来自环境变量 $HOSTNAME ?，测试留空则为 localhost（tnsnames.ora）
+> `ORACLE_HOSTNAME`是否来自环境变量 $HOSTNAME ?，测试留空则为 localhost（tnsnames.ora）
 
 ### 安装
 
@@ -243,9 +243,9 @@ su -l oracle
 netca /silent /responseFile /usr/local/tools/database/response/netca.rsp
 ```
 
-> 注意此处，必须使用/silent /responseFile格式，而不是-silent -responseFile，因为是静默安装。
+> 注意此处，必须使用`/silent /responseFile`格式，而不是`-silent -responseFile`，因为是静默安装。
 
-打印 Oracle Net Services configuration successful. The exit code is 0，说明运行成功；在 $ORACLE_HOME/network/admin 中生成 listener.ora 和 sqlnet.ora
+打印`Oracle Net Services configuration successful. The exit code is 0`，说明运行成功；在 $ORACLE_HOME/network/admin 中生成 listener.ora 和 sqlnet.ora
 
 ```properties
 # listener.ora Network Configuration File: /usr/local/oracle/product/11.2.0/db_1/network/admin/listener.ora
@@ -374,7 +374,7 @@ CHARACTERSET = "ZHS16GBK"
 # TOTALMEMORY = "800" 
 ```
 
-> GDBNAME 表示服务名，service_name，监听文件为 $ORACLE_HOME/network/admin/tnsnames.ora中可查看，如 plsql 中使用 192.168.3.127:1521/ORCL 连接数据库
+> `GDBNAME`表示服务名，service_name，在 \$ORACLE_HOME/network/admin/tnsnames.ora中可查看，如 plsql 中使用`192.168.3.127:1521/ORCL`连接数据库
 >
 > ```properties
 > # tnsnames.ora Network Configuration File: /usr/local/oracle/product/11.2.0/db_1/network/admin/tnsnames.ora
@@ -392,11 +392,11 @@ CHARACTERSET = "ZHS16GBK"
 
 
 
-> DATAFILEDESTINATION 表空间文件默认位置，select * from dba_data_files 可查看，如 system 表空间位置为 /home/oracle/oradata/orcl/system01.dbf
+> `DATAFILEDESTINATION`表空间文件默认位置，`select * from dba_data_files`可查看，如 system 表空间位置为`/home/oracle/oradata/orcl/system01.dbf`
 
 
 
-> OTALMEMORY 应保留默认值 800，不然调整 memory_target，启动时报 ORA-00838: Specified value of MEMORY_TARGET is too small 或 ORA-00845: MEMORY_TARGET not supported on this system
+> `OTALMEMORY`应保留默认值 800，不然调整`memory_target`，启动时报`ORA-00838: Specified value of MEMORY_TARGET is too small`或`ORA-00845: MEMORY_TARGET not supported on this system`
 
 ### 创建数据库实例
 
@@ -408,7 +408,7 @@ dbca -silent -responseFile /usr/local/tools/database/response/dbca.rsp
 
 ### 查看实例
 
-确认实例 orcl STATUS 为 OPEN
+确认实例 orcl`STATUS`为 OPEN
 
 ```bash
 SQL> select * from v$instance;
@@ -448,7 +448,7 @@ sqlplus / as sysdba
 show parameter memory
 ```
 
-如 memory_max_target 和 memory_target 为0，说明 dbca.rsp 中的 TOTALMEMORY 配置有误（过大？），此时调整将无法启动
+如`memory_max_target`和`memory_target`为0，说明 dbca.rsp 中的`TOTALMEMORY`配置有误（过大？），此时调整将无法启动
 
 # 调整内存
 
@@ -459,7 +459,7 @@ shutdown immediate;
 startup;
 ```
 
-> oracle 11g 有自动内存调整，只需调整 memory_max_target 和 memory_target 大小即可，值不要超过物理内存的 3/4，且不能超过 /dev/shm 大小
+> oracle 11g 有自动内存调整，只需调整`memory_max_target`和`memory_target`大小即可，值不要超过物理内存的 3/4，且不能超过`/dev/shm`大小
 
 ##### 调整前
 
@@ -533,11 +533,11 @@ SQL>
 
 ##### ORA-00838: Specified value of MEMORY_TARGET is too small 或 ORA-00845: MEMORY_TARGET not supported on this system
 
-创建实例时响应文件 dbca.ora 时设置了 TOTALMEMORY，经测试，保留默认值800，之后再调整内存可以
+创建实例时响应文件 dbca.ora 时设置了`TOTALMEMORY`，经测试，注释该配置，让 oracle 自行配置合适的大小，或保留默认值800，之后再调整内存
 
 ##### ORA-00845: MEMORY_TARGET not supported on this system
 
-> memory_max_target 小于 shm 分区，shm分区（mounted on /dev/shm）默认为物理内存的一半，可尝试增大该分区🥱
+> `memory_max_target`小于 shm 分区，shm分区（mounted on `/dev/shm`）默认为物理内存的一半，可尝试增大该分区🥱
 
 重建 spfile
 
@@ -616,21 +616,21 @@ su - oracle -c "/usr/local/oracle/product/11.2.0/db_1/bin/dbstart startup"
 >
 > oratab文件是在创建数据库实例时建立的，在安装时使用root用户执行root.sh脚本后得到。（如果忘记也可以直接手动创建。）
 >
-> 在$ORACLE_HOME/bin目录下的$ORACLE_HOME/bin/dbstart和$ORACLE_HOME/bin/dbshut需要调用/etc/oratab文件，如果不存在，dbstart和dbshut将失败，报错信息为/etc/oratab" is notaccessible。
+> 在\$ORACLE_HOME/bin目录下的\$ORACLE_HOME/bin/dbstart和\$ORACLE_HOME/bin/dbshut需要调用/etc/oratab文件，如果不存在，dbstart和dbshut将失败，报错信息为/etc/oratab" is notaccessible。
 >
-> oratab的格式为： ORACLE＿SID:ORACLE_HOME:AUTO
+> oratab的格式为： `ORACLE＿SID:ORACLE_HOME:AUTO`
 >
-> 如 果需要自动启动数据库，则将AUTO设为Y，在调用dbstart命令才生效。dbstart根据/etc/oratab中的配置来启动相应的数据库，选 项只是能不能用$ORACLE_HOME/bin/dbstart和$ORACLE_HOME/bin/dbshut来启动和关闭数据库的开关。
+> 如 果需要自动启动数据库，则将AUTO设为Y，在调用dbstart命令才生效。dbstart根据/etc/oratab中的配置来启动相应的数据库，选 项只是能不能用\$ORACLE_HOME/bin/dbstart和\$ORACLE_HOME/bin/dbshut来启动和关闭数据库的开关。
 >
 > 如果不用dbstart脚本启动数据库，而是用自己的脚本来启动，根本不需要oratab文件。
 >
 > **dbstart**
 >
-> dbstart是安装数据库时自带的启动数据库实例的脚本，默认存放在$oracle_home/bin下。在这里我们通过设置系统开机自动执行dbstart脚本文件来实现，开机自动启动数据实例。
+> dbstart是安装数据库时自带的启动数据库实例的脚本，默认存放在\$oracle_home/bin下。在这里我们通过设置系统开机自动执行dbstart脚本文件来实现，开机自动启动数据实例。
 >
 > **lsnrctl**
 >
-> lsnrctl是安装数据库时自带的启动数据库监听的脚本，默认存放在$oracle_home/bin下。在这里我们通过设置系统开机自动执行lsnrctl脚本文件来实现，开机自动启动数据监听
+> lsnrctl是安装数据库时自带的启动数据库监听的脚本，默认存放在\$oracle_home/bin下。在这里我们通过设置系统开机自动执行lsnrctl脚本文件来实现，开机自动启动数据监听
 >
 > **rc.local**
 >
@@ -675,7 +675,7 @@ cd deinstall
 ./deinstall
 ```
 
-> 全部卸载：在 Do you want 或者 y or n 的地方输入 y，其余地方按回车
+> 全部卸载：在 `Do you want` 或者 `y or n` 的地方输入 y，其余地方按回车
 
 > Oracle官方推荐的做法是使用后者，也就是专门的删除工具。原因是内置的deinstall工具脚本中常常带有很多bug，很多时候不能完全的将其删除干净。特别是Windows环境下的卸载工具，不能正常工作的场景很多。
 >
@@ -696,7 +696,7 @@ cp -a /etc/skel/. /home/oracle
 su -l oracle
 ```
 
-### ORA-12514:TNS:监听程序当前无法识别连接描述符中请求的服务
+### ORA-12514: TNS :监听程序当前无法识别连接描述符中请求的服务
 
 ip、服务名不对
 

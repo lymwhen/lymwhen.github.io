@@ -8,6 +8,8 @@ The sources and documentation are distributed under the [2-clause BSD-like licen
 
 Commercial support is available from [Nginx, Inc.](https://www.nginx.com/)
 
+> [http核心模块-Nginx中文文档](https://www.nginx.cn/doc/standard/httpcore.html)
+
 
 
 # 检查连接数
@@ -16,10 +18,10 @@ Commercial support is available from [Nginx, Inc.](https://www.nginx.com/)
 netstat -a | findstr 8082
 ```
 
-> 1. "listening":表示**监听** 表示这个端口**正在开放** 可以提供服务
-> 2. "closing"：表示**关闭的** 表示端口人为或者防火墙使其关闭(也许服务被卸载)
-> 3. "time wait" ：表示正在**等待连接** 就是你正在向该端口发送请求连接状态
-> 4. "established"：表示是对方与你**已经连接** 正在通信交换数据
+> 1. `listening`表示**监听** 表示这个端口**正在开放** 可以提供服务
+> 2. `closing`表示**关闭的** 表示端口人为或者防火墙使其关闭(也许服务被卸载)
+> 3. `time wait`表示正在**等待连接** 就是你正在向该端口发送请求连接状态
+> 4. `established`表示是对方与你**已经连接** 正在通信交换数据
 >
 
 # nginx 命令
@@ -42,11 +44,57 @@ nginx -t
 # 本地目录映射
 
 ```nginx
-location /upload/ {
-    root   E:/server/webapps/ROOT/upload;
-    rewrite ^/upload/(.*)$ /$1 break;
+worker_processes  8;
+
+events {
+    worker_connections  65535;
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    sendfile        on;
+    
+    keepalive_timeout  65;
+
+    server {
+        listen       8082;
+        server_name  127.0.0.1;
+
+        send_timeout 3600;
+
+        location /upload/ {
+            root   E:/server/webapps/ROOT/upload;
+            rewrite ^/upload/(.*)$ /$1 break;
+        }
+    }
 }
 ```
+
+> ## sendfile
+>
+> **syntax:** *sendfile [ on|off ]*
+>
+> **default:** *sendfile off*
+>
+> **context:** *http, server, location*
+>
+> Directive activate or deactivate the usage of`sendfile()`
+>
+> 大多数sendfile配置开启后，Nginx在进行数据传输，会调用sendfile()函数， Linux 2.0+ 以后的推出的一个系统调用。对比一般的数据的网络传输sendfile会有更少的切换和更少的数据拷贝。
+
+> ## send_timeout
+>
+> **syntax:** *send_timeout the time*
+>
+> **default:** *send_timeout 60*
+>
+> **context:** *http, server, location*
+>
+> Directive assigns response timeout to client. Timeout is established not on entire transfer of answer, but only between two operations of reading, if after this time client will take nothing, then nginx is shutting down the connection.
+>
+> yzk_web 发现ffplay播放暂停超过60s后，点击播放，播放几秒后会卡住；当客户超过`send_timeout`时间未向服务端读取数据，nginx会关闭连接；由于ffplay没有处理此情况的机制，只能将`send_timeout`延长至1小时
 
 > [通过nginx实现windows系统下本地目录的映射_CherishL_的专栏-CSDN博客](https://blog.csdn.net/lovelovelovelovelo/article/details/75038594)
 
@@ -212,6 +260,8 @@ send_timeout ：响应客户端超时时间，这个超时时间仅限于两个�
 server_tokens ：并不会让nginx执行的速度更快，但它可以关闭在错误页面中的nginx版本数字，这样对于安全性是有好处的。
 
 client_max_body_size：上传文件大小限制。
+
+> [http核心模块-Nginx中文文档](https://www.nginx.cn/doc/standard/httpcore.html)
 
 > [Nginx 性能优化有这篇就够了！ - 技术颜良 - 博客园 (cnblogs.com)](https://www.cnblogs.com/cheyunhua/p/10670070.html)
 

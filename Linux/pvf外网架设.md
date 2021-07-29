@@ -84,7 +84,7 @@ make&& make check && make install
 
 ### 数据库
 
-将 d_taiwan.db_connect 的 db_ip字段所有的 192.168.200.131 改成外网IP
+将`d_taiwan.db_connect`的`db_ip`字段所有的`192.168.200.131`改成外网IP
 
 ```bash
 mysql -ugame -p
@@ -92,7 +92,7 @@ uu5!^%jg
 update d_taiwan.db_connect set db_ip = 'ip-address';
 ```
 
-在 d_taiwan.geo_allow 添加允许ip，包括网段ip 和 网关ip
+在`d_taiwan.geo_allow`添加允许ip，包括网段ip 和 网关ip
 
 > 参看数据
 >
@@ -256,7 +256,7 @@ chkconfig httpd on
 
 ### 数据库备份恢复方法
 
-> mysqldump恢复时会报错，采用复制mysql目录的方式
+> `mysqldump`恢复时会报错，采用复制mysql目录的方式
 
 ##### 备份
 
@@ -390,7 +390,6 @@ mysql 服务没有启动
 ### wm虚拟机输入密码不对
 
 检查小键盘是否开启
-
 
 <span id="point-centos-disabled"></span>
 

@@ -11,6 +11,8 @@ Linux，全称GNU/Linux，是一种免费使用和自由传播的[类UNIX](https
 ```bash
 cat /proc/cpuinfo
 cat /proc/meminfo
+# 内存占用
+free 
 ```
 
 ### 用户
@@ -45,7 +47,5 @@ ls -l
 # 查看端口占用
 netstat -nltp | gerp 80
 ```
-
-
 
 > yum install net-tools

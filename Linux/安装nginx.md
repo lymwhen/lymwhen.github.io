@@ -4,11 +4,11 @@
 
 # 下载 nginx
 
-官网下载nginx，上传到服务器
+官网下载 nginx，上传到服务器
 
 > [nginx: download](http://nginx.org/en/download.html)
 >
-> 也可用 wget 下载
+> 也可用 `wget` 下载
 >
 > ```bash
 > wget http://nginx.org/download/nginx-1.12.2.tar.gz
@@ -38,9 +38,9 @@ make install
 ./configure --prefix=/usr/local/nginx --with-http_stub_status_module --with-http_ssl_module
 ```
 
---prefix 安装位置
+`--prefix`安装位置
 
---with-模块名称 编译时需要带上的模块
+`--with-`模块名称 编译时需要带上的模块
 
 ### 添加模块
 
