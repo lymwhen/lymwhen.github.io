@@ -6,13 +6,25 @@ Linux，全称GNU/Linux，是一种免费使用和自由传播的[类UNIX](https
 
 # 常用命令
 
-### 系统配置
+### 系统
 
 ```bash
+# CentOS版本
+rpm -q centos-release
+cat /etc/redhat-release
+uname -a
+# cpu
 cat /proc/cpuinfo
+# 内存
 cat /proc/meminfo
 # 内存占用
-free 
+free -m
+# 硬盘
+fdisk -l
+# 分区挂载情况
+df -h
+# 任务管理器
+top
 ```
 
 ### 用户
@@ -49,3 +61,4 @@ netstat -nltp | gerp 80
 ```
 
 > yum install net-tools
+
