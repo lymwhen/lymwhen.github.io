@@ -168,6 +168,8 @@ chmod -R 775 /usr/local/oracle
 chmod -R 777 /usr/local/tools/database
 ```
 
+> /usr/local/oracle 最小权限为 755
+
 # 设置 oracle 用户环境变量
 
 ```bash
