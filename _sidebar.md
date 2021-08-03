@@ -16,6 +16,8 @@
 	* [整合Freemarker](Spring_MVC/整合Freemarker.md)
 	* [前台调用后台静态方法和属性](Spring_MVC/前台调用后台静态方法和属性.md)
 	* [整合Mybatis](Spring_MVC/整合Mybatis.md)
+	* [集成ehcache](Spring_MVC/集成ehcache.md)
+	* [整合shiro](Spring_MVC/整合shiro.md)
 	* [jUnit单元测试](Spring_MVC/jUnit单元测试.md)
 	* [启动时执行](Spring_MVC/启动时执行.md)
 	* [静态注入](Spring_MVC/静态注入.md)

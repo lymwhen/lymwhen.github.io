@@ -24,6 +24,14 @@ shiro
 </bean>
 ```
 
+> 经测试，web.xml 中配置无效，
+>
+> ```xml
+> <session-config>
+>     <session-timeout>30</session-timeout>
+> </session-config>
+> ```
+
 # Ehcache 配置
 
 ehcache 配置不当会导致 session 被 ehcache 删除
