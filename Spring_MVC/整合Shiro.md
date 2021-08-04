@@ -619,7 +619,7 @@ public Object test3(@RequestParam Integer id) {
 
 ##### logical
 
-value 之间的逻辑关系，`AND`：与，`OR`：或
+value 之间的逻辑关系，默认`AND`，`AND`：与，`OR`：或
 
 ### 测试
 
@@ -752,7 +752,7 @@ public class ShiroTagFreeMarkerConfigurer extends FreeMarkerConfigurer {
 
 > `guest`：验证当前用户是否为“访客”，即未认证（包含未记住）的用户；shiro标签：`<shiro:guest></shiro:guest>`  ；freemark中： `<@shiro.guest>  </@shiro.guest>`
 >
-> `user`：认证通过或已记住的用户 shiro标签：`<shiro:user> </shiro:user>`  ；freemark中： `<@shiro.user> </@shiro.user>` ``
+> `user`：认证通过或已记住的用户 shiro标签：`<shiro:user> </shiro:user>`  ；freemark中： `<@shiro.user> </@shiro.user>` 
 >
 > `authenticated`：已认证通过的用户。不包含已记住的用户，这是与user标签的区别所在。 shiro标签：`<shiro:authenticated> </shiro:authenticated>`；freemark中： `<@shiro.authenticated></@shiro.authenticated>`
 >
