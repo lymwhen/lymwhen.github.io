@@ -772,3 +772,32 @@ public class ShiroTagFreeMarkerConfigurer extends FreeMarkerConfigurer {
 >
 > [freemarker集成shiro标签 - Mr.Liu’blog - 博客园 (cnblogs.com)](https://www.cnblogs.com/liuyingke/p/7723238.html)
 
+# 登录成功后跳转登陆前页面
+
+如果未登录打开 authc 配置的地址，shiroFilter 会重定向到 `loginUrl`，不过shiro在跳转前有记录跳转前的页面。前没有认证的用户请求需要认证的链接时，shiro在跳转前会把跳转过来的页面链接保存到session的attribute中，key的值叫shiroSavedRequest，我们可以能过WebUtils类拿到。
+
+```java
+String url = WebUtils.getSavedRequest(request).getRequestUrl()
+```
+
+### 登录成功后重定向到登录前 url
+
+```java
+UsernamePasswordToken token = new UsernamePasswordToken(id, password);
+Subject subject = SecurityUtils.getSubject();
+subject.login(token);
+SavedRequest savedRequest = WebUtils.getSavedRequest(request);
+if(savedRequest != null) {
+    // savedRequest非空，说明是从authc url跳转到登录页
+    modelAndView.setViewName("redirect:" + savedRequest.getRequestUrl());
+}else {
+    // 默认跳转到首页
+    modelAndView.setViewName("redirect:/");
+}
+```
+
+> 不过值得注意的是，这个SaveRequest是在用户通过上面方式跳转登录时shiro才会保存，并且不会改变，除非下一次跳转再次发生。并不是每一个请求，shiro都会把上一个请求保存到session中。所以，不能通过WebUtils.getSavedRequest(request)在任何地方调用来拿到上一个页面的请求。这个方法的调用，更应该是在用户登录成功后，重定向到页面时使用
+> ————————————————
+> 版权声明：本文为CSDN博主「LHacker」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+> 原文链接：https://blog.csdn.net/lhacker/article/details/20450855
+
