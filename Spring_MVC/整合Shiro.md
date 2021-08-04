@@ -567,3 +567,208 @@ ehcache 配置不当会导致 session 被 ehcache 删除
 > 版权声明：本文为CSDN博主「QQ_851228082」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
 > 原文链接：https://blog.csdn.net/wangjun5159/article/details/89875746
 
+# 启用注解
+
+### dispatcher-servlet.xml
+
+```xml
+<!-- 配置 Bean 后置处理器: 会自动的调用和 Spring 整合后各个组件的生命周期方法. -->
+<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor" />
+
+<!-- 启用shrio授权注解拦截方式，AOP式方法级权限检查 -->
+<bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" depends-on="lifecycleBeanPostProcessor">
+    <property name="proxyTargetClass" value="true" />
+</bean>
+<!-- 权限注解的通知器 -->
+<bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+    <property name="securityManager" ref="securityManager" />
+</bean>
+```
+
+> [Shiro权限控制(三):Shiro注解权限验证_kity9420的专栏-CSDN博客_shiro 注解权限控制](https://blog.csdn.net/kity9420/article/details/89198613)
+>
+> [aop:config在shiro权限注解中发挥的作用_wangjun5159的专栏-CSDN博客](https://blog.csdn.net/wangjun5159/article/details/51889628)
+
+### 在接口上加上注解
+
+```java
+@RequiresRoles(value={"admin"},logical=Logical.OR)
+@RequestMapping("/test2")
+@ResponseBody
+public Object test3(@RequestParam Integer id) {
+    return userDao.queryById(id);
+}
+```
+
+> `RequiresAuthentication`:使用该注解标注的类，实例，方法在访问或调用时，当前Subject必须在当前session中已经过认证
+> <br>
+> `RequiresGuest`:使用该注解标注的类，实例，方法在访问或调用时，当前Subject可以是“gust”身份，不需要经过认证或者在原先的session中存在记录。
+> <br>
+> `RequiresPermissions`:当前Subject需要拥有某些特定的权限时，才能执行被该注解标注的方法。如果当前Subject不具有这样的权限，则方法不会被执行。
+> <br>
+> `RequiresRoles`:当前Subject必须拥有所有指定的角色时，才能访问被该注解标注的方法。如果当天Subject不同时拥有所有指定角色，则方法不会执行还会抛出AuthorizationException异常。
+> <br>
+> `RequiresUser`:当前Subject必须是应用的用户，才能访问或调用被该注解标注的类，实例，方法。
+>
+> [shiro注解权限控制-5个权限注解 - lamsey16 - 博客园 (cnblogs.com)](https://www.cnblogs.com/limingxian537423/p/7928234.html)
+
+```java
+@RequiresPermissions(value={"evaluatingTeaching:add","evaluatingTeaching:edit"},logical=Logical.OR)
+@RequiresRoles(value={"G=qxzxry/O=ynstsjy","G=xxzyjsry/O=ynstsjy"},logical=Logical.OR)
+```
+
+##### logical
+
+value 之间的逻辑关系，`AND`：与，`OR`：或
+
+### 测试
+
+在 UserShiroRealm 中注释掉 admin 角色
+
+```java
+@Override
+protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
+    User user = (User)SecurityUtils.getSubject().getPrincipal();
+
+    SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
+    if(user != null) {
+        // info.addRole("admin");
+        info.addStringPermission("user:add");
+    }
+    return info;
+}
+```
+
+登录后浏览器访问`/test1`接口，此时应抛出`UnauthorizedException`异常，说明注解生效
+
+
+
+# Spring 的异常处理器
+
+`@ExceptionHandler({ Exception.class})`可以捕获控制器类中异常，可以实现无权限、报错跳转自定义页面
+
+```java
+// 无权限、授权异常跳转到403.html
+@ExceptionHandler({ UnauthorizedException.class, AuthorizationException.class })
+public Object authorizationException(HttpServletRequest request, HttpServletResponse response, Exception e) throws Exception {
+    e.printStackTrace();
+    if (HttpUtils.isAjaxRequest(request)) {
+        JSONObject obj = new JSONObject();
+        obj.put("msg", "您无权限访问，请联系管理员");
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json; charset=utf-8");
+        response.getWriter().write(JSON.toJSONString(obj));
+        return null;
+    } else {
+        return UrlBasedViewResolver.REDIRECT_URL_PREFIX + "/403.html";
+    }
+}
+
+// 异常跳转到403.html
+@ExceptionHandler({ Exception.class})
+public Object Exception(HttpServletRequest request, HttpServletResponse response, Exception e) throws Exception {
+    e.printStackTrace();
+    if (HttpUtils.isAjaxRequest(request)) {
+        JSONObject obj = new JSONObject();
+        obj.put("msg", "访问出错，请联系管理员");
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json; charset=utf-8");
+        response.getWriter().write(JSON.toJSONString(obj));
+        return null;
+    } else {
+        return UrlBasedViewResolver.REDIRECT_URL_PREFIX + "/500.html";
+    }
+}
+```
+
+> 卸载控制器父类中，可以实现所有子类控制器的异常跳转
+
+# 启动页面标签
+
+### pom.xml
+
+```xml
+<!-- https://mvnrepository.com/artifact/net.mingsoft/shiro-freemarker-tags -->
+<dependency>
+    <groupId>net.mingsoft</groupId>
+    <artifactId>shiro-freemarker-tags</artifactId>
+    <version>1.0.2</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.owasp.encoder/encoder -->
+<dependency>
+    <groupId>org.owasp.encoder</groupId>
+    <artifactId>encoder</artifactId>
+    <version>1.2.3</version>
+</dependency>
+```
+
+### 扩展 FreeMarkerConfigurer
+
+```java
+package com.springmvc.common.freemarker;
+import com.jagregory.shiro.freemarker.ShiroTags;
+import freemarker.template.TemplateException;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
+
+import java.io.IOException;
+
+/**
+ * 继承FreeMarkerConfigurer类,重写afterPropertiesSet()方法；
+ * 集成shiroTags标签
+ * Created by zsc on 2016/1/5.
+ */
+public class ShiroTagFreeMarkerConfigurer extends FreeMarkerConfigurer {
+
+    @Override
+    public void afterPropertiesSet() throws IOException, TemplateException {
+        super.afterPropertiesSet();
+        this.getConfiguration().setSharedVariable("shiro", new ShiroTags());
+    }
+
+}
+```
+
+### 更改 dispatcher-servlet.xml 中的 freemarker 配置类
+
+```xml
+<!-- 注册freemarker配置类，更改为我们扩展的ShiroTagFreeMarkerConfigurer -->
+<!-- <bean id="freeMarkerConfigurer" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer"> -->
+<bean id="freeMarkerConfigurer" class="com.springmvc.common.freemarker.ShiroTagFreeMarkerConfigurer">
+    <!-- ftl模版文件路径  -->
+    <property name="templateLoaderPath" value="/WEB-INF/page/"></property>
+    <!-- 页面编码 -->
+    <property name="defaultEncoding" value="utf-8" />
+</bean>
+```
+
+### 页面标签
+
+```xml
+<@shiro.hasPermission name="user:view">
+    <img src="${rc.contextPath}/images/img1.png">
+</@shiro.hasPermission>
+```
+
+> `guest`：验证当前用户是否为“访客”，即未认证（包含未记住）的用户；shiro标签：`<shiro:guest></shiro:guest>`  ；freemark中： `<@shiro.guest>  </@shiro.guest>`
+>
+> `user`：认证通过或已记住的用户 shiro标签：`<shiro:user> </shiro:user>`  ；freemark中： `<@shiro.user> </@shiro.user>` ``
+>
+> `authenticated`：已认证通过的用户。不包含已记住的用户，这是与user标签的区别所在。 shiro标签：`<shiro:authenticated> </shiro:authenticated>`；freemark中： `<@shiro.authenticated></@shiro.authenticated>`
+>
+> `notAuthenticated`：未认证通过的用户。与authenticated标签相对。 shiro标签：`<shiro:notAuthenticated> </shiro:notAuthenticated>`；freemark中： `<@shiro.notAuthenticated></@shiro.notAuthenticated>`
+>
+> `principal`：输出当前用户信息，通常为登录帐号信息  shiro标签：`Hello,  <@shiro.principal property="name" />`  ；freemarker中： `Hello,  <@shiro.principal property="name" />, how are you today?`    
+>
+> `hasRole`：验证当前用户是否属于该角色 ，shiro标签： `<shiro:hasRole name="administrator"> Administer the system </shiro:hasRole>` ；freemarker中：`<@shiro.hasRole name=”admin”>Hello admin!</@shiro.hasRole>` 
+>
+> `hasAnyRoles`：验证当前用户是否属于这些角色中的任何一个，角色之间逗号分隔 ，shiro标签： `<shiro:hasAnyRoles name="admin,user,operator"> Administer the system </shiro:hasAnyRoles>` ；freemarker中：`<@shiro.hasAnyRoles name="admin,user,operator">Hello admin!</@shiro.hasAnyRoles>`
+>
+> `hasPermission`：验证当前用户是否拥有该权限 ，shiro标签： `<shiro:hasPermission name="/order:*"> 订单 </shiro:hasPermission>` ；freemarker中：`<@shiro.hasPermission name="/order:*">订单/@shiro.hasPermission>` 
+>
+> `lacksRole`：验证当前用户不属于该角色，与hasRole标签想反，shiro标签： `<shiro:hasRole name="admin"> Administer the system </shiro:hasRole>` ；freemarker中：`<@shiro.hasRole name="admin">Hello admin!</@shiro.hasRole>` 
+>
+> `lacksPermission`：验证当前用户不拥有某种权限，与hasPermission标签是相对的，shiro标签： `<shiro:lacksPermission name="/order:*"> trade </shiro:lacksPermission>` ；freemarker中：`<@shiro.lacksPermission name="/order:*">trade</@shiro.lacksPermission>` 
+>
+> [freemarker集成shiro标签 - Mr.Liu’blog - 博客园 (cnblogs.com)](https://www.cnblogs.com/liuyingke/p/7723238.html)
+
