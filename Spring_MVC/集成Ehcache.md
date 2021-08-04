@@ -1,4 +1,4 @@
-# 集成 Ehcache
+# 集成 EhCache
 
 # pom.xml
 
@@ -37,14 +37,24 @@ http://www.springframework.org/schema/cache/spring-cache.xsd
  </bean>
   -->
 <!-- 若只想使用Spring自身提供的缓存器,则注释掉下面的两个关于Ehcache配置的bean,并启用上面的SimpleCacheManager即可 -->
-<!-- Spring提供的基于的Ehcache实现的缓存管理器 -->
+<!-- 用于创建缓存管理器的cacheManagerFactory -->
 <bean id="cacheManagerFactory" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
     <property name="configLocation" value="WEB-INF/ehcache.xml"/>
+    <property name="shared" value="true"></property>
 </bean>
+<!-- 使用cacheManagerFactory创建spring ehcache的缓存管理器 -->
 <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
     <property name="cacheManager" ref="cacheManagerFactory"/>
 </bean>
 ```
+
+> 通过shared来设置cache的基地是这里的Spring独用,还是跟别的(如hibernate的Ehcache共享)
+>
+> whether the EHCache CacheManager should be shared (as a singleton at the VM level)
+>  or independent (typically local within the application)
+> ————————————————
+> 版权声明：本文为CSDN博主「好的哈哈vie」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+> 原文链接：https://blog.csdn.net/qq_21574693/article/details/89332800
 
 > [SpringMVC整合Ehcache_半步多-CSDN博客](https://blog.csdn.net/jadyer/article/details/12257865)
 

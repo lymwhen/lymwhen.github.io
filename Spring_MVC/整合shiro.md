@@ -1,4 +1,4 @@
-# 整合 shiro
+# 整合 Shiro
 
 Shiro是Apache 旗下的一个简单易用的权限框架，可以轻松的完成 认证、授权、加密、会话管理、与 Web 集成、缓存等，这里只进行简单的介绍，详细的介绍请查阅官方文档，先来看下Shiro如何工作的
 
@@ -336,4 +336,234 @@ public ModelAndView logout(ModelAndView modelAndView){
 3. 注销、密码错误等提示
 
    ![整合Shiro2-密码错误](整合Shiro2-密码错误.png)
+
+# 密码加密
+
+shiro`HashedCredentialsMatcher`支持加盐和哈希多次迭代，生成64位特征值（SHA-256）存储为密码
+
+> ### Salting
+>
+> Prior to Shiro 1.1, salts could be obtained based on the end-user submitted [`AuthenticationToken`](https://shiro.apache.org/static/1.2.3/apidocs/org/apache/shiro/authc/AuthenticationToken.html) via the now-deprecated [`getSalt(AuthenticationToken)`](https://shiro.apache.org/static/1.2.3/apidocs/org/apache/shiro/authc/credential/HashedCredentialsMatcher.html#getSalt(org.apache.shiro.authc.AuthenticationToken)) method. This however could constitute a security hole since ideally salts should never be obtained based on what a user can submit. User-submitted salt mechanisms are *much* more susceptible to dictionary attacks and **SHOULD NOT** be used in secure systems. Instead salts should ideally be a secure randomly-generated number that is generated when the user account is created. The secure number should never be disseminated to the user and always kept private by the application.
+>
+> 盐值不应该由用户提供，应该使用用户创建时随机生成的、不向用户提供的、由程序私有的数字
+
+> ## MD5 & SHA-1 Notice
+>
+> [MD5](http://en.wikipedia.org/wiki/MD5) and [SHA-1](http://en.wikipedia.org/wiki/SHA_hash_functions) algorithms are now known to be vulnerable to compromise and/or collisions (read the linked pages for more). While most applications are ok with either of these two, if your application mandates high security, use the SHA-256 (or higher) hashing algorithms and their supporting implementations.
+>
+> MD5 和 SHA-1 容易被碰撞影响，SHA-256 具有更高的安全性
+
+### 在 Realm 中配置 hash 算法和迭代次数
+
+```xml
+<!-- 自定义域 -->
+<bean id="userShiroRealm" class="com.springmvc.common.shiro.UserShiroRealm">
+    <property name="credentialsMatcher">
+        <bean class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
+            <!-- 加密算法 -->
+            <property name="hashAlgorithmName" value="SHA-256"></property>
+            <!-- 加密次数 -->
+            <property name="hashIterations" value="1024"></property>
+        </bean>
+    </property>
+</bean>
+```
+
+### Realm 中生成验证信息时加盐
+
+```java
+// 使用id的字符串作为盐
+ByteSource salt = ByteSource.Util.bytes(String.valueOf(user.getId()));
+SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(user, user.getPassword(), salt, user.getName());
+```
+
+### 生成加密后的密码
+
+在创建用户或修改密码时生成加密密码
+
+```java
+public static final String md5(String password, Serializable userId){
+    //加密方式
+    String hashAlgorithmName = "SHA-256";
+    //盐：为了即使相同的密码不同的盐加密后的结果也不同
+    ByteSource salt = ByteSource.Util.bytes(String.valueOf(userId));
+    ByteSource byteSalt = ByteSource.Util.bytes(salt);
+    //密码
+    Object source = password;
+    //加密次数
+    int hashIterations = 1024;
+    SimpleHash result = new SimpleHash(hashAlgorithmName, source, byteSalt, hashIterations);
+    return result.toString();
+}
+```
+
+# 使用 ehcache 缓存
+
+每次我们刷新页面，或者每次进行权限验证时，都需要进行查询该用户的所有的权限数据， 花费了大量的时间，查询相同的数据。 所以，我们需要缓存。 如果我们想查询的数据，在缓存里面，就直接从缓存里面拿 ，如果缓存中不存在想查询的数据，那么才从数据库中查询。 注意，当授权信息发生改变时，需要清理缓存，不然会一直使用原先的旧权限数据。
+
+集成 ehcache 参看[集成EhCache](/Spring_MVC/集成EhCache.md)
+
+### dispatcher-servlet.xml
+
+```xml
+<!-- 使用cacheManagerFactory创建shiro ehcache的缓存管理器 --> 
+<bean id="shiroCacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager"> 
+    <property name="cacheManager" ref="cacheManagerFactory" /> 
+</bean>
+
+<!-- 会话ID生成器 -->
+<bean id="sessionIdGenerator" class="org.apache.shiro.session.mgt.eis.JavaUuidSessionIdGenerator"/>
+
+<!-- sessionDAO保存认证信息 -->
+<bean id="sessionDAO" class="org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO">
+    <property name="activeSessionsCacheName" value="shiro-activeSessionCache" />
+    <property name="cacheManager" ref="shiroCacheManager" />
+    <property name="sessionIdGenerator" ref="sessionIdGenerator"/>
+</bean>
+
+<!-- 会话管理器，设定会话超时及保存 -->
+<bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
+    <!-- 全局会话超时时间（单位毫秒），默认30分钟 -->
+    <property name="globalSessionTimeout" value="1800000" />
+    <!-- 删除失效的session -->
+    <property name="deleteInvalidSessions" value="true"/>
+    <property name="sessionDAO" ref="sessionDAO"/>
+</bean>
+```
+
+### ehcache.xml
+
+```xml
+<defaultCache
+              maxEntriesLocalHeap="0"
+              eternal="true"
+              timeToIdleSeconds="0"
+              timeToLiveSeconds="0"
+              overflowToDisk="true"
+              diskPersistent="true"
+              />
+```
+
+### 清理缓存
+
+当授权信息变化时，应清理缓存，让shiro重新加载权限信息；或者重新登录亦可以
+
+##### 在 UserShiroRealm 中定义清理缓存方法
+
+```java
+/**
+ * 清除缓存
+ */
+public void clearCache() {
+    System.out.println("清除缓存数据");
+    Subject subject=SecurityUtils.getSubject();
+    // 调用子类去清理缓存
+    super.clearCache(subject.getPrincipals());
+}
+```
+
+在需要调用的地方自动注入 UserShiroRealm，调用`clearCache`方法即可
+
+> [Shiro整合EhCache缓存(九)_两个蝴蝶飞-CSDN博客](https://blog.csdn.net/yjltx1234csdn/article/details/106121159)
+
+# Shiro Session 失效时间设置无效
+
+> shiro session 默认失效时间30分钟
+
+### Shiro sessionManager 全局 session 超时时间
+
+```xml
+<bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
+    <!-- 全局会话超时时间（单位毫秒），默认30分钟 -->
+    <property name="globalSessionTimeout" value="3600000" />
+    <!-- 删除失效的session -->
+    <property name="deleteInvalidSessions" value="true"/>
+    <property name="sessionDAO" ref="sessionDAO"/>
+</bean>
+```
+
+注意要在 securityManager 中配置 sessionManager
+
+```xml
+<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+	<property name="cacheManager" ref="shiroCacheManager" />
+	<property name="realm" ref="myRealm" />
+	<property name="sessionManager" ref="sessionManager"></property>
+</bean>
+```
+
+> 经测试，web.xml 中配置无效，
+>
+> ```xml
+> <session-config>
+>  <session-timeout>30</session-timeout>
+> </session-config>
+> ```
+
+### Ehcache 配置
+
+ehcache 配置不当会导致 session 被 ehcache 删除
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="ehcache.xsd"
+         updateCheck="false" monitoring="autodetect"
+         dynamicConfig="true" >
+         
+    <diskStore path="java.io.tmpdir/ehcache"/>
+
+    <defaultCache
+		maxEntriesLocalHeap="0"
+		eternal="true"
+		timeToIdleSeconds="0"
+		timeToLiveSeconds="0"
+		overflowToDisk="true"
+		diskPersistent="true"
+    />
+</ehcache>
+```
+
+> ehcache自作主张导致session未过期而删除，未通知session调度器。正确的做法是只有session调度器 有权删除，ehcache不能自行删除，这就要求ehcache中session的空闲时间为永久、如果内存不够就写到磁盘，如果要求重启jvm session不丢失，还需要diskPersistent=true。顺便说一下，session调度器默认是每隔1小时，执行一次。
+> 正确的配置应该为
+>
+> ```xml
+> <cache name="shiro-activeSessionCache" 
+>     maxEntriesLocalHeap="0"  <!--内存中不限制数量-->
+>     eternal="true"  <!--永久-->
+>     timeToIdleSeconds="0" <!--空闲时间为永久-->
+>     timeToLiveSeconds="0" <!--存活时间为永久-->
+>     overflowToDisk="true" <!--如果内存不够则写到磁盘，持久化以防止session丢失-->
+>     diskPersistent="true" <!--重启jvm，session不丢失-->
+> />
+> ```
+>
+>
+> 其实在shiro-ehcache.jar中，有个ehcache.xml（对应java中的net.sf.ehcache.config.CacheConfiguration），里边的注释也明确说明了这个问题
+>
+> We want eternal="true" and no timeToIdle or timeToLive settings because Shiro manages session
+>       expirations explicitly.  If we set it to false and then set corresponding timeToIdle and timeToLive properties,
+>       ehcache would evict sessions without Shiro's knowledge, which would cause many problems
+>      (e.g. "My Shiro session timeout is 30 minutes - why isn't a session available after 2 minutes?"
+>             Answer - ehcache expired it due to the timeToIdle property set to 120 seconds.)
+>
+> ```xml
+> diskPersistent=true since we want an enterprise session management feature - ability to use sessions after
+> even after a JVM restart.
+> <cache name="shiro-activeSessionCache"
+>     maxElementsInMemory="10000"
+>     overflowToDisk="true"
+>     eternal="true"
+>     timeToLiveSeconds="0"
+>     timeToIdleSeconds="0"
+>     diskPersistent="true"
+>     diskExpiryThreadIntervalSeconds="600"/>
+> ```
+> **总结**
+>
+> 设置session过期时间不起作用，是因为ehcache自行删除导致；
+> redis/ehcache与session的运作机制搞懂了。缓存只用来存储session，不能自行删除，session调度器负责check session有效性，如果过期，则明确指示redis/ehcache删除session。
+>
+> 版权声明：本文为CSDN博主「QQ_851228082」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+> 原文链接：https://blog.csdn.net/wangjun5159/article/details/89875746
 
