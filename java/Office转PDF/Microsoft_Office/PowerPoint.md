@@ -38,3 +38,5 @@ public void convert2Pdf(String source, String target) throws Exception {
 }
 ```
 
+> 经测试此方式支持`ppt`/`pptx`/`ppsx`格式
+

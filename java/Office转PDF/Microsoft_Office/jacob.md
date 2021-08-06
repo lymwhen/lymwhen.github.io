@@ -8,6 +8,11 @@
 
 jacob 可以在 java 中调用 DLL
 
+### 导入
+
+- 将`jacob.jar`导入到项目 
+- 将`jacob-1.20-x64.dll`拷贝到`%JAVA_HOME%/jre/bin/`下
+
 # Office VBA 参考
 
 > https://docs.microsoft.com/zh-cn/office/vba/api/overview/excel
