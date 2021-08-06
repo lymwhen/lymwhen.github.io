@@ -8,7 +8,7 @@
 
 jacob 可以在 java 中调用 DLL
 
-### 导入
+### 集成
 
 - 将`jacob.jar`导入到项目 
 - 将`jacob-1.20-x64.dll`拷贝到`%JAVA_HOME%/jre/bin/`下
