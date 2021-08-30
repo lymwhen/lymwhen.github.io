@@ -31,3 +31,37 @@ Spring Web MVC是一种基于Java的实现了Web MVC设计模式的请求驱动�
 @JSONField(format="yyyy-MM-dd HH:mm")
 ```
 
+# 参数传递
+
+### param
+
+```java
+@RequestParam(value="id" Long id)
+```
+
+### json 对象
+
+```java
+@RequestBody List<ACClasssForTimeTableTran> finalTimeTableTran
+```
+
+##### 前台
+
+```javascript
+$.ajax({
+    url:"/schedule/generateTimeTable?id=" + coursePlanId,
+    type:"post",
+    contentType:"application/json;charset=UTF-8",
+    data:JSON.stringify(finalTimeTableTran),
+    success: function(data){
+        
+    }
+});
+```
+
+> 对应 Postman 的 raw - json
+>
+> 此时`@RequestParam`接收的参数应该通过链接传递，不知道有没有别的方式
+>
+> json 对象转换的注意事项参看 [java - fastjson - json 字符串转对象时 get/set 方法、构造方法的影响](/java/fastjson?id=json-字符串转对象时-getset-方法、构造方法的影响)
+
