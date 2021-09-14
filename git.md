@@ -81,6 +81,19 @@ git push -f origin master
 
 > 如果仅是 commit，未 push，则 push 不需要 -f
 
+# 撤回合并
+
+`git reset --soft`提示
+
+```bash
+Cannot do a soft reset in the middle of a merge
+```
+
+```bash
+git reset --merge
+git reset --soft 752c8cf43498a64488fd560cd22e72d2aa361e87
+```
+
 
 
 # eclipse
