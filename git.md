@@ -29,34 +29,36 @@ git push -u origin master
 # 命令
 
 ```bash
-暂存所有文件
+# 暂存所有文件
 git add .
-提交
+# 提交
 git commit -m 'init'
-拉取
+# 拉取
 git pull origin master
-推送（-u 表示下次可以使用 git push 推送到上次的远程地址）
+# # 推送（-u 表示下次可以使用 git push 推送到上次的远程地址）
 git push -u origin master
-强制推送（本地仓库覆盖远程）
+# 强制推送（本地仓库覆盖远程）
 git push -f origin master
 
-回滚到某一版本（提交），本地资源库回到某一版本
+# 回滚到某一版本（提交），本地资源库回到某一版本
 git reset --hard 752c8cf43498a64488fd560cd22e72d2aa361e87
-回滚到某一版本（提交），本地 commit 被撤回
+# 重置为本地的最新版本
+git reset --hard head
+# 回滚到某一版本（提交），本地 commit 被撤回
 git reset --soft 752c8cf43498a64488fd560cd22e72d2aa361e87
 
-查看提交记录（按 q 退出）
+# 查看提交记录（按 q 退出）
 git log
-查看远程地址
+# 查看远程地址
 git remote -v
-查看远程分支，红色为所在分支
+# 查看远程分支，红色为所在分支
 git branch -a
-查看修改内容
+# 查看修改内容
 git status
 
-添加远程地址
+# 添加远程地址
 git remote add origin git@github.com:haiyiya/ddd.git
-删除远程地址
+# 删除远程地址
 git remote remove origin
 ```
 
