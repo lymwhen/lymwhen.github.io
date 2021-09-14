@@ -2,6 +2,8 @@
 * [java](java/java.md)
     * [基础知识](java/基础知识/常用代码.md)
         * [interface](java/基础知识/interface.md)
+        * [线程](java/基础知识/线程.md)
+        * [线程池](java/基础知识/线程池.md)
     * [Office转PDF](java/Office转PDF/Office转PDF.md)
         * [Microsoft_Office](java/Office转PDF/Microsoft_Office/jacob.md)
             * [Word](java/Office转PDF/Microsoft_Office/Word.md)
