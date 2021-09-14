@@ -51,6 +51,11 @@ cp response/* response_bak
 ls
 # 文件列表，列出权限
 ls -l
+# 解压
+tar -xvf repo.tar
+tar -zxvf repo.tar.gz
+# 压缩repo文件夹
+tar -zxvf repo.tar.gz repo
 ```
 
 ### 十位权限
