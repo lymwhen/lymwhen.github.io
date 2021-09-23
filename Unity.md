@@ -1,9 +1,6 @@
 # Unity
 
-Unipatcher 选择unity\Editor 文件夹
 
-> 如果提示Unity patching failed. Already patched or unpatchable!!!
-> 将editor文件夹下的unity.exe.bak恢复，重试
 
 # 对象
 
