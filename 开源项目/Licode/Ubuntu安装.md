@@ -288,7 +288,7 @@ cd ~
 tar -zcvf licode.tar.gz licode licode
 ```
 
-### 拷贝到其他服务器，解压
+### 拷贝到其他服务器当前，解压
 
 ```bash
 tar -zxvf licode.tar.gz
@@ -296,15 +296,24 @@ tar -zxvf licode.tar.gz
 
 ### 安装依赖
 
-根据`./scripts/installUbuntuDeps.sh`查看所需的依赖，待测试，已知其他两个脚本中不需要安装依赖
-
 ```bash
 sudo apt install -y rabbitmq-server
 ```
 
+> 根据`./scripts/installUbuntuDeps.sh`查看所需的依赖。经测试，编译好的 Licode 仅需要安装`rabbitmq-server`
+
 ### 启动
 
-参看启动
+```bash
+#初始化存储目录？
+#mongod --repair --dbpath /home/lyml/licode/build/db
+# 启动 mongodb
+~/licode/build/libdeps/mongodb-linux-x86_64-ubuntu2004-4.4.4/bin/mongod --dbpath ~/licode/build/db --logpath ~/licode/build/mongo.log --fork
+# 启动licode
+./scripts/initLicode.sh
+# 启动示例
+./scripts/initBasicExample.sh
+```
 
 
 
