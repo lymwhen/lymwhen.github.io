@@ -96,6 +96,19 @@ git reset --merge
 git reset --soft 752c8cf43498a64488fd560cd22e72d2aa361e87
 ```
 
+# 将分支更新到 master
+
+```bash
+# 查看分支（当前分支有*号和绿色标注）
+git branch
+# 删除分支
+git branch -D master
+# 切换到分支
+git checkout release
+# 更新当前分支到master
+git checkout -b master
+```
+
 
 
 # eclipse
