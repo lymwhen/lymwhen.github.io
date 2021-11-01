@@ -289,3 +289,15 @@ cas.authn.jdbc.encode[0].passwordFieldName=password
 #cas.authn.jdbc.encode[0].disabledFieldName=
 ```
 
+# 使用 http 协议
+
+在`application.properties`中添加
+
+```properties
+#server.ssl.key-store=file:/etc/cas/thekeystore
+#server.ssl.key-store-password=changeit
+#server.ssl.key-password=changeit
+cas.tgc.secure=false
+```
+
+> 经测试必须使用 CA 签发的证书，自签名 https 服务客户端会报错
