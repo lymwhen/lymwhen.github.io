@@ -298,14 +298,19 @@ tar -zxvf licode.tar.gz
 
 ```bash
 sudo apt install -y rabbitmq-server
+sudo apt install -y libcurl4
+sudo apt install -y coturn
 ```
 
-> 根据`./scripts/installUbuntuDeps.sh`查看所需的依赖。经测试，编译好的 Licode 仅需要安装`rabbitmq-server`
+> 根据`./scripts/installUbuntuDeps.sh`查看所需的依赖。
 
 ### 启动
 
 ```bash
 #初始化存储目录？
+
+# 启动turn
+turnserver -o -a -f -v --mobility -m 100 --max-bps=100000 --min-port=32355 --max-port=65535 --user=nzjdsturn:bf10127Tku -r nzjdsturn
 #mongod --repair --dbpath /home/lyml/licode/build/db
 # 启动 mongodb
 ~/licode/build/libdeps/mongodb-linux-x86_64-ubuntu2004-4.4.4/bin/mongod --dbpath ~/licode/build/db --logpath ~/licode/build/mongo.log --fork
