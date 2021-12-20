@@ -60,7 +60,7 @@ service sshd restart
 /etc/init.d/ssh restart
 ```
 
-> [(1条消息) Debian之—— Debian 10 允许root用户登录和以ssh方式登录_zhoudatianchai的专栏-CSDN博客_debian11允许root登录](https://blog.csdn.net/zhoudatianchai/article/details/113740262)
+> [Debian之—— Debian 10 允许root用户登录和以ssh方式登录_zhoudatianchai的专栏-CSDN博客_debian11允许root登录](https://blog.csdn.net/zhoudatianchai/article/details/113740262)
 
 # 设置静态IP
 
