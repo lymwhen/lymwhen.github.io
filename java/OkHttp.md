@@ -86,3 +86,12 @@ Request request1 = new Request.Builder()
 
 > yntsjy sso Authorization 自动生成了一个名为`Authorization`的header，但headers中还有另一个同名header，在 Postman 中正常，在代码中报 400，删除多出的名为`Authorization`的header，正常
 
+# XMLHttpRequest
+
+```javascript
+var xhr = new XMLHttpRequest();
+xhr.open('POST', 'https://192.168.3.105/api/notification/list?page=1&limit=2');
+xhr.setRequestHeader("J-Token", "eyJhbGciOiJIUzUxMiJ9.eyJzdW...f4Mm18VPvrztQzTO3yopgdQoKPkh28g");
+xhr.send();
+```
+
