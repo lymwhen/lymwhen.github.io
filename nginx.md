@@ -230,7 +230,72 @@ http {
 
 # rtmp 推流
 
-TODO
+> 需要使用`nginx-rtmp-win32`
+>
+> [illuspas/nginx-rtmp-win32: Nginx-rtmp-module Windows builds. (github.com)](https://github.com/illuspas/nginx-rtmp-win32)
+
+```nginx
+rtmp {
+    server {
+        listen 1935;
+
+        application live {
+            live on;
+        }
+		
+        application hls {
+            live on;
+            hls on;  
+            hls_path temp/hls;  
+            hls_fragment 8s;  
+        }
+    }
+}
+
+http {
+    server {
+        listen      28080;
+		
+        location / {
+            root html;
+        }
+		
+        location /stat {
+            rtmp_stat all;
+            rtmp_stat_stylesheet stat.xsl;
+        }
+
+        location /stat.xsl {
+            root html;
+        }
+		
+        location /hls {
+            add_header 'Access-Control-Allow-Origin' '*';
+            #server hls fragments  
+            types{  
+                application/vnd.apple.mpegurl m3u8;  
+                video/mp2t ts;  
+            }  
+            alias temp/hls;  
+            expires -1;  
+        }  
+    }
+}
+```
+
+### 推流
+
+```bash
+ffmpeg  -re -i "rtmp://rtmp.live.com/stream" -vcodec libx264 -vprofile baseline -acodec libmp3lame -ar 44100 -ac 1 -f flv rtmp://127.0.0.1:1935/hls/http8
+```
+
+### http 流地址
+
+```
+http://127.0.0.1:28080/hls/http8.m3u8
+```
+
+
 
 # https 配置
 
@@ -244,6 +309,39 @@ server {
     ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
     ssl_ciphers         HIGH:!aNULL:!MD5:!DH;
     ssl_prefer_server_ciphers on;
+}
+```
+
+# 代理 mysql
+> https://blog.csdn.net/jiahao1186/article/details/111501253
+
+```nginx
+stream {
+    upstream mysql3306 {
+        hash $remote_addr consistent;
+        server 192.168.0.6:3306 weight=5 max_fails=3 fail_timeout=30s;
+    }
+
+    server {
+        listen 41386;
+        proxy_connect_timeout 10s;
+        proxy_timeout 200s;
+        proxy_pass mysql3306;
+    }
+}
+
+```
+
+或
+
+```nginx
+stream {
+    server {
+        listen 41386;
+        proxy_connect_timeout 10s;
+        proxy_timeout 200s;
+        proxy_pass 192.168.0.6:3306;
+    }
 }
 ```
 
