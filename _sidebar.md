@@ -24,6 +24,7 @@
     * [Freemarker添加Shiro标签](Spring_Boot/Freemarker添加Shiro标签.md)
     * [集成Mybatis-Plus-3](Spring_Boot/集成Mybatis-Plus-3.md)
     * [MyBatis-Plus多数据源](Spring_Boot/MyBatis-Plus多数据源.md)
+    * [HttpMessageConverter](Spring_Boot/HttpMessageConverter.md)
     * [logback](Spring_Boot/logback.md)
     * [vscode设置](Spring_Boot/vscode设置.md)
   * [Cas](java/Cas/Cas.md)
