@@ -1,5 +1,7 @@
 # HttpMessageConverter
 
+> https://www.cnblogs.com/hhhshct/p/9676604.html
+
 ```java
 package com.ydxy.config;
 
