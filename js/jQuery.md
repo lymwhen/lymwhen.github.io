@@ -124,6 +124,34 @@ $(document).on("click", ".shareTo", function() {
     alert($(this).attr('id'))
 })
 ```
+
+### 输入
+
+change事件，需要失去焦点才会触发，有输入即触发的需求时，不适用
+```javascript
+$("#id").on('change',function(e)
+{
+    console.log(e.delegateTarget.value);
+    //其他执行代码
+});
+```
+keyup，有兼容性问题，Chrome和IE，遇到中文输入时，打入拼音后，必须空格选择中文，如果使用数字选择键，事件将不会触发，但360极速模式，可以正常使用，费解！
+```javascript
+$("#id").on('keyup',function(e)
+{
+    console.log(e.delegateTarget.value);
+    //其他执行代码
+});
+```
+**推荐使用，input**，目前所有浏览器都适用
+```javascript
+$("#id").on('input',function(e)
+{
+    console.log(e.delegateTarget.value);
+    //其他执行代码
+});
+```
+
 # 调用iframe中的方法
 
 ```javascript
