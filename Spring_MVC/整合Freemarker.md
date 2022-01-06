@@ -212,3 +212,22 @@ ${fawen.toString()}
 > 由于 Freemarker  运算符优先级问题，判断非空并且xxx，后面的要打括号
 
 > Freemarker 解析优先于页面 html、js等，所以 Freemarker 标签和表达式可以用在页面的任意位置
+
+# 与ES6模板字符串冲突
+
+> [FreeMarker教程网 - 第五节：FreeMarker的HTML转义](http://www.freemarker.net/#6)
+>
+> [freemaker与es6模板字符串语法冲突问题_InternalServerError的博客-CSDN博客](https://blog.csdn.net/Tale_zy/article/details/121353828)
+
+```javascript
+var userSel = `<#noparse><a href="javascript:;" code="${v.code}" name="${v.name}" pcode="${v.pcode}" type="${v.type}"><span>${v.name}</span><i></i></a></#noparse>`
+
+// 包裹区域
+// <#noparse>
+var userSel = `<a href="javascript:;" code="${v.code}" name="${v.name}" pcode="${v.pcode}" type="${v.type}"><span>${v.name}</span><i></i></a>`
+// </#noparse>
+```
+
+> [!TIP]
+>
+> `<#noparse>`标签可以写在任意地方，被包裹的部分不会被 freemarker 解析
