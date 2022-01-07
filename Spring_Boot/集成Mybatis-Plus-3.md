@@ -62,7 +62,7 @@ dicSetMapper.listByObjTest(map);
 
 # 特殊条件构造
 
-### 包裹逻辑
+### 条件嵌套
 
 ```java
 query().eq("appId", info.getId())
