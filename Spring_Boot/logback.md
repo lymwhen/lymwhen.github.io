@@ -1,5 +1,22 @@
 # logback
 
+```java
+@SpringBootTest
+@Slf4j
+class ResourcesTest1 {
+
+	@Autowired
+	FfmpegProperties ffmpegProperties;
+
+	@Test
+	void contextLoads() {
+		log.info("String: {}, int: {}, long: {}, float: {}, double: {}, boolean: {}, date: {}", "一", 2, 3L, 4.75f, 4.75, true, new Date());
+	}
+}
+```
+
+# 配置
+
 > [springboot使用Logback把日志输出到控制台或输出到文件_java_脚本之家 (jb51.net)](https://www.jb51.net/article/197386.htm)
 
 logback-spring.xml
