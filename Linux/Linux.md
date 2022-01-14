@@ -238,3 +238,13 @@ netstat -nltp | gerp 80
 
 > yum install net-tools
 
+# lsof
+
+```bash
+# 查看端口占用 -t:进程号
+lsof -i：8080
+# 结束进程
+kill -9 17084
+# 结束指定端口的进程
+kill -9 `lsof -t -i:8080`
+```
