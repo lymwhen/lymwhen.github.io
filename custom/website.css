@@ -110,3 +110,9 @@ img:hover {
 strong {
     color: #FF4081 !important;
 }
+.katex .katex-html {
+    text-align: left;
+    font-size: initial;
+    line-height: 28px;
+    font-family: 'KaTeX_Main';
+}
