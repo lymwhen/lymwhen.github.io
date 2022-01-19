@@ -8,6 +8,151 @@
 
 至少下载 basic 和 sqlplus，下载后合并到一个文件夹
 
+# 连接
+
+```bash
+E:\oracle\product\11.1.0\db_1\BIN>sqlplus /?
+
+SQL*Plus: Release 11.1.0.6.0 - Production on 星期三 1月 19 15:34:38 2022
+
+Copyright (c) 1982, 2007, Oracle.  All rights reserved.
+
+
+SQL*Plus: Release 11.1.0.6.0 - Production
+
+Copyright (c) 1982, 2007, Oracle.  All rights reserved.
+
+使用 SQL*Plus 执行 SQL, PL/SQL 和 SQL*Plus 语句。
+
+用法 1: sqlplus -H | -V
+
+    -H             显示 SQL*Plus 版本和
+                   用法帮助。
+    -V             显示 SQL*Plus 版本。
+
+用法 2: sqlplus [ [<option>] [<logon>] [<start>] ]
+
+  <option> 为: [-C <version>] [-L] [-M "<options>"] [-R <level>] [-S]
+
+    -C <version>   将受影响的命令的兼容性设置为
+                   <version> 指定的版本。该版本具有
+                   "x.y[.z]" 格式。例如, -C 10.2.0
+    -F             为 RAC 环境启用故障转移模式。
+    -L             只尝试登录一次, 而不是
+                   在出错时再次提示。
+    -M "<options>" 设置输出的自动 HTML 标记。选项
+                   的格式为:
+                   HTML [ON|OFF] [HEAD text] [BODY text] [TABLE text]
+                   [ENTMAP {ON|OFF}] [SPOOL {ON|OFF}] [PRE[FORMAT] {ON|OFF}]
+    -R <level>     设置受限模式, 以禁用与文件系统交互的
+                    SQL*Plus 命令。级别可以
+                   是 1, 2 或 3。最高限制级别为 -R 3, 该级别
+                   禁用与文件系统交互的
+                   所有用户命令。
+    -S             设置无提示模式, 该模式隐藏
+                   命令的 SQL*Plus 标帜, 提示和回显
+                   的显示。
+
+  <logon> 为: (<username>[/<password>][@<connect_identifier>] | /)
+              [AS SYSDBA | AS SYSOPER | AS SYSASM] | /NOLOG | [EDITION=value]
+
+    指定数据库帐户用户名, 口令和数据库连接
+    的连接标识符。如果没有连接
+    标识符, SQL*Plus 将连接到默认数据库。
+
+    AS SYSDBA, AS SYSOPER 和 AS SYSASM 选项是数据库
+    管理权限。
+
+    <connect_identifier> 的形式可以是 Net 服务名
+    或轻松连接。
+
+      @[<net_service_name> | [//]Host[:Port]/<service_name>]
+
+        <net_service_name> 是服务的简单名称, 它解析
+        为连接描述符。
+
+        示例: 使用 Net 服务名连接到数据库, 且
+                 数据库 Net 服务名为 ORCL。
+
+           sqlplus myusername/mypassword@ORCL
+
+        Host 指定数据库服务器计算机的主机名或 IP
+        地址。
+
+        Port 指定数据库服务器上的监听端口。
+
+        <service_name> 指定要访问的数据库的
+        服务名。
+
+        示例: 使用轻松连接连接到数据库, 且
+                 服务名为 ORCL。
+
+           sqlplus myusername/mypassword@Host/ORCL
+
+    /NOLOG 选项可启动 SQL*Plus 而不连接到
+    数据库。
+
+    EDITION 指定应用程序
+    版本的值
+
+  <start> 为: @<URL>|<filename>[.<ext>] [<parameter> ...]
+
+    使用将分配给脚本中的替代变量的指定参数
+    从 Web 服务器 (URL) 或本地文件系统 (filename.ext)
+    运行指定的 SQL*Plus 脚本。
+
+在启动 SQL*Plus 并且执行 CONNECT 命令后, 将运行站点概要
+文件 (例如, $ORACLE_HOME/sqlplus/admin/glogin.sql) 和用户概要文件
+(例如, 工作目录中的 login.sql)。这些文件
+包含 SQL*Plus 命令。
+
+有关详细信息, 请参阅 SQL*Plus 用户指南和参考。
+```
+
+```bash
+# 普通用户
+sqlplus TEST/password
+# 以管理员登录（SYS）
+sqlplus TEST/password as sysdba
+# 服务名登录
+sqlplus TEST/password@ORCL
+# 实例名登录
+sqlplus TEST/password@orcl
+# 远程服务名登录
+sqlplus TEST/password@192.168.3.101/ORCL
+# 远程管理员登录
+sqlplus TEST/password@192.168.3.101/ORCL as sysdba
+# 操作系统登录（服务器本地登录）
+sqlplus / as sysdba
+# 启动sqlplus而不连接到数据库
+sqlplus /nolog
+```
+
+# 常用 SQL
+```sql
+-- 查询当前用户
+select user from dual;
+-- 修改某用户密码
+alter user TEST identified by 123456;
+-- 查看所有用户、表空间
+select username,default_tablespace from dba_users;
+-- 查看当前用户的所有表
+select table_name from user_tables;
+-- 查看某用户的所有表
+select * from all_tab_comments where owner = 'TEST'
+-- 修改某用户密码
+alter user TEST identified by 123456;
+-- 提交
+commit;
+
+-- 查看数据库版本
+select * from v$version
+-- 查看实例名（platform）
+select instance_name from v$instance
+-- 查看服务名（PLATFORM）
+select global_name from global_name
+```
+
 # 创建表空间、用户
 
 ### 查询已有表空间信息
@@ -47,63 +192,8 @@ grant dba,connect,resource to TEST2;
 revoke dba from TEST2;
 ```
 
-### 数据库版本
-
-```sql
-select * from v$version
-```
-
-### 实例名
-
-```sql
-select instance_name from v$instance
-```
-
-### 服务名
-
-```sql
-select global_name from global_name
-```
-
 > sid: 实例名
 > 服务名：监听程序名字
-
-# 连接
-
-### 通过实例连接（存疑）
-
-```sql
-sqlplus YNYBJ_EFLOW/ynybj_eflow@10.xxx.xxx.xxx/LDDB.LDDB1
-```
-
-### 通过服务连接
-
-```sql
-sqlplus YNYBJ_EFLOW/ynybj_eflow@10.xxx.xxx.xxx/LDDB
-```
-
-### 本地连接
-
-```bash
-sqlplus / as sysdba
-sqlplus SYSTEM/123456
-```
-
-```sql
-conn SYSTEM/123456
-```
-
-使用 sys 登录，用户名需输入为`sys as sysdba`
-
-```bash
-sqlplus SYS/BF603k7BFchunshu2021 as sysdba;
-```
-
-```sql
-conn SYS/BF603k7BFchunshu2021 as sysdba;
-```
-
-
 
 # 备份
 
