@@ -122,6 +122,40 @@ okHttpClient.newCall(request).enqueue(new Callback() {
 });
 ```
 
+# 文件上传
+
+```java
+OkHttpClient okHttpClient = new OkHttpClient();
+File file = new File(filePath);
+RequestBody requestBody = new MultipartBody.Builder()
+        .setType(MultipartBody.FORM)
+        .addFormDataPart("file", file.getName(),
+                RequestBody.create(MediaType.parse("multipart/form-data"), file))
+        .addFormDataPart("savePath", serverSavePath)
+        .build();
+Request request = new Request.Builder().url(ServerConfig.URL_API_FILE2PDF)
+        .post(requestBody)
+        .addHeader("J-Token", jToken)
+        .build();
+okHttpClient.newCall(request).enqueue(new Callback() {
+    @Override
+    public void onFailure(Call call, IOException e) {
+        Message msg = new Message();
+        msg.what = MSG_FAILED;
+        msg.obj = e;
+        handler.sendMessage(msg);
+    }
+
+    @Override
+    public void onResponse(Call call, Response response) {
+        response.close();
+        Message msg = new Message();
+        msg.what = MSG_SUCCESS;
+        handler.sendMessage(msg);
+    }
+});
+```
+
 # Authorization
 
 > 对应 Postman - Authorization
