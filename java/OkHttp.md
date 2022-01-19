@@ -71,6 +71,57 @@ try (Response response = client.newCall(request1).execute()) {
 }
 ```
 
+# 异步请求
+```java
+OkHttpClient okHttpClient = new OkHttpClient();
+Request request = new Request.Builder().url(url).build();
+okHttpClient.newCall(request).enqueue(new Callback() {
+    @Override
+    public void onFailure(Call call, IOException e) {
+
+    }
+
+    @Override
+    public void onResponse(Call call, Response response) throws IOException {
+        InputStream is = null;
+        byte[] buf = new byte[2048];
+        int len = 0;
+        FileOutputStream fos = null;
+
+        File file = new File(destFilePath);
+        File dir = file.getParentFile();
+        // 储存下载文件的目录
+        if (!dir.exists() && !dir.mkdirs()) {
+            Message msg = new Message();
+            msg.what = MSG_FAILED;
+            msg.obj = new Exception("创建文件目录失败");
+            handler.sendMessage(msg);
+        }
+        try {
+            is = response.body().byteStream();
+            fos = new FileOutputStream(file);
+            while ((len = is.read(buf)) != -1) {
+                fos.write(buf, 0, len);
+            }
+            fos.flush();
+        } catch (Exception e) {
+            
+        } finally {
+            try {
+                if (is != null)
+                    is.close();
+            } catch (IOException e) {
+            }
+            try {
+                if (fos != null)
+                    fos.close();
+            } catch (IOException e) {
+            }
+        }
+    }
+});
+```
+
 # Authorization
 
 > 对应 Postman - Authorization
