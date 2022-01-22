@@ -99,12 +99,14 @@
     }
     
     var lastTime = 0;
+    var lastX = 0;
+    var lastY = 0;
     var countKickA = 0;
       console.log(countKickA)
     window.addEventListener("mousedown", function (e) {
         if(pathContains(e.path, 'a')){
           var nowTime = new Date().getTime();
-          if(nowTime - lastTime <= 1000){
+          if((Math.abs(e.clientX - lastX) <= 2) && (Math.abs(e.clientY - lastY) <= 2) && (nowTime - lastTime <= 200)){
             countKickA = countKickA + 1;
 
             if(countKickA >= 3){
@@ -113,6 +115,8 @@
             }
           }
           lastTime = nowTime;
+          lastX = e.clientX;
+          lastY = e.clientY;
         }
     }, false);
 </script>
