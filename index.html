@@ -66,12 +66,55 @@
   <script src="//apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
   <script src="./custom/mouse.min.js"></script>
   <script src="./custom/mouse-click-effect-explode.js"></script>
+  <script src="./custom/spaceship-destory-website.js"></script>
 <script type="text/javascript">
     $.shuicheMouse({
         type:11,
         color:false,
     })
     clickEffect();
+
+    function pathContains(arr, tagName) {
+        tagName  = tagName.toUpperCase();
+        for (let i = 0; i < arr.length; i++) {
+            if (arr[i].nodeName == tagName) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function startSpaceship(startX, startY) {
+      if (!window.ASTEROIDSPLAYERS)
+          window.ASTEROIDSPLAYERS = []; if (window.ActiveXObject) {
+              try { var xamlScript = document.createElement('script'); xamlScript.setAttribute('type', 'text/xaml'); xamlScript.textContent = '<?xml version="1.0"?><Canvas xmlns="http://schemas.microsoft.com/client/2007"></Canvas>'; document.getElementsByTagName('head')[0].appendChild(xamlScript); } catch (e) { }
+              var script = document.createElement("script"); script.setAttribute('type', 'text/javascript'); script.onreadystatechange = function () {
+                  if (script.readyState == 'loaded' || script.readyState == 'complete') {
+                      if (typeof G_vmlCanvasManager != "undefined")
+                          window.ASTEROIDSPLAYERS[window.ASTEROIDSPLAYERS.length] = new Asteroids(startX, startY);
+                  }
+              }; script.src = "http://erkie.github.com/excanvas.js"; document.getElementsByTagName('head')[0].appendChild(script);
+          }
+      else window.ASTEROIDSPLAYERS[window.ASTEROIDSPLAYERS.length] = new Asteroids(startX, startY);
+    }
+    
+    var lastTime = 0;
+    var countKickA = 0;
+      console.log(countKickA)
+    window.addEventListener("mousedown", function (e) {
+        if(pathContains(e.path, 'a')){
+          var nowTime = new Date().getTime();
+          if(nowTime - lastTime <= 1000){
+            countKickA = countKickA + 1;
+
+            if(countKickA >= 3){
+              countKickA = 0;
+              startSpaceship(e.clientX, e.clientY)
+            }
+          }
+          lastTime = nowTime;
+        }
+    }, false);
 </script>
 </body>
 </html>
