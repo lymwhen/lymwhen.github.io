@@ -272,3 +272,18 @@
 
 - `WARN`及以上的拒绝，否则由后续过滤器决定
 - `IMPORT_INFO`及以上的接收，否则拒绝
+
+# 问题
+
+```
+java.lang.NoClassDefFoundError: org/apache/log4j/xml/DOMConfigurator
+    at org.springframework.util.Log4jConfigurer.initLogging(Log4jConfigurer.java:69)
+```
+
+删除 web.xml 的`Log4jConfigListener `
+
+> i got it!
+>
+> Problem is: org.springframework.web.util.Log4jConfigListener This is deprecated from Spring Framework 4.2.1. Only delete this listener!
+>
+> https://stackoverflow.com/questions/36683852/log4j-error-noclassdeffounderror-org-apache-log4j-xml-domconfigurator
