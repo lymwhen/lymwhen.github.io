@@ -35,7 +35,8 @@ function clickEffect() {
             clearInterval(longPress);
             if (longPressed == true) {
                 document.body.classList.remove("is-longpress");
-                pushBalls(randBetween(50 + Math.ceil(multiplier), 100 + Math.ceil(multiplier)), e.clientX, e.clientY);
+                // pushBalls(randBetween(50 + Math.ceil(multiplier), 100 + Math.ceil(multiplier)), e.clientX, e.clientY);
+                pushBalls(randBetween(10, 20), e.clientX, e.clientY);
                 longPressed = false;
             }
             document.body.classList.remove("is-pressed");
