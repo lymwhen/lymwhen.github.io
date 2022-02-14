@@ -51,6 +51,7 @@
     * [源码修改](js/layui/源码修改.md)
   * [IE-8兼容性](js/IE-8兼容性.md)
   * [zTree](js/zTree.md)
+  * [流媒体播放](js/流媒体播放.md)
 * [Android](Android/Android.md)
   * [常用代码](Android/常用代码.md)
   * [集成第三方NDK(jniLibs)](Android/集成第三方NDK(jniLibs).md)
