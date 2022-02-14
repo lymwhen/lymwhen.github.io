@@ -21,7 +21,7 @@ function clickEffect() {
         window.addEventListener('resize', updateSize, false);
         loop();
         window.addEventListener("mousedown", function (e) {
-            if(pathContains(e.path, 'code')){
+            if(pathContains(e.path, 'pre') || pathContains(e.path, 'code')){
                 return false;
             }
             pushBalls(randBetween(10, 20), e.clientX, e.clientY);
