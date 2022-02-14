@@ -345,7 +345,127 @@ stream {
 }
 ```
 
+# 跨域
 
+https 下前台访问 http 网站接口（跨域），可以使用 nginx 代理，需要解决跨域问题
+
+> [!TIP]
+> 如果该 http 网站支持 https，可以将请求转换为 https 请求，在页面`<head>`中添加：
+>
+> ```html
+> <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"/>
+> ```
+
+```nginx
+
+#user  nobody;
+worker_processes  1;
+
+#error_log  logs/error.log;
+#error_log  logs/error.log  notice;
+#error_log  logs/error.log  info;
+
+#pid        logs/nginx.pid;
+
+
+events {
+    worker_connections  1024;
+}
+
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    #log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+    #                  '$status $body_bytes_sent "$http_referer" '
+    #                  '"$http_user_agent" "$http_x_forwarded_for"';
+
+    #access_log  logs/access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    #keepalive_timeout  0;
+    keepalive_timeout  65;
+
+    #gzip  on;
+
+    server {
+        listen       28481 ssl;
+        # server_name  cs.qjjsxy.com;
+		
+		ssl_certificate     server.crt;
+		ssl_certificate_key server.key;
+		ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
+		ssl_ciphers         HIGH:!aNULL:!MD5:!DH;
+		ssl_prefer_server_ciphers on;
+		
+		proxy_connect_timeout 300;
+		proxy_send_timeout 300;
+		proxy_read_timeout 300;
+		send_timeout 300;
+		uwsgi_read_timeout 300;
+
+        #charset koi8-r;
+
+        #access_log  logs/host.access.log  main;
+		
+		location /access/ {
+            proxy_pass http://access.homed.me/;
+		
+			if ($request_method = OPTIONS) {
+				add_header 'Access-Control-Allow-Origin' *;
+				add_header 'Access-Control-Allow-Headers' *;
+				add_header 'Access-Control-Allow-Credentials' 'true';
+				add_header 'Access-Control-Allow-Methods' *;
+				return 204;
+			}
+        }
+		
+		location /slave/ {
+            proxy_pass http://slave.homed.me/;
+		
+			if ($request_method = OPTIONS) {
+				add_header 'Access-Control-Allow-Origin' *;
+				add_header 'Access-Control-Allow-Headers' *;
+				add_header 'Access-Control-Allow-Credentials' 'true';
+				add_header 'Access-Control-Allow-Methods' *;
+				return 204;
+			}
+        }
+		
+		location /poster/ {
+            proxy_pass http://slave.homed.me:13160/;
+        }
+
+        location /httpdvb/ {
+            proxy_pass http://httpdvb.slave.homed.me:13164;
+            types {
+				application/vnd.apple.mpegurl m3u8;
+				video/mp2t ts;
+			}
+
+			add_header Cache-Control no-cache;
+			client_max_body_size 50m; #允许客户端请求的最大单文件字节数
+			client_body_buffer_size 1m;#缓冲区代理缓冲用户端请求的最大字节数，
+			proxy_buffer_size 256k;#设置代理服务器（nginx）保存用户头信息的缓冲区大小
+			proxy_buffers 4 256k;  #proxy_buffers缓冲区，网页平均在256k下，这样设置
+			proxy_busy_buffers_size 256k; #高负荷下缓冲大小（proxy_buffers*2）
+			proxy_temp_file_write_size 256k;  #设定缓存文件夹大小
+			proxy_next_upstream error timeout invalid_header http_500 http_503 http_404;
+			proxy_max_temp_file_size 128m;
+        }
+    }
+}
+```
+
+使用场景为https代理支持跨域的网站，aka https请求前会发送`OPTION`请求，关键在于 nginx 给`OPTION`请求添加允许跨域请求头
+
+不可所有请求都添加，因为被代理的网站会给请求添加允许跨域请求头，重复添加会报`The 'Access-Control-Allow-Origin' header contains multiple values '*, *', but only one is allowed`
+
+> [!NOTE]
+> `server`下`if`里不可以写`add_header`，在`location`下可以
 
 # 默认配置文件
 
