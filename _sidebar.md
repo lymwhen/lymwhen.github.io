@@ -45,6 +45,8 @@
   * [OkHttp](java/OkHttp.md)
   * [fastjson](java/fastjson.md)
 * [js](js/README.md)
+  * [语法](js/语法/语法.md)
+    * [Promise](js/语法/Promise.md)
   * [js封装](js/js封装.md)
   * [jQuery](js/jQuery.md)
   * [layui](js/layui/layui.md)
