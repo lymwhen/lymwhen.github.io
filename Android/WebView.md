@@ -37,6 +37,14 @@ if (Build.VERSION.SDK_INT >= 21) {
     CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true);
 }
 
+// 开启localStorage
+x5WebView.getSettings().setDomStorageEnabled(true);
+x5WebView.getSettings().setAppCacheMaxSize(1024*1024*8);
+String appCachePath = getApplicationContext().getCacheDir().getAbsolutePath();
+x5WebView.getSettings().setAppCachePath(appCachePath);
+x5WebView.getSettings().setAllowFileAccess(true);
+x5WebView.getSettings().setAppCacheEnabled(true);
+
 // 默认背景，对于底色不是白色的页面可以设置
 // webView.setBackgroundColor(Color.argb(1, 0, 0, 0));
 
@@ -277,3 +285,72 @@ webView.setWebViewClient(new WebViewClient() {
 });
 ```
 
+# 显示加载进度
+
+```xml
+<ProgressBar
+    android:id="@+id/pb"
+    style="?android:attr/progressBarStyleHorizontal"
+    android:progressDrawable="@drawable/progressbar"
+    android:layout_width="match_parent"
+    android:layout_height="3dp"
+    android:background="@color/colorGray"
+    android:visibility="gone"/>
+```
+
+drawable/progressbar.xml
+
+```xml
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item android:id="@android:id/background">
+        <shape>
+            <corners android:radius="0dp" />
+            <gradient
+                android:angle="270"
+                android:centerColor="#FFFFFF"
+                android:endColor="#FFFFFF"
+                android:startColor="#FFFFFF" />
+        </shape>
+    </item>
+    <item android:id="@android:id/progress">
+        <clip>
+            <shape>
+                <corners android:radius="0dp" />
+                <gradient
+                    android:centerColor="#2f66d2"
+                    android:endColor="#144ebd"
+                    android:startColor="#4b93ff" />
+            </shape>
+        </clip>
+    </item>
+</layer-list>
+```
+
+在 WebView的`WebChromeClient.onProgressChanged`中根据进度值`newProgress`处理
+
+```java
+webview.setWebChromeClient(new WebChromeClient() {
+
+    @Override
+    public void onProgressChanged(WebView view, int newProgress) {
+        // TODO 自动生成的方法存根
+
+        if (newProgress == 100) {
+            progressBar.setVisibility(View.GONE);//加载完网页进度条消失
+        } else {
+            progressBar.setVisibility(View.VISIBLE);//开始加载网页时显示进度条
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                progressBar.setProgress(newProgress, true);//设置进度值
+            }else{
+                progressBar.setProgress(newProgress);//设置进度值
+            }
+        }
+    }
+}
+```
+
+# 疑难问题
+
+##### logcat: Uncaught TypeError: Cannot read property 'getItem' of null
+
+很有可能是没有开启`localStorage`，因为`setItem`和`getItem`是它的常用方法
