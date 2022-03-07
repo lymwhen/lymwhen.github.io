@@ -38,6 +38,8 @@ nginx -t
 ```
 
 > [Nginx的启动、停止与重启 - codingcloud - 博客园 (cnblogs.com)](https://www.cnblogs.com/codingcloud/p/5095066.html)
+>
+> [nginx Command-line parameters](http://nginx.org/en/docs/switches.html)
 
 # 请求转发
 
