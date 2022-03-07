@@ -78,3 +78,15 @@ gradlew processDebugManifest --stacktrace -info -scan -debug
 Element uses-feature#android.hardware.camera.autofocus at AndroidManifest.xml:42:5-44:36 duplicated with el
 ```
 AndroidManifest.xml 中`android.hardware.camera.autofocus`权限重复
+
+### 打包报 Cannot find a version of ‘com.android.support:support-annotations‘ ... 'com.android.support:support-annotations:28.0.0'
+
+app build.gradle 中在`android`中加入：
+```gradle
+lintOptions {
+    checkReleaseBuilds false
+    abortOnError false
+}
+```
+
+> [Cannot find a version of ‘com.android.support:support-annotations‘ that...](https://blog.csdn.net/weixin_54615356/article/details/112858578)
