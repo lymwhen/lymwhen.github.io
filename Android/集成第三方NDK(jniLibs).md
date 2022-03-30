@@ -43,3 +43,10 @@ sourceSets {
 
 > [Android关于libs，jniLibs库的基本使用说明及冲突解决_wapchief的博客-CSDN博客_jnilibs](https://blog.csdn.net/wapchief/article/details/78229097)
 
+# 异常问题
+
+刷卡调用 SerialPort 的 native 方法闪退（No implementation found for java.io.FileDescriptor）
+
+`android_serialport_api` 包名需要与 demo 一致
+
+> [No implementation found for java.io.FileDescriptor](https://blog.csdn.net/weixin_38252138/article/details/106465850)
