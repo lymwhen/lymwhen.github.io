@@ -90,3 +90,26 @@ lintOptions {
 ```
 
 > [Cannot find a version of ‘com.android.support:support-annotations‘ that...](https://blog.csdn.net/weixin_54615356/article/details/112858578)
+
+### 修改包名后 adb 运行报 Error: Activity class {com.xxxx.jdspad/com.xxxx.mtxxclasscard.SplashActivity} does not exist.
+
+删除 module build.gradle 中 `android.defaultConfig.applicationId`，不行再删除app下的`build`文件夹
+
+### /lib/arm/libVoAACEncoder.so" has text relocations
+
+/lib/arm/libVoAACEncoder.so" has text relocations 
+(https://android.googlesource.com/platform/bionic/+/master/android-changes-for-ndk-developers.md#Text-Relocations-Enforced-for-API-level-23)
+
+so动态链接库的代码并非PIC（Position independent code）
+
+将应用 API level 改为22
+
+> [lib/arm/libVoAACEncoder.so has text relocations问题的解决方案](https://blog.csdn.net/yf1252555020/article/details/83616494)
+
+代码按照报错的信息处理，如：
+
+- `findViewById`强制类型转换
+- 安装apk文件方式
+- 无需申请权限
+- implementation 'com.android.support:appcompat-v7:26.1.0' 版本改为 `22+`
+- 删除一些控件不支持的属性，如`roundIcon`
