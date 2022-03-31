@@ -177,6 +177,10 @@ ps aux|grep mysqld
 
 配置文件存在错误
 
+##### Windows 下修改 basedir 启动报错
+
+新的数据文件夹安全选项卡下需要添加`NETWORK-SERVICE`用户/组，勾选完全控制
+
 # 配置文件
 
 ### my.cnf
