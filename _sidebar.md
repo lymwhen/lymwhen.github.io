@@ -18,6 +18,7 @@
     * [集成Quartz](Spring_MVC/集成Quartz.md)
     * [跨域](Spring_MVC/跨域.md)
     * [升级log4j2](Spring_MVC/升级log4j2.md)
+    * [防止点击劫持](Spring_MVC/防止点击劫持.md)
   * [Spring_Boot](Spring_Boot/Spring_Boot.md)
     * [拦截器](Spring_Boot/拦截器.md)
     * [集成Druid](Spring_Boot/集成Druid.md)
