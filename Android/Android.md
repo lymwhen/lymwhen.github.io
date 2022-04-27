@@ -42,6 +42,21 @@ public void onPause() {
 > [!NOTE]
 > 亮度设置为 -1 表示恢复系统亮度
 
+### 剪切板
+
+##### 复制到剪切板
+
+```java
+//获取剪贴板管理器：
+ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+// 创建普通字符型ClipData
+ClipData mClipData = ClipData.newPlainText("Label", "这里是要复制的文字");
+// 将ClipData内容放到系统剪贴板里。
+cm.setPrimaryClip(mClipData);
+```
+
+> [Android----复制到剪切板 - 简书 (jianshu.com)](https://www.jianshu.com/p/1e84d33154bd)
+
 # 调试
 
 ### ADB 网络调试
@@ -62,6 +77,53 @@ adb disconnect 192.168.3.62
 
 > [!TIP]
 > 默认网络调试端口：5555
+
+# ADB 命令
+
+```bash
+# adb设备列表
+adb devices
+# 进入shell
+adb shell
+```
+
+### shell 命令
+
+```bash
+# root
+su
+# 所有应用列表
+pm list package
+# 停用应用
+pm disable-user com.edu.xxx
+# 启用应用
+pm enable com.edu.xxx
+
+# 启动activity
+am start com.xxx.xxxx/.SplashActivity
+# 查看前台activity
+dumpsys activity | grep -i run
+```
+
+> [!TIP]
+>
+> shell 命令也可以在不进入 shell 时使用`adb shell pm list package`执行
+
+> [!NOTE]
+>
+> shell 执行禁用等命令时报错：`Error:java.lang.SecurityException:PermissionDenial:attempttochangecomponentstatefrompid=10941,uid=2000,packageuid=10040`，说明权限不足，需要 root 权限
+
+> [adb查看手机中已安装的应用列表_夜瑾漠的博客-CSDN博客](https://blog.csdn.net/weixin_38515203/article/details/90718733)
+>
+> [Android通过adb shell命令查看当前与用户交互的前台Activity_IT先森的博客-CSDN博客_adb命令查看当前activity](https://blog.csdn.net/tkwxty/article/details/108484512)
+>
+> [ADB - 无需root禁用系统APP+关闭系统应用广告 - Citrusliu - 博客园 (cnblogs.com)](https://www.cnblogs.com/citrus/p/12961113.html)
+>
+> [adb指令禁用软件_Android免root禁用系统应用（adb停用安卓系统应用）_Lo-FiGames的博客-CSDN博客](https://blog.csdn.net/weixin_28936835/article/details/111923940)
+>
+> [Android adb启动任意app的几种方式_Ang_qq_252390816的博客-CSDN博客_adb打开app](https://blog.csdn.net/ezconn/article/details/99885715)
+>
+> [adb 命令大全（简洁明了）adb命令启动应用_ihoudf的博客-CSDN博客_adb启动应用](https://blog.csdn.net/HDFQQ188816190/article/details/98599940)
 
 # 报错
 
