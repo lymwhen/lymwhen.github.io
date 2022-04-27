@@ -220,6 +220,8 @@ emoji shortcode: :dog:
 >
 > 也有 plainTeX 风格的 \$\$ ... \$\$ 来插入不编号的行间公式。但是在 LaTeX 中这样做会改变行文的默认行间距，不推荐。请参考我的回答。
 >
+> [Markdown/LaTeX数学符号、公式大全（一）](https://blog.csdn.net/weixin_43159148/article/details/88621318)
+>
 > [一份其实很短的 LaTeX 入门文档](https://liam.page/2014/09/08/latex-introduction/)
 >
 > [Latex常见符号对照表](https://blog.csdn.net/zgj926503/article/details/52757631)
@@ -264,7 +266,7 @@ $$
 平均数符号：$\overline{xyz}$    
 开二次方符号：$\sqrt x$       
 开方符号：$\sqrt[3]{x+y}$   
-对数符号：$\log(x)$  
+对数符号：$\log(x) + log_2 10 + ln 7$  
 极限符号：$\lim^{x \to \infty}_{y \to 0}{\frac{x}{y}}$  
 极限符号：$\displaystyle \lim^{x \to \infty}_{y \to 0}{\frac{x}{y}}$  
 求和符号：$\sum^{x \to \infty}_{y \to 0}{\frac{x}{y}}$  
@@ -279,7 +281,7 @@ $$
 平均数符号：$\overline{xyz}$    
 开二次方符号：$\sqrt x$       
 开方符号：$\sqrt[3]{x+y}$   
-对数符号：$\log(x)$  
+对数符号：$\log(x) + log_2 10 + ln 7$ 
 极限符号：$\lim^{x \to \infty}_{y \to 0}{\frac{x}{y}}$  
 极限符号：$\displaystyle \lim^{x \to \infty}_{y \to 0}{\frac{x}{y}}$  
 求和符号：$\sum^{x \to \infty}_{y \to 0}{\frac{x}{y}}$  
