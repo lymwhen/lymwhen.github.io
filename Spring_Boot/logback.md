@@ -53,7 +53,7 @@ logback-spring.xml
         </encoder>
     </appender>
     <!--输出到文件-->
-    <!-- <appender name="DEBUG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <appender name="DEBUG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50}:%line - %msg%n</pattern>
             <charset>UTF-8</charset>
@@ -70,7 +70,7 @@ logback-spring.xml
             <onMatch>ACCEPT</onMatch>
             <onMismatch>DENY</onMismatch>
         </filter>
-    </appender> -->
+    </appender>
     <!-- 时间滚动输出 level为 INFO 日志 -->
     <appender name="INFO_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!-- 正在记录的日志文件的路径及文件名，设置此值之后，rollingPolicy.fileNamePattern中设置的路径将无效 -->
@@ -150,15 +150,15 @@ logback-spring.xml
     <!--开发环境-->
     <springProfile name="dev">
         <!--可以输出项目中的debug日志，包括mybatis的sql日志-->
-        <logger name="com.chunshu.ydxy.mapper" level="DEBUG" />
+        <!-- <logger name="com.chunshu.signup.mapper" level="DEBUG" /> -->
         <!--
           root节点是必选节点，用来指定最基础的日志输出级别，只有一个level属性
           level:用来设置打印级别，大小写无关：TRACE, DEBUG, INFO, WARN, ERROR, ALL 和 OFF，默认是DEBUG
           可以包含零个或多个appender元素。
         -->
-        <root level="INFO">
+        <root level="DEBUG">
             <appender-ref ref="CONSOLE" />
-            <!-- <appender-ref ref="DEBUG_FILE" /> -->
+             <appender-ref ref="DEBUG_FILE" />
             <appender-ref ref="INFO_FILE" />
             <appender-ref ref="WARN_FILE" />
             <appender-ref ref="ERROR_FILE" />
@@ -166,9 +166,9 @@ logback-spring.xml
     </springProfile>
     <!--生产环境-->
     <springProfile name="pro">
-        <root level="INFO">
+        <root level="DEBUG">
             <appender-ref ref="CONSOLE" />
-            <!-- <appender-ref ref="DEBUG_FILE" /> -->
+            <appender-ref ref="DEBUG_FILE" />
             <appender-ref ref="INFO_FILE" />
             <appender-ref ref="WARN_FILE" />
             <appender-ref ref="ERROR_FILE" />
@@ -176,6 +176,29 @@ logback-spring.xml
     </springProfile>
 </configuration>
 ```
+
+> [!TIP]
+>
+> root 节点日志级别为 DEBUG，控制台日志级别为 INFO，即可实现保存 DEBUG 级别日志，但控制台打印 INFO 级别日志
+
+### 日志存放位置
+
+`log.path`属性可配置日志存放位置，支持绝对路径和相对路径
+
+```
+<property name="log.path" value="D:/logs" />
+```
+
+经测试，war + tomcat 部署时，linux 下当前路径为`tomcat`目录，windows 下当前目录为`tomcat/bin`目录。如需将配置文件保存在`tomcat/logs`，应使用配置：
+
+```xml
+<!--linux-->
+<property name="log.path" value="logs" />
+<!--windows-->
+<property name="log.path" value="../logs" />
+```
+
+
 
 # 区分开发与生产环境
 
@@ -500,3 +523,33 @@ public class FreemarkerConfig {
 ```
 
 > Logger.selectLoggerLibrary 方法已经过时，等待 freemarker 升级了
+
+### WAR 方式部署到 tomcat 日志不打印
+
+```java
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+public class ServletInitializer extends SpringBootServletInitializer {
+	@Override
+	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+		return application.sources(AdsbAcquireApplication.class);
+	}
+}
+```
+
+有博客说要添加 pom.xml，实测不需要
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-tomcat</artifactId>
+    <scope>provided</scope>
+</dependency>
+
+<dependency>
+    <groupId>javax.servlet.jsp</groupId>
+    <artifactId>javax.servlet.jsp-api</artifactId>
+    <version>2.3.3</version>
+</dependency>
+```
+
