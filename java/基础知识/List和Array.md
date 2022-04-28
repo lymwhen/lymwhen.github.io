@@ -54,3 +54,4 @@ Integer[] arr = new ArrayList<Integer>(){{
 }}.toArray(new Integer[0]);
 ```
 
+> [java中List和Array相互转换 - 古兰精 - 博客园 (cnblogs.com)](https://www.cnblogs.com/goloving/p/7740100.html)

@@ -553,3 +553,4 @@ public class ServletInitializer extends SpringBootServletInitializer {
 </dependency>
 ```
 
+> [三分钟把spring boot打成war包部署到tomcat中 - 掘金 (juejin.cn)](https://juejin.cn/post/6844903839477301261)
