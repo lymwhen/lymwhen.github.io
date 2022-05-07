@@ -42,6 +42,14 @@ ffmpeg -i "rtmp://xxxxxx" -c:a copy -c:v copy D:\1.mp4
 
 > [【编码推流】ffmpeg将直播转码保存到本地_jn10010537的博客-CSDN博客](https://blog.csdn.net/jn10010537/article/details/124079739)
 
+# 使用视频文件推流
+
+```bash
+ffmpeg -re -i "C:\Users\20200513170000_20200513172728~1.mp4" -c copy -f flv -y rtmp://192.168.3.180/live/live1
+```
+
+
+
 # 其他
 
 ### FFmpeg推流中断问题解决
