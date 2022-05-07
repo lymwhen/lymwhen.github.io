@@ -278,3 +278,15 @@ gsettings set org.gnome.desktop.interface enable-animations false
 gsettings set org.gnome.desktop.interface enable-animations true
 ```
 
+# 防火墙
+
+```bash
+# 开启防火墙
+ufw enable
+# 关闭防火墙
+ufw disable
+# 查看防火墙运行状态
+ufw status
+```
+
+> [开启或关闭Linux实例中的系统防火墙 (aliyun.com)](https://help.aliyun.com/document_detail/175507.html)
