@@ -116,14 +116,15 @@ openssl rsa -in server.pass.key -out server.key
 # -key 私钥文件
 # -out 生成的CSR文件
 # -subj 生成CSR证书的参数
-openssl req -new -key G:/openssl_key/server.key -out G:/openssl_key/chunshu_server.csr -subj "/C=CN/ST=Yunnan/L=Kunming/O=chunshu/OU=chunshu/CN=www.chunshuinfo.com"
+# "/C=CN/ST=Yunnan/L=Kunming/O=chunshu/OU=chunshu/CN=www.example.com"
+openssl req -new -key server.key -out server.csr -subj "/C=CN/ST=Yunnan/L=Kunming/O=chunshu/OU=chunshu/CN=10.0.3.8"
 
 # 生成自签名SSL证书
 # -days 证书有效期
-openssl x509 -req -days 3650 -in G:/openssl_key/chunshu_server.csr -signkey G:/openssl_key/server.key -out G:/openssl_key/chunshu_server.crt
+openssl x509 -req -days 3650 -in server.csr -signkey server.key -out server.crt
 
 # 生成服务端p12格式根证书
-openssl pkcs12 -export -clcerts -in G:/openssl_key/chunshu_server.crt -inkey G:/openssl_key/server.key -out G:/openssl_key/chunshu_server.p12
+openssl pkcs12 -export -clcerts -in server.crt -inkey server.key -out server.p12
 ```
 
 > 字段	字段含义	示例
