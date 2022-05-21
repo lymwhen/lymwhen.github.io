@@ -1,6 +1,8 @@
 # Markdown
 
 > [慕课教程 - Markdown 简介](https://www.imooc.com/wiki/markdownlesson/markdownoverview.html)
+>
+> [Markdown Reference - Typora Support](https://support.typora.io/Markdown-Reference/)
 
 # 一级标题
 ```
@@ -137,6 +139,11 @@ public static void main(String[] args) {
 ```
 [网页](https://github.com)
 ```
+
+引用本工程其他文档
+参看[Linux/安装Redis](Linux/安装Redis)
+引用当前文档
+参看[一级标题](#一级标题)
 
 ---
 
