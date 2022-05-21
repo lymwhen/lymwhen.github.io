@@ -1,6 +1,8 @@
 # docsify
 
 > [docsify](https://docsify.js.org/#/)
+>
+> [Quick start (docsify.js.org)](https://docsify.js.org/#/quickstart)
 
 # 代码高亮
 
