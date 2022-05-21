@@ -1,6 +1,8 @@
 # ffmpeg
 
 > [FFmpeg](http://ffmpeg.org/)
+>
+> [ffmpeg Documentation](https://ffmpeg.org/ffmpeg-all.html)
 
 # 转换格式
 
@@ -22,7 +24,7 @@ ffmpeg -i C:\Users\lymly\Desktop\22-04-08-15-21-21_x264.mp4 -profile:v main -lev
 
 > [FFmpeg基础知识之————H264编码profile & level控制 - DoubleLi - 博客园 (cnblogs.com)](https://www.cnblogs.com/lidabo/p/7419393.html)
 
-> 
+> [!NOTE]
 >
 > 解决苹果上 h264 无法播放的问题
 >
@@ -45,7 +47,32 @@ ffmpeg -i "rtmp://xxxxxx" -c:a copy -c:v copy D:\1.mp4
 # 使用视频文件推流
 
 ```bash
+# mp4转rtsp（推到达尔文）
+ffmpeg -re -i kdxf.mp4 -rtsp_transport udp -vcodec h264 -f rtsp rtsp://localhost/test
+ffmpeg -re -i kdxf.mp4 -s 800*600 -rtsp_transport udp -vcodec h264 -f rtsp rtsp://localhost/test
 ffmpeg -re -i "C:\Users\20200513170000_20200513172728~1.mp4" -c copy -f flv -y rtmp://192.168.3.180/live/live1
+
+# tcp/udp
+ffmpeg -re -i C:\Users\Administrator\Videos\test.mkv -rtsp_transport tcp -vcodec h264 -f rtsp rtsp://localhost/test
+ffmpeg -re -i C:\Users\Administrator\Videos\test.mkv -rtsp_transport udp -vcodec h264 -f rtsp rtsp://localhost/test
+
+# rtsp转hls
+ffmpeg -i "rtsp://localhost/test" -c copy -f hls -hls_time 2.0 -hls_list_size 1 15 C:\Users\LYML\Desktop\nginx-rtmp-win32\temp\hls\test.m3u8
+ffmpeg -rtsp_transport tcp -i rtsp://localhost/test -codec:v libx264 -map 0 -f hls -hls_list_size 6 -hls_time 10 C:\Users\LYML\Desktop\nginx-rtmp-win32\temp\hls\test.m3u8
+ffmpeg -rtsp_transport udp -i rtsp://localhost/test -codec:v libx264 -map 0 -s 600x400 -f hls -hls_list_size 6 -hls_time 10 C:\Users\LYML\Desktop\nginx-rtmp-win32\temp\hls\test.m3u8
+
+# 拉转推，rtsp转rtmp（nginx）
+ffmpeg  -re -i "rtsp://localhost/test" -vcodec libx264 -vprofile baseline -acodec libmp3lame -ar 44100 -ac 1 -f flv rtmp://127.0.0.1:1935/hls/http8
+
+# 循环推流
+ffmpeg -re -stream_loop -1 -i kdxf.mp4 -c copy -f rtsp rtsp://localhost:8554/mystream
+```
+
+# ffplay
+
+```bash
+ffplay -rtsp_transport tcp rtsp://localhost/test
+ffplay rtsp://localhost/test
 ```
 
 
