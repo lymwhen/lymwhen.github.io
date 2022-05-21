@@ -47,5 +47,7 @@ OK
 OK
 127.0.0.1:6379> ttl test2
 (integer) 58
+# 清空
+flushall
 ```
 
