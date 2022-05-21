@@ -22,6 +22,9 @@ GATEWAY="19.37.33.1" # 网关地址
 DNS1="192.168.241.2"
 DNS2="192.168.241.1"
 ONBOOT="yes" # 开机启动
+
+# 重启网络服务
+systemctl restart network
 ```
 
 > 貌似可以不用引号
