@@ -99,3 +99,19 @@ echo %date:~0,4%-%date:~5,2%-%date:~8,2% %time:~0,2%:%time:~3,2%:%time:~6,2%
 # 远程桌面无法复制粘贴
 
 结束进程`rdpclip`，`win`+`r`运行`rdpclip`
+
+# 文件夹权限
+
+复制文件进去提示需要管理员权限、winrar 解压到时无法创建文件夹
+
+右键 - 属性 - 安全 - 高级
+
+所有者选择`Users`，权限条目仅保留：
+
+- `SYSTEM`/完全控制
+- `Administrators`/完全控制
+- `Authenticated Users`/修改
+- `Users`/读取和执行
+
+均继承于`无`，应用于`此文件夹、子文件夹和文件`
+
