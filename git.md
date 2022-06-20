@@ -60,6 +60,9 @@ git status
 git remote add origin git@github.com:haiyiya/ddd.git
 # 删除远程地址
 git remote remove origin
+
+# 添加safe文件夹
+git config --global --add safe.directory D:/projects/jds_web/nzxxx_jwt
 ```
 
 # 使用旧项目创建新项目保留提交记录
