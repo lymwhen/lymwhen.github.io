@@ -115,3 +115,15 @@ echo %date:~0,4%-%date:~5,2%-%date:~8,2% %time:~0,2%:%time:~3,2%:%time:~6,2%
 
 均继承于`无`，应用于`此文件夹、子文件夹和文件`
 
+# PowerShell：因为在此系统上禁止运行脚本
+
+管理员运行 powershell
+
+```
+# 查询
+get-executionpolicy
+# 设置为remotesigned
+set-executionpolicy remotesigned
+```
+
+> [PowerShell：因为在此系统上禁止运行脚本，解决方法 - 简书 (jianshu.com)](https://www.jianshu.com/p/4eaad2163567)
