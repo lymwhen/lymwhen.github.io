@@ -103,6 +103,11 @@ pm enable com.edu.xxx
 am start com.xxx.xxxx/.SplashActivity
 # 查看前台activity
 dumpsys activity | grep -i run
+# 导出apk
+platform-tools>adb shell pm path net.ossrs.flutter_live_example
+package:/data/app/~~hPzRSKuT3wQJdF-_OdNwng==/net.ossrs.flutter_live_example-29dYs9vez7LfOG2uGvHNig==/base.apk
+platform-tools>adb pull /data/app/~~hPzRSKuT3wQJdF-_OdNwng==/net.ossrs.flutter_live_example-29dYs9vez7LfOG2uGvHNig==/base.apk C:\Users\lymly\
+/data/app/~~hPzRSKuT3wQJdF-_OdNwng==/net.ossrs.flutter_liv...le pulled, 0 skipped. 36.5 MB/s (44790407 bytes in 1.170s)
 ```
 
 > [!TIP]
