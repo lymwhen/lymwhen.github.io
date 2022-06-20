@@ -28,3 +28,25 @@ systemctl restart network
 ```
 
 > 貌似可以不用引号
+
+# 系统信息
+
+```bash
+[root@192.168.1.1 ~]# cat /proc/version 
+Linux version 2.6.32-279.el6.x86_64 (mockbuild@c6b9.bsys.dev.centos.org) (gcc version 4.4.6 20120305 (Red Hat 4.4.6-4) (GCC) ) #1 SMP Fri Jun 22 12:19:21 UTC 2012
+[root@192.168.1.1 ~]# uname -a
+Linux LAMP1.1 2.6.32-279.el6.x86_64 #1 SMP Fri Jun 22 12:19:21 UTC 2012 x86_64 x86_64 x86_64 GNU/Linux
+[root@192.168.1.1 ~]# uname -r
+2.6.32-279.el6.x86_64
+[root@192.168.1.1 ~]#
+[root@192.168.1.1 ~]# cat /etc/issue
+CentOS release 6.3 (Final)
+Kernel \r on an \m
+[root@192.168.1.1 ~]# cat /etc/redhat-release 
+CentOS release 6.3 (Final)
+[root@192.168.1.1 ~]# getconf LONG_BIT
+64
+[root@192.168.1.1 ~]# file /bin/ls
+/bin/ls: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 2.6.18, stripped
+```
+
