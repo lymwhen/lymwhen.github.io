@@ -18,7 +18,18 @@
 
 所以官方提示 **Socket.IO 不是一个 WebSocket 的实现**
 
+> [!NOTE]
+>
+> 使用 socket.io 连接时如果报错：
+>
+> ```log
+> socket io Expected HTTP 101 response but was '200 OK'
+> ```
+>
+> 很有可能是服务端使用的 websocket，而不是 socket.io
+
 > [!INFO]
 > WebSocket is a communication protocol which provides a full-duplex and low-latency channel between the server and the browser. More information can be found here.
 >
 > WebSocket 是一个在服务器和浏览器之间提供全双工、低延迟通道的通信协议
+
