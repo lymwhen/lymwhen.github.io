@@ -51,6 +51,32 @@ yum install -y mysql mysql-server mysql-devel
 chkconfig mysqld on
 ```
 
+**CentOS 7**
+
+```bash
+# 查询是否安装mariadb
+rpm -qa | grep mariadb
+# 安装mysql（不加参数vh不会自动添加系统服务）
+rpm -ivh MySQL-server-5.1.73-1.glibc23.x86_64.rpm
+# 查询mysql状态
+service mysql status
+# 开机启动
+systemctl enable mysql
+
+# 查询mysql
+# rpm -qa | grep MySQL
+MySQL-server-5.1.73-1.glibc23.x86_64
+# 卸载，e：卸载，nodeps：不校验依赖关系
+rpm -e --nodeps MySQL-server-5.1.73-1.glibc23.x86_64
+# 查找mysql目录一并删除
+find / -name mysql
+rm -rf xx
+```
+
+> 在 MySQL 官网[MySQL :: Download MySQL Community Server (Archived Versions)](https://downloads.mysql.com/archives/community/) 下载 5.1.73 版本的 MySQL**Linux - Generic (glibc 2.3) (x86, 64-bit), RPM Package MySQL Server**
+
+> [基础篇六 CentOS7.9安装MySQL5.1.47_山百草的博客-CSDN博客_centos7安装mysql5.1](https://blog.csdn.net/qq_41562136/article/details/125033895)
+
 # 上传服务端文件并解压
 
 ```bash
@@ -71,6 +97,17 @@ chown -R mysql.mysql /var/lib/mysql/
 # service mysqld restart
 service mysqld start
 ```
+
+**CentOS 7**
+
+通过上述方式安装的mysql启动方式为：
+
+```
+# service mysql restart
+service mysql start
+```
+
+
 
 # 编译 GeoIP
 
@@ -181,6 +218,14 @@ rm -rf /home/dxf/channel/log/*.*
 ./df_channel_r channel start &
 ```
 
+**CentOS 7**
+
+需要安装 psmisc 以支持 stop 脚本中的`killall`命令
+
+```bash
+yum -y install psmisc
+```
+
 
 
 # 启动服务器
@@ -287,11 +332,59 @@ service mysqld start
 
 如果要重新恢复数据库，重置 mysql 数据库 - 恢复数据
 
+**CentOS 7**
+
+上述的`删除mysql数据文件夹`再`启动mysql`的重置mysql数据库的方式在CentOS 7中报错
+
+```
+ERROR! Manager of pid-file quit without updating file
+```
+
+遇到这个错误，就卸载mysql，搜索删除mysql相关文件/文件夹，再重新安装即可覆盖，重新启动。
+
 ### 将虚拟机中服务端部署到云服务器
 
 理论上仅需使用 Server.tar.gz 全新部署，部署 pvf、等级补丁、root下脚本即可
 
 也可尝试全新部署之后，替换 /home/dxf/game、mysql 数据夹、root下脚本
+
+---
+
+最新测试
+
+在服务端依赖安装完毕，部署 Server.tar.gz 之后
+
+```bash
+# 虚拟机，打包之后拷贝到云服务器
+# 打包/home/dxf/game
+tar -zcvf /game.tar.gz /home/dxf/game
+# 打包/var/lib/mysql
+tar -zcvf /mysql.tar.gz /var/lib/mysql
+# 打包/root（启动/停止脚本）
+tar -zcvf /root.tar.gz /root
+
+# 云服务器
+# 授权
+chmod -R 777 /home/dxf/game
+# 删除/home/dxf/game
+rm -rf /home/dxf/game
+# 删除/root下文件
+rm -rf /root/*
+# 重置mysql目录，注意此处不是删除
+# CentOS 6
+rm -rf /var/lib/mysql
+service mysqld restart
+# CentOS 7 卸载、搜索删除全部的mysql目录，重新安装
+# 解压覆盖
+tar -zxvf game.tar.gz
+tar -zxvf mysql.tar.gz
+tar -zxvf root.tar.gz
+# 启动mysql，修改ip
+service mysql start
+# 替换/home/dxf下的ip
+```
+
+
 
 ### 数据库信息
 
@@ -332,9 +425,15 @@ systemctl enable firewalld.service
 
 # 疑难问题
 
+> ![TIP]
+>
+> 长时间没有启动起来要注意翻看启动日志，看是否有ip错误，是否有报`Fail`
+
 ### connection faild port = 20203
 
 加大虚拟内存，然后先不管它，后面就没有了
+
+数据库`d_taiwan.db_connect`表中的ip没有改，导致前面一直没有初始化好，所以一直连不上 
 
 ### 单机模式 此主机支持 Intel VT-x，但 Intel VT-x 处于禁用状态
 
@@ -368,6 +467,8 @@ systemctl enable firewalld.service
 ### 报错 Init GlobalData Fail
 
 /root 下脚本没有拷贝
+
+服务端拷贝不全，尝试整个替换/home/dxf/game
 
 ### mysql 报错：ERROR 2002 (HY000): Can't connect to local MySQL server through socket '/var/lib/mysql/mysql.sock' (2)
 
