@@ -1,5 +1,21 @@
 # CentOS
 
+# 配置阿里云源
+
+```bash
+yum -y install wget
+# 下载Centos-7.repo文件
+wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+# 清除yum缓存
+yum clean all
+# 缓存阿里云源
+yum makecache
+# 测试阿里云源 
+yum list
+```
+
+> [CentOS7配置阿里云镜像源（超详细过程）_KingveyLee的博客-CSDN博客_centos设置阿里云镜像源](https://blog.csdn.net/KingveyLee/article/details/114984534)
+
 # 物理机安装
 
 ### 选择`install CentOS`安装报错
@@ -48,5 +64,17 @@ CentOS release 6.3 (Final)
 64
 [root@192.168.1.1 ~]# file /bin/ls
 /bin/ls: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 2.6.18, stripped
+```
+
+# 脚本
+
+```bash
+vim start.sh
+
+#!/bin/bash
+echo 'start...'
+
+chmod 777 start.sh
+./start.sh
 ```
 
