@@ -65,6 +65,24 @@ git remote remove origin
 git config --global --add safe.directory D:/projects/jds_web/nzxxx_jwt
 ```
 
+# 大小写不敏感问题
+
+git 默认大小写不敏感，修改文件名大小写提交的办法
+
+```bash
+# 重命名：Index.html -> 1Index.html
+git add .
+# 重命名：1Index.html -> index.html
+git add .
+```
+
+```bash
+git mv -f src/views/List/Home.vue  src/views/list/Home.vue
+git mv -f src/views/List/About.vue  src/views/list/About.vue
+```
+
+
+
 # 使用旧项目创建新项目保留提交记录
 
 ```bash
