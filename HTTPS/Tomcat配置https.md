@@ -33,7 +33,32 @@ keytool -genkey -alias tomcat -keyalg RSA -storetype PKCS12 -keystore G:\tomcat.
 </Connector>
 ```
 
+### key + crt
+
+key + 中间证书 + 服务器证书
+
+```xml
+<Connector port="28080" protocol="HTTP/1.1"
+           connectionTimeout="20000"
+           redirectPort="443" />
+<Connector port="80" protocol="HTTP/1.1"
+           connectionTimeout="20000"
+           redirectPort="443" />
+
+<Connector port="443"  protocol="org.apache.coyote.http11.Http11NioProtocol"
+           maxThreads="150" SSLEnabled="true" scheme="https">
+    <SSLHostConfig sslProtocol="TLS">
+        <Certificate certificateFile="conf/server.crt" certificateKeyFile="conf/server.key" certificateChainFile="conf/chain.crt" 
+                     type="RSA"/>
+    </SSLHostConfig>
+</Connector>
+```
+
+> [tomcat9使用crt格式证书配置HTTPS_大李SVIP的博客-CSDN博客_tomcat配置crt证书](https://blog.csdn.net/lzj_lives/article/details/123824964)
+>
+
 # JAVA WEB 项目强制使用 https
+
 在 web.xml web-app 中加入
 ```xml
 <security-constraint>
