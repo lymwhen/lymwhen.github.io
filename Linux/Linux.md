@@ -238,7 +238,9 @@ netstat -nltp | gerp 80
 
 > yum install net-tools
 
-# lsof
+### 端口占用情况
+
+lsof
 
 ```bash
 # 查看端口占用 -t:进程号
@@ -248,3 +250,12 @@ kill -9 17084
 # 结束指定端口的进程
 kill -9 `lsof -t -i:8080`
 ```
+
+### 端口活动情况
+
+```bash
+yum -y install iptraf
+iptraf
+```
+
+> [linux查看某个端口的流量_linux流量查看工具汇总_weixin_39895977的博客-CSDN博客](https://blog.csdn.net/weixin_39895977/article/details/111755204)
