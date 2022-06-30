@@ -2,6 +2,17 @@
 
 # 系统
 
+取消 EditText 自动获得焦点，如打开一个 有 EditText 的 Activity 的时候，不要软键盘立马就弹出来
+
+在父级控件中加入
+
+```xml
+android:focusable="true" 
+android:focusableInTouchMode="true"
+```
+
+[Android取消EditText自动获取默认焦点 - 百度文库 (baidu.com)](https://wenku.baidu.com/view/05e62f40021ca300a6c30c22590102020740f2ad.html)
+
 ### 保持背光常量
 
 View 添加属性：
