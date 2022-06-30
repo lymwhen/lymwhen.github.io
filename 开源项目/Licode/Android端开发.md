@@ -356,7 +356,7 @@ https://192.168.31.153:8080/?singlePC=true&tokenId=%s&host=%s&secure=%s&signatur
 
 查看 `Socket.EVENT_CONNECT_ERROR`事件的回调方法 `call`可以看到错误堆栈中包含 okhttp 报证书错误
 
-socket.io 基于 okhttp，默认不允许通过不安全的 https 传输数据，可配置 okhttp 不校验证书，参看 [Tomcat/Android端不安全https处理](../../Tomcat/Android端不安全https处理)
+socket.io 基于 okhttp，默认不允许通过不安全的 https 传输数据，可配置 okhttp 不校验证书，参看 [HTTPS/Android端不安全https处理](/HTTPS/Android端不安全https处理)
 
 ```java
 IO.Options opts = new IO.Options();
