@@ -81,6 +81,93 @@ public class ResApiInterceptor implements HandlerInterceptor {
 }
 ```
 
+# @PostConstruct 执行顺序
+
+在类B中的`@PostConstruct`进行初始化依赖于A类的`@PostConstruct`初始化。
+
+> [!TIP]
+>
+> ##### @PostConstruct和@Autowired、[构造函数](https://so.csdn.net/so/search?q=构造函数&spm=1001.2101.3001.7020)的执行顺序
+>
+> 构造方法 > @Autowired > @PostConstruct
+>
+> [多个类中 使用@PostConstruct，加载先后顺序_janet1100的博客-CSDN博客_多个postconstruct顺序](https://blog.csdn.net/janet1100/article/details/105657399)
+
+##### 实测`@Order(Ordered.HIGHEST_PRECEDENCE)`无效
+
+> 在spring中，初始化的操作是在管理初始化的BeanPostProcessor中进行的，BPP依次反射调用初始化方法。而执行的顺序却是由beanDefinitionNames这个List控制的，但问题是beanDefinitionNames 并没有根据@Order做排序，也就是不管是MyBean1,MyBean2,其实都是根据扫描BeanDefinition放入beanDefinitionNames列表的顺序初始化的。正**因为MyBean2的位置在配置文件中定义的更靠前，所以它被先扫描加入beanDefinitionNames列表了！**
+>
+> 总的来说，用户业务bean初始化方法的调用顺序是在扫描bean definition后就确定了的。
+>
+> [你用@Order控制过Spring的@PostConstruct调用顺序吗？可能写错了 - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/388929292)
+
+##### `@DependsOn`不能用于控制`@PostConstruct`的执行顺序
+
+> @DependsOn合约仅保证已构造bean并已设置属性。这并不能保证调用任何@PostConstruct方法。
+>
+> 让它工作的方法是让“dependee”类（其他人依赖的类）实现“InitializingBean”类，这需要实现“afterPropertiesSet（）”方法。我将我的“init（）”方法的原始主体放入此方法中。我确认现在在依赖于此的任何类之前执行此操作。
+>
+> [java - 为什么Spring会忽略我的@DependsOn注释？ - Thinbug](https://www.thinbug.com/q/22178735)
+
+> **`@DependsOn`可以控制bean的创建、初始化（InitializingBean）、销毁方法执行顺序**。
+>
+> 示例：假如有三个Bean类叫Aaa、Bbb、Ccc分别实现了如下两个接口。
+> `org.springframework.beans.factory.InitializingBean`
+> `org.springframework.beans.factory.DisposableBean`
+>
+> Ccc通过@DependsOn指定依赖bean创建的顺序为Bbb > Aaa
+>
+> ```java
+> @DependsOn({"bbb","ccc"})
+> @Service
+> public class Aaa implements InitializingBean, DisposableBean {
+>        private static final Logger logger = LoggerFactory.getLogger(Aaa.class);
+> 
+>        public Aaa() {
+>            logger.info(this.getClass().getName() + " Construction");
+>        }
+> 
+>        @Override
+>        public void afterPropertiesSet() throws Exception {
+>            logger.info(this.getClass().getName() + " afterPropertiesSet");
+>        }
+> 
+>        @Override
+>        public void destroy() throws Exception {
+>            logger.info(this.getClass().getName() + " destroy");
+>        }
+> }
+> ```
+> 
+> [Spring中@DependsOn注解的作用及实现原理解析_java_脚本之家 (jb51.net)](https://www.jb51.net/article/207243.htm)
+
+##### 可以利用spring的依赖关系来处理`@PostConstruct`执行顺序的问题
+
+```java
+@Component
+public abstract class B {
+
+	/*
+	 * 此处注入A以保证A在B之前执行
+	 */
+	@Autowired
+	A a;
+
+	@PostConstruct
+	private void init() {
+    
+    }
+}
+```
+
+> 多个类中 使用@PostConstruct，加载先后顺序
+> 有时候Class A 中@PostConstruct 注解的方法中的代码执行，需要等待Class B 中@PostConstruct 注解方法中的代码执行完后，拿到结果，才能执行，也就是中A中某些代码的执行需要依赖B中代码执后的结果。
+> 此时就需要B先执行完，再执行A，
+>
+> 可以在A中先注入B。
+>
+> [多个类中 使用@PostConstruct，加载先后顺序_janet1100的博客-CSDN博客_多个postconstruct顺序](https://blog.csdn.net/janet1100/article/details/105657399)
+
 # 打包
 
 ```bash
@@ -329,3 +416,85 @@ org.springframework.security.web.firewall.RequestRejectedException: The request 
 ```
 
 其他项目的 cookie 影响导致，在浏览器地址栏删除 cookie 重试。
+
+### 在 IDE 中启动正常，但 WAR 包放到 tomcat 中启动报 Failed to instantiate WebApplicationInitializer class
+
+```
+13-Jul-2022 18:39:47.791 严重 [main] org.apache.catalina.core.StandardContext.startInternal ServletContainerInitializer 处理期间出错
+        javax.servlet.ServletException: Failed to instantiate WebApplicationInitializer class
+                at org.springframework.web.SpringServletContainerInitializer.onStartup(SpringServletContainerInitializer.java:160)
+                at org.apache.catalina.core.StandardContext.startInternal(StandardContext.java:5219)
+                at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:183)
+                at org.apache.catalina.core.ContainerBase.addChildInternal(ContainerBase.java:726)
+                at org.apache.catalina.core.ContainerBase.addChild(ContainerBase.java:698)
+                at org.apache.catalina.core.StandardHost.addChild(StandardHost.java:696)
+                at org.apache.catalina.startup.HostConfig.deployDirectory(HostConfig.java:1185)
+                at org.apache.catalina.startup.HostConfig$DeployDirectory.run(HostConfig.java:1933)
+                at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+                at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+                at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:75)
+                at java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:112)
+                at org.apache.catalina.startup.HostConfig.deployDirectories(HostConfig.java:1095)
+                at org.apache.catalina.startup.HostConfig.deployApps(HostConfig.java:477)
+                at org.apache.catalina.startup.HostConfig.start(HostConfig.java:1618)
+                at org.apache.catalina.startup.HostConfig.lifecycleEvent(HostConfig.java:319)
+                at org.apache.catalina.util.LifecycleBase.fireLifecycleEvent(LifecycleBase.java:123)
+                at org.apache.catalina.util.LifecycleBase.setStateInternal(LifecycleBase.java:423)
+                at org.apache.catalina.util.LifecycleBase.setState(LifecycleBase.java:366)
+                at org.apache.catalina.core.ContainerBase.startInternal(ContainerBase.java:946)
+                at org.apache.catalina.core.StandardHost.startInternal(StandardHost.java:835)
+                at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:183)
+                at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1396)
+                at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1386)
+                at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+                at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:75)
+                at java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:134)
+                at org.apache.catalina.core.ContainerBase.startInternal(ContainerBase.java:919)
+                at org.apache.catalina.core.StandardEngine.startInternal(StandardEngine.java:263)
+                at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:183)
+                at org.apache.catalina.core.StandardService.startInternal(StandardService.java:432)
+                at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:183)
+                at org.apache.catalina.core.StandardServer.startInternal(StandardServer.java:930)
+                at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:183)
+                at org.apache.catalina.startup.Catalina.start(Catalina.java:772)
+                at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+                at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+                at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+                at java.lang.reflect.Method.invoke(Method.java:498)
+                at org.apache.catalina.startup.Bootstrap.start(Bootstrap.java:345)
+                at org.apache.catalina.startup.Bootstrap.main(Bootstrap.java:476)
+        Caused by: java.lang.NoSuchMethodError: org.springframework.util.ReflectionUtils.accessibleConstructor(Ljava/lang/Class;[Ljava/lang/Class;)Ljava/lang/reflect/Constructor;
+                at org.springframework.web.SpringServletContainerInitializer.onStartup(SpringServletContainerInitializer.java:157)
+                ... 40 more
+```
+
+注意观察下面的`Caused by`， 此处为`java.lang.NoSuchMethodError: org.springframework.util.ReflectionUtils.accessibleConstructor`，可能是引入了两个相同的spring 包导致（因为新旧版本类方法不一定一致）
+
+在 IDEA 中双击`shift`，在`classes`中搜索缺少方法的类：`org.springframework.util.ReflectionUtils`
+
+![image-20220713185057371](image-20220713185057371.png)
+
+可以看到明显是有个`spring-1.2.6.jar`导致冲突了
+
+在 IDEA Project - External Libraries 中也可以看到这个包：
+
+![image-20220713185254680](image-20220713185254680.png)
+
+经排查，是`xfire-all`中包含的，排除之
+
+```xml
+<!-- https://mvnrepository.com/artifact/org.codehaus.xfire/xfire-all -->
+<dependency>
+    <groupId>org.codehaus.xfire</groupId>
+    <artifactId>xfire-all</artifactId>
+    <version>1.2.6</version>
+    <exclusions>
+        <exclusion>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+```
+
+> [java.lang.NoSuchMethodError: org.springframework.util.ReflectionUtils.doWithLocalFieldsV_one 大白(●—●)的博客-CSDN博客](https://blog.csdn.net/weixin_42292697/article/details/95061324)
