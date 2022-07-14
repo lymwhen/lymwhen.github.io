@@ -243,3 +243,37 @@ private String getMsg(Object... args){
 可能是版本太高
 
 > [Socket.io 400 (Bad Request)_ll_xiaohanqing_91的博客-CSDN博客](https://blog.csdn.net/ll_xiaohanqing_91/article/details/51107614)
+
+### Received fatal alert: certificate_unknown
+
+```log
+2022-07-02 14:53:54 nioEventLoopGroup-3-31 ERROR DefaultExceptionListener.exceptionCaught:53 : javax.net.ssl.SSLException: Received fatal alert: certificate_unknown
+io.netty.handler.codec.DecoderException: javax.net.ssl.SSLException: Received fatal alert: certificate_unknown
+	at io.netty.handler.codec.ByteToMessageDecoder.callDecode(ByteToMessageDecoder.java:480)
+	at io.netty.handler.codec.ByteToMessageDecoder.channelRead(ByteToMessageDecoder.java:279)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:379)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:365)
+	at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:357)
+	at io.netty.channel.DefaultChannelPipeline$HeadContext.channelRead(DefaultChannelPipeline.java:1410)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:379)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:365)
+	at io.netty.channel.DefaultChannelPipeline.fireChannelRead(DefaultChannelPipeline.java:919)
+	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:166)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:722)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:658)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:584)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:496)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:995)
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+```
+
+使用了 wss 协议连接到，应该使用 https，因为 socket.io 不是 websocket 的实现
+
+```javascript
+// WebSocket
+WebSocket("wss://192.168.3.106:27301/socket.io/chat?token=" + res.data.token"")
+// Socket.IO
+io("https://192.168.3.106:27301/socket.io/chat?token=" + res.data.token")
+```
+
