@@ -141,6 +141,47 @@ platform-tools>adb pull /data/app/~~hPzRSKuT3wQJdF-_OdNwng==/net.ossrs.flutter_l
 >
 > [adb 命令大全（简洁明了）adb命令启动应用_ihoudf的博客-CSDN博客_adb启动应用](https://blog.csdn.net/HDFQQ188816190/article/details/98599940)
 
+# Gradle
+
+### 使用代理
+
+查看 v2rayN 的本地 http 端口
+
+```properties
+# gradle.properties
+systemProp.https.proxyHost=127.0.0.1
+systemProp.https.proxyPort=10809
+```
+
+
+
+### 运行旧项目
+
+根据 IDE 报错更改 gradle 版本号，如 2022-07-23，gradle 最低 4.6，`com.android.tools.build:gradle`最低 3.2.0
+
+gradle
+
+```properties
+# gradle-wrapper.properties
+distributionUrl=https\://services.gradle.org/distributions/gradle-4.6-bin.zip
+```
+
+`com.android.tools.build:gradle`
+
+```nginx
+# build.gradle (Project)
+buildscript {
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.2.0'
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+```
+
+
+
 # 报错
 
 ### Manifest merger failed with multiple errors, see logs
