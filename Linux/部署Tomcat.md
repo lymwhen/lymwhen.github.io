@@ -56,6 +56,8 @@ set JAVA_OPTS=-Xms256m -Xmx512m -XX:PermSize=128m -XX:MaxPermSize=256m
 ps aux|grep java
 ```
 
+
+
 # 查看控制台打印
 
 ```bash
@@ -85,6 +87,74 @@ oa-shutdown
 eflow-shutdown
 oa | eflow | tail -f /usr/local/oa/logs/catalina.out
 ```
+
+# 更便捷地重启 Tomcat
+
+### 配置 tomcat CATALINA_PID
+
+在 bin/catalina.sh 中`PRGDIR=dirname "$PRG"`下方加入
+
+```bash
+CATALINA_PID=$PRGDIR/tomcat.pid
+```
+
+### 在 bin 目录下创建脚本
+
+restart.sh
+
+```bash
+#!/bin/bash
+cd `dirname $0`
+
+if [ -f ./tomcat.pid ]; then
+	echo "kill tomcat..."
+	kill -9 `cat ./tomcat.pid`
+	rm ./tomcat.pid
+else
+	echo "tomcat is not running."
+fi
+
+echo "start tomcat..."
+nohup ./startup.sh &
+if [ ! -f ../logs/catalina.out ]; then
+	sleep 2s
+fi
+tail -f ../logs/catalina.out
+```
+
+stop.sh
+
+```bash
+#!/bin/bash
+cd `dirname $0`
+
+if [ -f ./tomcat.pid ]; then
+	echo "kill tomcat..."
+	kill -9 `cat ./tomcat.pid`
+	rm ./tomcat.pid
+	echo "killed tomcat."
+else
+	ps aux | grep java
+	echo "tomcat is not running?"
+fi
+```
+
+> [!NOTE]
+>
+> 脚本必须为`unix`格式
+>
+> vim：命令`set ff=unix`
+>
+> notepad++：右下角确认编码为`Unix (LF)`，否则右键切换。
+
+授权
+
+```
+chmod +x restart.sh
+chmod +x stop.sh
+```
+
+
 
 # 乱码问题
 

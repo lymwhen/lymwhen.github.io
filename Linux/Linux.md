@@ -229,6 +229,95 @@ find $ORACLE_BASE/ -type f \( -perm -o+w -a -perm -o+x \)|xargs ls -al
 >
 > [find与逻辑关系运算_勿弃字纸-CSDN博客](https://blog.csdn.net/zhaoyangkl2000/article/details/76407820)
 
+# 脚本
+
+```bash
+# 开头
+#!/bin/bash
+
+# 定位到当前目录
+cd `dirname $0`
+
+# 回显
+echo "test"
+echo `cat ./tomcat.pid`
+
+# 后台启动
+./startup.sh &
+# 后台启动，当关闭shell窗口时不会被挂断
+nohup ./startup.sh &
+
+# 时间
+date;sleep 2s;date
+
+# 延时，默认s（秒）
+sleep 2
+sleep 2s
+sleep 2m
+
+# 条件表达式
+# 文件存在
+[ -f ./tomcat.pid ] && echo 'exists.'
+# 取反
+[ ! -f ./tomcat.pid ] && echo 'not exists.'
+# if
+if [ -f ./tomcat.pid ]; then
+    echo "exists."
+elif [ -f ./tomcat1.pid ]
+then
+    echo "exists 1."
+else
+    echo "not exists."
+fi
+```
+
+> [!TIP]
+>
+> `if [ -f ./tomcat.pid ]; then`中的分号表示命令结束，即一行内区分多个命令，如
+>
+> ```bash
+> date;sleep 2;date
+> ```
+> 
+> 如果不使用分号，那么应该分多行写。
+
+> [!TIP]
+>
+> 类似 js ES6 模板语法，可以获得其他命令的返回值
+>
+> ```bash
+> kill -9 `lsof -t -i:8080`
+> ```
+
+> 文件测试
+>
+> - -d：测试是否为目录(Directory)。
+>
+> - -e：测试目录或文件是否存在(Exist)。
+>
+> - -f：测试是否为文件(File)。
+>
+> - -r：测试当前用户是否有权限读取(Read)。
+>
+> - -w：测试当前用户是否有权限写入(Write)。
+>
+> - -x：测试是否设置有可执行(Excute)权限。
+>
+
+> [shell if 取反_Shell脚本的应用（二）_weixin_39665379的博客-CSDN博客](https://blog.csdn.net/weixin_39665379/article/details/111171632)
+>
+> [linux后台运行shell脚本_我心无悔dcw的博客-CSDN博客](https://blog.csdn.net/dcwnb1/article/details/12993889)
+
+
+
+> [!NOTE]
+>
+> 脚本必须为`unix`格式
+>
+> vim：命令`set ff=unix`
+>
+> notepad++：右下角确认编码为`Unix (LF)`，否则右键切换。
+
 # 网络
 
 ```bash
