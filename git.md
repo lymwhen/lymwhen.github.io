@@ -30,7 +30,11 @@ git push -u origin master
 
 ```bash
 # 暂存所有文件
+git add <file>
 git add .
+# 取消暂存的文件
+git reset <file>
+git reset
 # 提交
 git commit -m 'init'
 # 拉取
@@ -130,7 +134,36 @@ git checkout release
 git checkout -b master
 ```
 
+# 使用代理
 
+```bash
+# 查询代理
+git config --get --global http.proxy
+# 设置代理
+git config --global http.proxy 127.0.0.1:10809
+# 单个项目设置代理
+git config http.proxy 127.0.0.1:10809
+# 取消
+git config --unset --global http.proxy
+
+# 关闭https证书校验
+git config --global http.sslVerify false
+
+# 替换git协议为http（待求证）
+git config --global url."https://".insteadOf git://
+```
+
+> [!NOTE]
+>
+> http.proxy仅用于代理用于http协议，即远程链接为`https://`时
+
+> Git支持四种协议 1 ，而除本地传输外，还有：git://, ssh://, 基于HTTP协议，这些协议又被分为哑协议（HTTP协议）和智能传输协议。对于这些协议，要使用代理的设置也有些差异：
+>
+> 1. 使用 `git协议` 时，设置代理需要配置 `core.gitproxy`
+> 2. 使用 `HTTP协议` 时，设置代理需要配置 `http.proxy`
+> 3. 而是用 `ssh协议` 时，代理需要配置ssh的 `ProxyCommand` 参数
+>
+> [Windows下git设置代理服务器 - wavemelody - 博客园 (cnblogs.com)](https://www.cnblogs.com/mymelody/p/6132728.html)
 
 # eclipse
 
