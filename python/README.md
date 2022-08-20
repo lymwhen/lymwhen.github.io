@@ -26,3 +26,13 @@ pip install cherrypy
 
 
 
+# python3
+
+windows 现在可以使用应用商店安装
+
+### 使用代理
+
+```bash
+pip3 install -r requirements.txt --proxy=127.0.0.1:10809
+```
+
