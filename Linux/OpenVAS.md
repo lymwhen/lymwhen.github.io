@@ -57,7 +57,7 @@ apt-get clean
 
 > [!NOTE]
 >
-> 有博主踩坑说需要改 postgresql，亲测改了貌似导致 configuration - post list 中的记录为空，可能最新版已经解决这个问题
+> 有博主踩坑说需要改 postgresql 端口，亲测改了貌似导致 configuration - post list 中的记录为空，可能最新版已经解决这个问题
 >
 > 端口 5432 改为 5433 。（我的是postgres 14 总之改成5433就对了）
 >
@@ -158,7 +158,7 @@ apt update gvm
 
 2. postgresql 不是最新版
 
-亲测很有可能是这个原因，先彻底卸载 postgresql，然后直接安装 gvm
+先彻底卸载 postgresql，然后直接安装 gvm，gvm 会自动安装 postgresql
 
 > 这个博主就是最终更新搞好的，可能就是更新了 postgresql
 >
@@ -180,3 +180,26 @@ gvm-feed-update
 配置多个源
 
 > [【2022KaliLinux】openvas/gvm 没有scan configs 或者是 scan config error “XXXXXXXXXXX”_zbossz的博客-CSDN博客](https://blog.csdn.net/weixin_54130714/article/details/125344745)
+
+---
+
+刚刚（2022-08-20 20-06）正好遇到一次，执行了以下命令
+
+```bash
+gvm-feed-update
+gvm-setup
+gvm-check-setup
+gvm-feed-update
+gvm-stop
+gvm-start
+# 此时测试不行
+gvm-setup
+apt upgrade gvm
+# 更新gvm，但是并没有更新任何软件包
+gvm-feed-update
+gvm-stop
+gvm-start
+# 此时测试configuration - scan configs中列表有7项了
+```
+
+莫名其妙
