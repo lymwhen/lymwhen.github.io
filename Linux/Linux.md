@@ -41,6 +41,16 @@ exit
 # 文件
 
 ```bash
+# 创建文件夹，p参数会创建路径中的文件夹
+mkdir -p /usr/local/test1
+mkdir /usr/local/test1
+# 创建文件
+touch test.txt
+# 写入文件
+echo 'hello' > test.txt
+# 追加写入
+echo 'hello' >> test.txt
+
 # 重命名
 mv tools tools1
 # 移动
@@ -340,7 +350,7 @@ kill -9 17084
 kill -9 `lsof -t -i:8080`
 ```
 
-### 端口活动情况
+### 端口活动情况/端口流量
 
 ```bash
 yum -y install iptraf
@@ -348,3 +358,16 @@ iptraf
 ```
 
 > [linux查看某个端口的流量_linux流量查看工具汇总_weixin_39895977的博客-CSDN博客](https://blog.csdn.net/weixin_39895977/article/details/111755204)
+
+# 编译安装
+
+### 卸载
+
+```bash
+make uninstall
+make clean
+```
+
+接下来就可以从`configure`那一步开始重新安装了
+
+> [一个软件包通过编译源代码安装后，如何完全的卸载？？ _advance1989的博客-CSDN博客_编译安装的软件包如何卸载](https://blog.csdn.net/advance1989/article/details/6527704)
