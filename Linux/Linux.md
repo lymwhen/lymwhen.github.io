@@ -4,8 +4,6 @@ Linux，全称GNU/Linux，是一种免费使用和自由传播的[类UNIX](https
 
 
 
-
-
 # 系统
 
 ```bash
@@ -55,8 +53,20 @@ echo 'hello' >> test.txt
 mv tools tools1
 # 移动
 mv tools test/tools
+# 移动时排除
+# 把除了data1/2的文件和目录移动到bak1中
+mv !(bak1|bak2) bak1
 # 复制
 cp response/* response_bak
+# 复制文件和文件夹
+cp -r * bak
+# 复制文件和文件夹，并连同所具有的权限一同复制
+# 正常情况应该是用这个，但貌似不带p也会连同权限一同复制，待探究
+cp -rp * bak
+# 复制时排除某文件或目录
+# 把除了data1/2的文件和目录复制到bak1中
+cp -rp !(bak1|bak2) bak1
+
 # 文件列表
 ls
 # 文件列表，列出权限
@@ -66,7 +76,21 @@ tar -xvf repo.tar
 tar -zxvf repo.tar.gz
 # 压缩repo文件夹
 tar -zxvf repo.tar.gz repo
+# 指定解压目录
+tar -zxvf mysql-xxx.tar.gz -C /usr/local
 ```
+
+> [!TIP]
+>
+> 如果`mv`报错：`!: event not  `，需要执行：
+>
+> ```
+> shopt -s extglob
+> ```
+>
+> 表示扩展模式匹配操作符，就可以使用更多的通配符。
+>
+> [linux mv命令排除某个文件或文件夹_庭前荷雨的博客-CSDN博客_mv 排除](https://blog.csdn.net/motingqian/article/details/84308629)
 
 ### 十位权限
 
