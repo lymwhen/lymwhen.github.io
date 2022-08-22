@@ -131,23 +131,7 @@ set password for root@localhost=password("password");
 
 > mysqldump 位于basedir/bin下，已经在环境变量中，Windows和Linux都可以直接使用
 
-### 备份
-
-```bash
-mysqldump -h 127.0.0.1 -uroot -ppassword tlga_oa > f:\tzx_oa.sql
-mysqldump -h 127.0.0.1 -uroot -ppassword tlga_eflow > f:\tzx_eflow.sql
-```
-
-### 还原
-
-```bash
-# 创建数据库
-create database tlga_oa default character set utf8 collate utf8_general_ci;
-create database tlga_eflow default character set utf8 collate utf8_general_ci;
-# oa视图中使用了eflow中的表，应先导入eflow
-mysql -uroot -pbf2000bf tlga_eflow < tlga_eflow.sql
-mysql -uroot -pbf2000bf tlga_oa < tlga_oa.sql
-```
+参看[数据库/mysql/命令行 - 备份还原](数据库/mysql/命令行.md?id=备份还原)
 
 # 验证mysql用户
 
@@ -180,6 +164,113 @@ ps aux|grep mysqld
 ##### Windows 下修改 basedir 启动报错
 
 新的数据文件夹安全选项卡下需要添加`NETWORK-SERVICE`用户/组，勾选完全控制
+
+# 升级 mysql
+
+查询版本号
+
+```sql
+select @@version;
+select version();
+```
+
+
+
+### 备份数据
+
+```bash
+mysqldump -uroot -p -A > /usr/local/mysql/bak20220822.sql
+# 远程备份
+mysqldump -h192.168.3.200 -uroot -p -A > /usr/local/mysql/bak20220822.sql
+```
+
+### 关闭服务
+
+升级最好不使用快速关闭
+
+> innodb_fast_shutdown有3个值：
+>
+> 默认是1 可选0 1 2
+>
+> 支持全动态局设置
+>
+> 使用场景：在做数据库关闭升级的时候 set global innodb_fast_shutdown=0，这个时候能最大保障数据的完整性。
+>
+> 设置为1：关闭MySQL的时候不会做清除脏页和插入缓冲区的合并操作，也不会将脏页刷新到磁盘
+>
+> 设置为0：会做清除脏页和插入缓冲区的合并操作，也会将脏页全部刷新到磁盘上面去，但是这个时候关闭的速度也是最慢的
+>
+> 设置为2：不会做清除脏页和插入缓冲区的合并操作，也不会将脏页刷新到磁盘，但是会刷新到redo log里面，再下次启动mysql的时候恢复
+>
+> [Mysql innodb_fast_shutdown - Presley - 博客园 (cnblogs.com)](https://www.cnblogs.com/Presley-lpc/p/9177081.html)
+
+```bash
+mysql -uroot -p
+# 查询innodb_fast_shutdown值
+mysql> select @@innodb_fast_shutdown;
+# 设置为0
+mysql> set global innodb_fast_shutdown=0;
+# 关闭mysql
+cd /usr/local/mysql/bin
+./mysqladmin -uroot -p shutdown
+```
+
+### 备份数据目录
+
+```bash
+cd /usr/local/datadisk
+cp -rp data data_old
+```
+
+### 替换新版的 mysql 目录
+
+> [!TIP]
+>
+> 此步骤涉及`/usr/local`目录操作，通常 mysql 只有`mysql`目录的权限，所以需要切换到 root 执行
+
+```bash
+tar -zxvf mysql-xxx.tar.gz -C /usr/local
+cd /usr/local
+mv mysql mysql_old
+mv mysql-xxx mysql
+# 将新版mysql所有者和属组给到mysql
+chown -R mysql:mysql mysql
+
+# 拷贝配置文件
+cp -p mysql_old/my.cnf mysql
+# 如果数据目录也在mysql目录中，也需要拷贝
+```
+
+> [!TIP]
+>
+> 建议不要将数据目录放在安装目录下，以便于安装，而且如果数据目录是挂载的硬盘，将会不好处理。
+
+### 升级
+
+```bash
+# 定位到新版mysql目录
+cd /usr/local/mysql
+cd bin
+# 启动mysql
+./mysqld_safe --defaults-file=/usr/local/mysql/my.cnf
+# 正常上一句就可以，也可以用下句，参数作用待查明
+./mysqld_safe --defaults-file=/usr/local/mysql/my.cnf --pid-file=/usr/local/datadisk/data/mysql.upgrade.pid
+```
+
+启动成功的话，这里会阻塞 shell 终端，所以下面应该新开一个终端。如果报错可根据提示查看错误日志文件。
+
+```bash
+# 运行升级程序
+./mysql_upgrade -uroot -p
+# 关闭mysql
+./mysqladmin -uroot -p shutdown
+# 启动mysql服务
+service mysqld start
+```
+
+查询版本号验证，查看数据是否正常。
+
+> [记录mysql扫描漏洞，小版本升级_studymary的博客-CSDN博客_mysql漏洞扫描](https://blog.csdn.net/studymary/article/details/125797829)
 
 # 配置文件
 
