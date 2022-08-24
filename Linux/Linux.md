@@ -354,6 +354,16 @@ fi
 
 # 网络
 
+### ssh
+
+```bash
+ssh root@172.17.1.7
+# 指定端口
+ssh root@172.17.1.7 -p 22
+```
+
+### 端口占用情况
+
 ```bash
 # 查看端口占用
 netstat -nltp | gerp 80
@@ -361,9 +371,7 @@ netstat -nltp | gerp 80
 
 > yum install net-tools
 
-### 端口占用情况
-
-lsof
+##### lsof
 
 ```bash
 # 查看端口占用 -t:进程号
@@ -382,6 +390,27 @@ iptraf
 ```
 
 > [linux查看某个端口的流量_linux流量查看工具汇总_weixin_39895977的博客-CSDN博客](https://blog.csdn.net/weixin_39895977/article/details/111755204)
+
+### nmap
+
+```bash
+# 查看端口开启状态
+# tcp
+nmap -sT 172.16.100.73 -p 22222 -Pn
+# tcp/udp，多端口
+nmap -sTU 172.16.100.73 -p 22222,8080 -Pn
+```
+
+> [nmap常用命令检查主机在线与在线主机端口开放情况 - 腾讯云开发者社区-腾讯云 (tencent.com)](https://cloud.tencent.com/developer/article/1696459)
+
+### curl
+
+```bash
+# 查看服务器信息
+curl -I 172.16.1.7:8080
+```
+
+
 
 # 编译安装
 
