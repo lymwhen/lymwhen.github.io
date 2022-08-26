@@ -354,6 +354,15 @@ fi
 
 # 网络
 
+### wget
+
+```bash
+wget https://www.google.com
+wget "https://10.0.3.8:27280/live/e75ae53e-b29e-41ae-9a08-bf40212eeeda.flv?token=6bf964a192ea47da9f297e82ff7478fe"  --no-check-certificate
+```
+
+
+
 ### ssh
 
 ```bash
