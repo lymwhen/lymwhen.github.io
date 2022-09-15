@@ -25,7 +25,7 @@ hls.js 异常事件：
 - timeupdate：`currentTime` 属性指定的时间发生变化。即视频正在播放
 - waiting：由于暂时缺少数据，播放已停止。即播放卡住
 
-> [<video>: 视频嵌入元素 - HTML（超文本标记语言） | MDN (mozilla.org)](https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/video#%E4%BA%8B%E4%BB%B6)
+> [\<video\>: 视频嵌入元素 - HTML（超文本标记语言） | MDN (mozilla.org)](https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/video#%E4%BA%8B%E4%BB%B6)
 
 正在加载动画：
 
@@ -264,3 +264,17 @@ export default {
 > [videojs判断直播流是否卡住，卡住30秒自动刷新页面 - 简书 (jianshu.com)](https://www.jianshu.com/p/4c14dd4fe7b6)
 >
 > [在vue中使用hls.js播放hls视频流 - 简书 (jianshu.com)](https://www.jianshu.com/p/ed997ac5ea12)
+
+### 可能出现的问题
+
+##### DOMException : play() can only be initiated by a user gesture
+
+在`Hls.Events.MEDIA_ATTACHED`事件中调用`video.play()`可能报错：
+
+```
+DOMException : play() can only be initiated by a user gesture
+```
+
+原因是从 chromium 某个版本开始，必须要用户操作网页后`video`的`play`等方法才可以调用，貌似和无法直接播放声音是一个问题。
+
+Android 参考[Android/WebView/[DOMException : play() can only be initiated by a user gesture](http://localhost:3000/#/Android/WebView?id=domexception-play-can-only-be-initiated-by-a-user-gesture)](Android/WebView.md?id=domexception-play-can-only-be-initiated-by-a-user-gesture)
