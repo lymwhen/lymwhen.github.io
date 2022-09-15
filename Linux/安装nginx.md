@@ -36,6 +36,9 @@ make install
 ./configure --prefix=/usr/local/nginx --with-http_ssl_module
 
 ./configure --prefix=/usr/local/nginx --with-http_stub_status_module --with-http_ssl_module
+
+# stream模块，如代理mysql/oracle
+./configure --prefix=/usr/local/nginx --with-http_stub_status_module --with-http_ssl_module --with-stream
 ```
 
 `--prefix`安装位置
