@@ -45,6 +45,12 @@ x5WebView.getSettings().setAppCachePath(appCachePath);
 x5WebView.getSettings().setAllowFileAccess(true);
 x5WebView.getSettings().setAppCacheEnabled(true);
 
+// 解决报错：DOMException : play() can only be initiated by a user gesture
+// video.play()方法默认仅可以用户手势启动，关闭后可由代码直接调用
+if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+    webSetting.setMediaPlaybackRequiresUserGesture(false);
+}
+
 // 默认背景，对于底色不是白色的页面可以设置
 // webView.setBackgroundColor(Color.argb(1, 0, 0, 0));
 
@@ -88,6 +94,14 @@ webView.setWebViewClient(new WebViewClient() {
 });
 
 webView.setWebChromeClient(new WebChromeClient() {
+    @Nullable
+    @Override
+    public Bitmap getDefaultVideoPoster() {
+        // 设置video标签默认封面
+        Bitmap bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+        bitmap.setHasAlpha(true);
+        return bitmap;
+    }
 
     @Override
     public void onProgressChanged(WebView view, int newProgress) {
@@ -217,6 +231,9 @@ private void onActivityResultAboveL(int requestCode, int resultCode, Intent inte
     uploadMessageAboveL = null;
 }
 ```
+
+> - 设置video标签默认封面：[各位大佬 Android中 怎么更改 webview中 video 默认图片，有偿_android开发吧_百度贴吧 (baidu.com)](https://tieba.baidu.com/p/6551481556)
+> - play() can only be initiated by a user gesture：[Webview 中 Play() can only be initiated by a user gesture_ieeso的博客-CSDN博客](https://blog.csdn.net/ieeso/article/details/112133163)
 
 # 执行 js 方法
 
@@ -351,6 +368,16 @@ webview.setWebChromeClient(new WebChromeClient() {
 
 # 疑难问题
 
-##### logcat: Uncaught TypeError: Cannot read property 'getItem' of null
+### logcat: Uncaught TypeError: Cannot read property 'getItem' of null
 
 很有可能是没有开启`localStorage`，因为`setItem`和`getItem`是它的常用方法
+
+### DOMException : play() can only be initiated by a user gesture
+
+参看上文
+
+```java
+webSetting.setMediaPlaybackRequiresUserGesture(false);
+```
+
+> [Webview 中 Play() can only be initiated by a user gesture_ieeso的博客-CSDN博客](https://blog.csdn.net/ieeso/article/details/112133163)
