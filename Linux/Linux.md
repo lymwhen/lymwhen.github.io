@@ -92,6 +92,8 @@ tar -zxvf mysql-xxx.tar.gz -C /usr/local
 >
 > [linux mv命令排除某个文件或文件夹_庭前荷雨的博客-CSDN博客_mv 排除](https://blog.csdn.net/motingqian/article/details/84308629)
 
+# 权限
+
 ### 十位权限
 
 ```bash
@@ -150,6 +152,71 @@ r-- = 100 = 4
 ```properties
 rw-r--r-- = 644
 rwxrwxrwx = 777
+```
+
+### 特殊权限
+
+`s`命令执行者在执行文件时临时获得所有者/所属组的权限
+
+##### SetUID（设置UID）
+
+执行文件时临时获得所有者的权限
+
+```bash
+sudo chmod u+s test1
+```
+
+实例：
+
+- 存放用户密码的、所有者为`root`的`/etc/shadow`权限为0，意味着只有`root`才能对其进行写入（读写权限对`root`无效），`/usr/bin/passwd`权限为`-rwsr-xr-x root root`依靠`SetUID`权限修改密码
+- 在 ubuntu 将程序所有者改为`root`，授予`SetUID`权限，以使用 1024 以下端口
+
+##### SetGID（设置GID）
+
+执行文件时临时获得所属组的权限
+
+其他用户在其中创建的文件/文件夹所属组为该目录的所属组（`SetUID`不具备该功能，有还得了:dog:）
+
+```bash
+sudo chmod g+s test1
+```
+
+实例：
+
+- 授予目录`SetGID`权限，其他用户在其中创建的文件/文件夹所属组为该目录的所属组
+
+`t`粘滞位
+
+##### Sticky BIT（粘滞位）
+
+用户创建的文件不会被其他用户修改
+
+```bash
+sudo chmod o+t test1
+```
+
+实例：
+
+- /tmp 目录
+
+##### 与十位权限的关系
+
+二进制排列为：
+
+setuid setgid stickybit r w x r w x r w x
+
+故：
+
+`u+s` = `4xxx`，显示为所有者`rws`
+
+`g+s` = `2xxx`，显示为所属组`rws`
+
+`o+t` = `1xxx`，显示为其他人`rwt`
+
+特殊权限要求普通用户必须拥有`x`权限，否则会显示为大写`S`/`T`
+
+```bash
+chmod 4755 test1
 ```
 
 ### 授权
