@@ -78,6 +78,11 @@
   <script src="./custom/mouse.min.js"></script>
   <script src="./custom/mouse-click-effect-explode.js"></script>
   <script src="./custom/spaceship-destory-website.js"></script>
+  <script>
+    $(document).on("click","li.file a[href][title]:not(.section-link), li.folder a[href][title]:not(.section-link)",function () {
+      document.documentElement.scrollTop = document.body.scrollTop = 0
+    });
+  </script>
   <script type="text/javascript">
     // 鼠标跟随效果
     $.shuicheMouse({
