@@ -290,3 +290,56 @@ ufw status
 ```
 
 > [开启或关闭Linux实例中的系统防火墙 (aliyun.com)](https://help.aliyun.com/document_detail/175507.html)
+
+# 非 root 用户使用 1024 以下端口
+
+非 root 用户使用 1024 以下端口报`Permission denied`：
+
+```
+java.net.BindException: Permission denied:80
+```
+
+不知道哪个搞的这种脑残设计:dog:
+
+##### 方法1：将文件所有者改为`root`，并赋予所有者（u）执行权限
+
+```bash
+sudo chown root MediaServer
+sudo chmod u+s MediaServer
+```
+
+当然当前用户也是需要执行权限的，可以赋予所属组（g）或其他人（o）执行权限
+
+##### 方法2：使用非80端口启动程序，然后再用iptables做一个端口转发
+
+```bash
+iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8080
+```
+
+> [ubuntu启用root:如何让非root用户启用小于1024号的端口_weixin_34226182的博客-CSDN博客](https://blog.csdn.net/weixin_34226182/article/details/91577498)
+
+# Ubuntu 20.04 LTS
+
+下载地址：[Index of /releases (ubuntu.com)](http://old-releases.ubuntu.com/releases/)，服务器使用应该选择 LTS（长期支持）版，server 版本。如 http://old-releases.ubuntu.com/releases/focal/ubuntu-20.04.3-live-server-amd64.iso。
+
+### 设置静态IP
+
+```bash
+vim /etc/netplan/00-installer-config.yaml
+# This is the network config written by 'subiquity'
+network:
+  renderer: networkd
+  ethernets:
+    ens33:
+      addresses:
+      - 192.168.31.207/24
+      gateway4: 192.168.31.1
+      nameservers:
+        addresses:
+        - 114.114.114.114
+  version: 2
+  
+# 刷新网络
+netplan apply
+```
+
