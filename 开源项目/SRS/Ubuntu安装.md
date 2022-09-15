@@ -38,6 +38,71 @@ make
 tail -n 30 -f ./objs/srs.log
 ```
 
+# 缺点
+
+SRS 支持 rtmp/flv/hls/webrtc 等协议格式，作为直播、音视频互动已经很完美。
+
+作为流媒体服务器的缺点：
+
+##### 正式版本不支持 GB28181
+
+> 我们目前达成的一致是：要把GB的SIP支持从SRS中移除，只支持媒体处理部分。
+>
+> 我现在考虑的是：是否可以更进一步，完全不支持GB28181的接入。
+>
+> 原因有：
+>
+> - 监控场景主要是RTSP，用FFmpeg拉RTSP后转RTMP推SRS，参考 [FAQ: RTSP](https://github.com/ossrs/srs/issues/2716#rtsp)
+> - GB场景很小，而且可以用其他的开源项目完成协议转换，比如 [ZLM](https://github.com/ZLMediaKit/ZLMediaKit)
+> - 就算SRS支持GB，也只支持GB的媒体部分，还需要花大量时间对接SIP项目，维护文档，以及后续的更新支持
+>
+> 目前我们的方向太多了，比如API完善、RTC的完善、QUIC、JS虚拟机、切片协议完善等等。
+>
+> 问了一圈，大家还是想继续支持，那就新建一个仓库吧，owner是 [@xialixin](https://github.com/xialixin) [@duiniuluantanqin](https://github.com/duiniuluantanqin) 仓库地址 [ossrs/srs-gb28181](https://github.com/ossrs/srs-gb28181)
+>
+> GB独立发展，让子弹飞一会儿，搞不好飞得也挺好。
+>
+> [GB28181: I'm thingking about saying goodbye，我在想是否不支持 · Issue #2845 · ossrs/srs (github.com)](https://github.com/ossrs/srs/issues/2845)
+
+> Moved to [ossrs/srs-gb28181#4](https://github.com/ossrs/srs-gb28181/issues/4)
+>
+> GB已经放到独立的仓库 [srs-gb28181](https://github.com/ossrs/srs-gb28181)， 请参考 [#2845](https://github.com/ossrs/srs/issues/2845)
+> 问题请提交到GB的仓库[bug](https://github.com/ossrs/srs-gb28181/issues)，或者[pr](https://github.com/ossrs/srs-gb28181/pulls)
+>
+> [支持对接GB28181吗？监控，智能摄像头，国标推流 · Issue #1500 · ossrs/srs (github.com)](https://github.com/ossrs/srs/issues/1500)
+
+##### 不支持 RTSP
+
+> 关于RTSP先说结论：SRS不直接支持RTSP，现有的推RTSP到SRS功能会设置为Deprecated并在未来删除。SRS可以用Ingester(FFmpeg)拉RTSP流转成RTMP后推给SRS，当然这实际上是FFmpeg支持的功能了。
+>
+> [PUSH RTSP is removed，不支持RTSP推流 · Issue #2304 · ossrs/srs (github.com)](https://github.com/ossrs/srs/issues/2304)
+
+### GB28181
+
+> 编译SRS，需要切换到Develop分支，并开启gb28181功能：
+>
+> ```bash
+> git checkout feature/gb28181 &&
+> ./configure --with-gb28181 && 
+> make clean && make
+> ```
+>
+> 然后使用配置文件`conf/push.gb28181.conf `启动：
+>
+> ```bash
+> ./objs/srs -c conf/push.gb28181.conf 
+> ```
+>
+> [支持对接GB28181吗？监控，智能摄像头，国标推流 #1500 · Issue #4 · ossrs/srs-gb28181 (github.com)](https://github.com/ossrs/srs-gb28181/issues/4)
+
+摄像头配置
+
+[支持对接GB28181吗？监控，智能摄像头，国标推流 #1500 · Issue #4 · ossrs/srs-gb28181 (github.com)](https://github.com/ossrs/srs-gb28181/issues/4)
+
+[支持对接GB28181吗？监控，智能摄像头，国标推流 · Issue #1500 · ossrs/srs (github.com)](https://github.com/ossrs/srs/issues/1500#issuecomment-657480580)
+
+[srs_code_note/srs_gb28181.md at master · xialixin/srs_code_note (github.com)](https://github.com/xialixin/srs_code_note/blob/master/doc/srs_gb28181.md)
+
 # 疑难问题
 
 ### 查看SRS的状态为 Failed
