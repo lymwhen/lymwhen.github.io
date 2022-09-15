@@ -314,7 +314,7 @@ server {
 }
 ```
 
-# 代理 mysql
+# 代理 mysql/oracle
 > https://blog.csdn.net/jiahao1186/article/details/111501253
 
 ```nginx
