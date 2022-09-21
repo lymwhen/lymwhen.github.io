@@ -291,6 +291,8 @@ http {
 ffmpeg  -re -i "rtmp://rtmp.live.com/stream" -vcodec libx264 -vprofile baseline -acodec libmp3lame -ar 44100 -ac 1 -f flv rtmp://127.0.0.1:1935/hls/http8
 ```
 
+参看 [工具/ffmpeg - 推流](工具/ffmpeg.md?id=推流)
+
 ### http 流地址
 
 ```
@@ -314,7 +316,7 @@ server {
 }
 ```
 
-# 代理 mysql/oracle
+# 代理 mysql/oracle/rtmp
 > https://blog.csdn.net/jiahao1186/article/details/111501253
 
 ```nginx
@@ -346,6 +348,23 @@ stream {
     }
 }
 ```
+
+rtmp
+
+```nginx
+stream {
+    server {
+        listen 1935;
+        proxy_connect_timeout 10s;
+        proxy_timeout 15s;
+        proxy_pass 192.168.3.208:1935;
+    }
+}
+```
+
+> [!NOTE]
+>
+> rtsp 不可以这种代理转发
 
 # 跨域
 
