@@ -79,8 +79,15 @@
   <script src="./custom/mouse-click-effect-explode.js"></script>
   <script src="./custom/spaceship-destory-website.js"></script>
   <script>
-    $(document).on("click","li.file a[href][title]:not(.section-link), li.folder a[href][title]:not(.section-link)",function () {
-      document.documentElement.scrollTop = document.body.scrollTop = 0
+    // 文章回顶部
+    // $(document).on("click","li.file a[href][title]:not(.section-link), li.folder a[href][title]:not(.section-link)",function () {
+    //   document.documentElement.scrollTop = document.body.scrollTop = 0
+    // });
+    $(document).on("click","a[href]",function () {
+      var target = this.target;
+      var href = this.href;
+      // 页面内跳转且不包含id参数（不跳转到某一标题）时回顶部
+      (!target || target === '_self') && !(/.*(?=\?id=)/.test(href)) && (document.documentElement.scrollTop = document.body.scrollTop = 0)
     });
   </script>
   <script type="text/javascript">
