@@ -165,6 +165,21 @@ git config --global url."https://".insteadOf git://
 >
 > [Windows下git设置代理服务器 - wavemelody - 博客园 (cnblogs.com)](https://www.cnblogs.com/mymelody/p/6132728.html)
 
+# Tree
+
+> 安装 tree：[Windows下如何使用tree命令生成目录树 - 简书 (jianshu.com)](https://www.jianshu.com/p/7002eee46561)
+
+git bash 的 tree 要比 windows 自带的 tree 要强大得多
+
+```bash
+tree src
+# 显示3层
+tree -L 3
+tree src -L 3
+```
+
+
+
 # eclipse
 
 ### push/pull报错，命令行正常
