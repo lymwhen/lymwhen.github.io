@@ -44,7 +44,7 @@ ffmpeg -i "rtmp://xxxxxx" -c:a copy -c:v copy D:\1.mp4
 
 > [【编码推流】ffmpeg将直播转码保存到本地_jn10010537的博客-CSDN博客](https://blog.csdn.net/jn10010537/article/details/124079739)
 
-# 使用视频文件推流
+# 推流
 
 ```bash
 # mp4转rtsp（推到达尔文）
@@ -64,8 +64,9 @@ ffmpeg -rtsp_transport udp -i rtsp://localhost/test -codec:v libx264 -map 0 -s 6
 # 拉转推，rtsp转rtmp（nginx）
 ffmpeg  -re -i "rtsp://localhost/test" -vcodec libx264 -vprofile baseline -acodec libmp3lame -ar 44100 -ac 1 -f flv rtmp://127.0.0.1:1935/hls/http8
 
-# 循环推流
+# 循环推流，rtsp/rtmp
 ffmpeg -re -stream_loop -1 -i kdxf.mp4 -c copy -f rtsp rtsp://localhost:8554/mystream
+ffmpeg -re -stream_loop -1 -i kdxf.mp4 -c copy -f flv rtmp://localhost:8554/mystream
 ```
 
 # ffplay
