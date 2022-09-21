@@ -1,5 +1,9 @@
 # Android
 
+> [Android 开发者  | Android Developers (google.cn)](https://developer.android.google.cn/)
+>
+> [API Levels | Android versions, SDK/API levels, version codes, codenames, and cumulative usage](https://apilevels.com/)
+
 # 系统
 
 取消 EditText 自动获得焦点，如打开一个 有 EditText 的 Activity 的时候，不要软键盘立马就弹出来
@@ -153,8 +157,6 @@ systemProp.https.proxyHost=127.0.0.1
 systemProp.https.proxyPort=10809
 ```
 
-
-
 ### 运行旧项目
 
 根据 IDE 报错更改 gradle 版本号，如 2022-07-23，gradle 最低 4.6，`com.android.tools.build:gradle`最低 3.2.0
@@ -179,6 +181,135 @@ buildscript {
     }
 }
 ```
+
+然后根据 Android Studio 的提示修改配置文件，可能需要的修改：
+
+删除 local.properties 中的 ndk 配置
+
+```properties
+sdk.dir=C\:\\softwares\\android-studio\\sdk
+```
+
+Project build.gradle 中把仓库加上
+
+```nginx
+buildscript {
+    repositories {
+        google()
+        maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+    }
+}
+```
+
+删除 app/build.gradle 的`allprojects`配置，仓库用 Project 的 build.gradle 配置就好
+
+```nginx
+allprojects {
+    repositories {
+        jcenter()
+        maven { url 'https://jitpack.io' }
+        flatDir {
+            dirs 'libs'
+        }
+    }
+}
+```
+
+`flatDir`加到`android.repositories`下
+
+```nginx
+repositories {
+    flatDir {
+        dirs 'libs'   // aar放置目录
+    }
+}
+```
+
+配置检查选项，错误时不中断构建，`android`下
+
+```nginx
+lintOptions {
+    checkReleaseBuilds false
+    // Or, if you prefer, you can continue to check for errors in release builds,
+    // but continue the build even when errors are found:
+    abortOnError false
+}
+```
+
+删除`android.signingConfigs`属性，用根据 Android Studio 的提示使用证书就行
+
+改完以上两项基本上是可以编译了，但是代码可能各种报错，Android Studio Project 窗口看下External Libraries，很多android/第三方库中可能只有一个 AndroidManifest.xml，正常应该包含一个 classes.jar，可能有其他资源文件：
+
+![image-20220921172407124](image-20220921172407124.png)
+
+那么这个工程可能使用的是远古工程目录（Eclipse？），在 app/build.gradle 中应该还有如下的目录配置：
+
+```nginx
+sourceSets {
+    main {
+        manifest.srcFile 'AndroidManifest.xml'
+        java.srcDirs = ['src']
+        resources.srcDirs = ['src']
+        jniLibs.srcDirs = ['libs']
+        aidl.srcDirs = ['src']
+        renderscript.srcDirs = ['src']
+        res.srcDirs = ['res']
+        assets.srcDirs = ['assets']
+    }
+    // Move the build types to build-types/<type>
+    // For instance, build-types/debug/java, build-types/debug/AndroidManifest.xml, ...
+    // This moves them out of them default location under src/<type>/... which would
+    // conflict with src/ being used by the main source set.
+    // Adding new build types or product flavors should be accompanied
+    // by a similar customization.
+    debug.setRoot('build-types/debug')
+    release.setRoot('build-types/release')
+}
+```
+
+```bash
+$ tree app -L 1
+app
+|-- AndroidManifest.xml
+|-- app.iml
+|-- assets
+|-- build.gradle
+|-- gen
+|-- libs
+|-- project.properties
+|-- res
+`-- src
+```
+
+且不管上面的配置对不对了，这个工程目录是有问题的，Module 默认目录：
+
+```bash
+$ tree src -L 2
+src
+|-- androidTest
+|   `-- java
+|-- main
+|   |-- AndroidManifest.xml
+|   |-- assets
+|   |-- ic_launcher-web.png
+|   |-- java
+|   `-- res
+`-- test
+    `-- java
+```
+
+直接在 src 下创建`main/java`目录，将源代码`com.xxx`放入`main/java`，将`assets`/`res`/`AndroidManifest.xml`等文件放入`main`，删除 app/build.gradle `android.sourceSets`配置。尝试重新 grade sync 或 Make Project。
+
+> [!TIP]
+>
+> 可以使用 Android Studio 右键 src 目录 - new - Directory，可以直接创建`main/java`/`test/java`/`androidTest`等目录。
 
 
 
@@ -232,3 +363,24 @@ so动态链接库的代码并非PIC（Position independent code）
 - 无需申请权限
 - implementation 'com.android.support:appcompat-v7:26.1.0' 版本改为 `22+`
 - 删除一些控件不支持的属性，如`roundIcon`
+
+### java.lang.NullPointerException: Attempt to invoke virtual method ‘android.content.res.XmlResourceParser android.content.pm.ProviderInfo.loadXmlMetaData(android.content.pm.PackageManager, java.lang.String)’ on a null object reference
+
+使用 FileProvider 创建 uri 时报错
+
+```java
+Uri apkUri =
+                        FileProvider.getUriForFile(mContext, mContext.getApplicationInfo().packageName + ".provider", result);
+```
+
+```log
+java.lang.NullPointerException: Attempt to invoke virtual method ‘android.content.res.XmlResourceParser android.content.pm.ProviderInfo.loadXmlMetaData(android.content.pm.PackageManager, java.lang.String)’ on a null object reference
+```
+
+`FileProvider.getUriForFile`的第二参数 provider 的`authorities`属性名传递错误，注意对比传入的字符串和 AndroidManifest.xml 中的`provider`配置
+
+> [NullPointerException: Attempt to invoke virtual method ‘android.content.res.XmlResourceParser androi_android_9527_的博客-CSDN博客](https://blog.csdn.net/android_9527_/article/details/107555134)
+
+### External Libraries android/第三方库中可能只有一个 AndroidManifest.xml、代码中引用报错
+
+工程目录有问题，参看上文
