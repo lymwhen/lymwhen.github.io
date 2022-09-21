@@ -362,6 +362,8 @@ stream {
 }
 ```
 
+> [nginx 转发 rtmp 直播流 - 腾讯云开发者社区-腾讯云 (tencent.com)](https://cloud.tencent.com/developer/article/1925439)
+
 > [!NOTE]
 >
 > rtsp 不可以这种代理转发
