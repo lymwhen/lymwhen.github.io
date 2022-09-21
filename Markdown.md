@@ -142,10 +142,21 @@ public static void main(String[] args) {
 [网页](https://github.com)
 ```
 
-引用本工程其他文档
-参看[Linux/安装Redis](Linux/安装Redis)
-引用当前文档
-参看[一级标题](#一级标题)
+引用本工程文档：[工具/ffmpeg](工具/ffmpeg.md)
+
+```
+[工具/ffmpeg - 推流](工具/ffmpeg.md)
+```
+
+引用本工程文档，定位到标题：[工具/ffmpeg - 推流](工具/ffmpeg.md#推流)
+
+```
+[工具/ffmpeg - 推流](工具/ffmpeg.md#推流)
+[工具/ffmpeg - 推流](工具/ffmpeg.md?id=推流)
+```
+> [!TIP]
+>
+> 链接中的`#`会自动转换为`?id=`
 
 ---
 
