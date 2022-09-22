@@ -245,7 +245,7 @@ lintOptions {
 
 删除`android.signingConfigs`属性，用根据 Android Studio 的提示使用证书就行
 
-改完以上两项基本上是可以编译了，但是代码可能各种报错，Android Studio Project 窗口看下External Libraries，很多android/第三方库中可能只有一个 AndroidManifest.xml，正常应该包含一个 classes.jar，可能有其他资源文件：
+改完以上几项基本上是可以编译了，但是代码可能各种报错，Android Studio Project 窗口看下External Libraries，很多android/第三方库中可能只有一个 AndroidManifest.xml，正常应该包含一个 classes.jar，可能有其他资源文件：
 
 ![image-20220921172407124](image-20220921172407124.png)
 
@@ -377,7 +377,7 @@ Uri apkUri =
 java.lang.NullPointerException: Attempt to invoke virtual method ‘android.content.res.XmlResourceParser android.content.pm.ProviderInfo.loadXmlMetaData(android.content.pm.PackageManager, java.lang.String)’ on a null object reference
 ```
 
-`FileProvider.getUriForFile`的第二参数 provider 的`authorities`属性名传递错误，注意对比传入的字符串和 AndroidManifest.xml 中的`provider`配置
+`FileProvider.getUriForFile`的第二参数 provider 的`authorities`属性值传递错误，注意对比传入的字符串和 AndroidManifest.xml 中的`provider`配置
 
 > [NullPointerException: Attempt to invoke virtual method ‘android.content.res.XmlResourceParser androi_android_9527_的博客-CSDN博客](https://blog.csdn.net/android_9527_/article/details/107555134)
 
