@@ -145,6 +145,14 @@ platform-tools>adb pull /data/app/~~hPzRSKuT3wQJdF-_OdNwng==/net.ossrs.flutter_l
 >
 > [adb 命令大全（简洁明了）adb命令启动应用_ihoudf的博客-CSDN博客_adb启动应用](https://blog.csdn.net/HDFQQ188816190/article/details/98599940)
 
+# Android Studio
+
+### 使用代理
+
+![image-20220922171206542](image-20220922171206542.png)
+
+貌似这里设置了之后会连同 gradle 也是用代理，可以不用到 gradle.properties 中再去配置。
+
 # Gradle
 
 ### 使用代理
@@ -311,9 +319,30 @@ src
 >
 > 可以使用 Android Studio 右键 src 目录 - new - Directory，可以直接创建`main/java`/`test/java`/`androidTest`等目录。
 
+---
 
+还有更离谱的，打开工程，看着它下载了一会各种依赖，完成后发现 Project 窗口中没有显示 app 或其他 module，也没有显示 gradle 文件夹，只有几个文件，gradle sync 后也只显示了个 failed（竟然是绿色的）。
 
-# 报错
+检查 settings.gradle 文件中是否`include`了 module
+
+```nginx
+include ':app', ':libksylive'
+```
+
+从资源管理器中打开工程目录 - gradle - wrapper - gradle-wrapper.properties
+
+```properties
+#Fri Feb 09 10:39:56 CST 2018
+distributionBase=GRADLE_USER_HOME
+distributionPath=wrapper/dists
+zipStoreBase=GRADLE_USER_HOME
+zipStorePath=wrapper/dists
+distributionUrl=https\://services.gradle.org/distributions/gradle-4.10.1-all.zip
+```
+
+查看 gradle 是否版本过低了，截止 2022-09-22，最低版本要求是 4.6，手动改到支持的版本，然后重新打开工程、gradle sync。
+
+# 问题/报错
 
 ### Manifest merger failed with multiple errors, see logs
 
@@ -364,7 +393,7 @@ so动态链接库的代码并非PIC（Position independent code）
 - implementation 'com.android.support:appcompat-v7:26.1.0' 版本改为 `22+`
 - 删除一些控件不支持的属性，如`roundIcon`
 
-### java.lang.NullPointerException: Attempt to invoke virtual method ‘android.content.res.XmlResourceParser android.content.pm.ProviderInfo.loadXmlMetaData(android.content.pm.PackageManager, java.lang.String)’ on a null object reference
+### java.lang.NullPointerException: android.content.pm.ProviderInfo.loadXmlMetaData
 
 使用 FileProvider 创建 uri 时报错
 
@@ -384,3 +413,7 @@ java.lang.NullPointerException: Attempt to invoke virtual method ‘android.cont
 ### External Libraries android/第三方库中可能只有一个 AndroidManifest.xml、代码中引用报错
 
 工程目录有问题，参看上文
+
+### Android Studio SDK Manager 中只有已安装的 SDK，没有未安装的
+
+没有正常连接到 SDK Update Sites，可以在 SDK Update Sites Tab 页中添加国内镜像，或着配置 Android Studio 代理，参看上文
