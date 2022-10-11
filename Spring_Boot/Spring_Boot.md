@@ -1,14 +1,20 @@
 # Spring Boot
 
-# @ModelAttribute 和 HandlerInterceptor
+过滤器与拦截器
 
-经测试调用顺序为
+![_1](dc9e75be16fa56d90ef7eb06b2a658dc568a1165.png)
 
-1. preHandle
-2. @ModelAttribute
-3. @RequestMapping
-4. postHandle
-5. afterCompletion
+
+
+### @ModelAttribute 和 HandlerInterceptor
+
+`@ModelAttribute`，也属于控制器部分，只是在控制器之前执行，所以他们的顺序为：
+
+1. `Interceptor`preHandle
+2. `controller`@ModelAttribute
+3. `controller`@RequestMapping
+4. `Interceptor`postHandle
+5. `Interceptor`afterCompletion
 
 ### 接口访问控制
 
@@ -354,6 +360,10 @@ java -jar stream_server-0.0.1-SNAPSHOT.jar --server.port=8086 --hlsdir=C:\Users\
 idea 没有识别到 maven，或者没有加载这个 maven 项目
 
 右侧点击 Maven，可以看到项目列表，如果这里已有，点击左上角的刷新按钮（Reload All Maven Projects）即可；如果没有，点击添加，选择 pom.xml 文件
+
+---
+
+点击 File - Invalidate Cache，重新打开后尝试创建启动项
 
 ### Spring Security 登录报 The request was rejected
 
