@@ -87,6 +87,76 @@ sdp 为 answerSDP，完成 SDP 交换即开始拉流。
 
 offerSDP 不合法，在创建 offerSDP 前应完成添加本地的音视频流。
 
+### SDP 交换后 serve error code=4043
+
+实测这个4043不代表失败，实际可以通过 srs 自带的测试页测试：
+
+```
+https://192.168.3.200:18443/players/rtc_player.html?schema=https&port=18443&api=18443
+```
+
+播放地址：
+
+```
+webrtc://192.168.3.200:18444/live/live3
+```
+
+上述的`18443`为 http server ssl 端口，`18444`为 http api 的 ssl 端口
+
+```
+[2022-09-26 23:26:21.113][Error][2857][06d73d95][0] serve error code=4043 : parse message : parse message : grow buffer : read bytes : SSL_read r0=0, r1=6, r2=0, r3=1
+thread [2857][06d73d95]: process_requests() [src/app/srs_app_http_conn.cpp:183][errno=0]
+thread [2857][06d73d95]: parse_message() [src/protocol/srs_service_http_conn.cpp:98][errno=0]
+thread [2857][06d73d95]: parse_message_imp() [src/protocol/srs_service_http_conn.cpp:161][errno=0]
+thread [2857][06d73d95]: grow() [src/protocol/srs_protocol_stream.cpp:162][errno=0]
+thread [2857][06d73d95]: read() [src/app/srs_app_conn.cpp:810][errno=0]
+[2022-09-26 23:26:21.113][Trace][2857][9k1s5w0h] TCP: clear zombies=1 resources, conns=1, removing=0, unsubs=0
+[2022-09-26 23:26:21.113][Trace][2857][06d73d95] TCP: disposing #0 resource(HttpsConn)(0x2790510), conns=1, disposing=1, zombies=0
+[2022-09-26 23:26:21.171][Trace][2857][06d73d95] RTC: session address init 192.168.3.213:42157
+[2022-09-26 23:26:21.172][Trace][2857][06d73d95] RTC: session STUN done, waiting DTLS handshake.
+[2022-09-26 23:26:21.172][Trace][2857][95933902] <- RTC RECV #13, udp 184, pps 15/1, schedule 184
+[2022-09-26 23:26:21.179][Trace][2857][06d73d95] DTLS: State Passive RECV, done=0, arq=0/0, r0=1, r1=0, len=155, cnt=22, size=142, hs=1
+[2022-09-26 23:26:21.179][Trace][2857][06d73d95] DTLS: State Passive SEND, done=0, arq=0/0, r0=-1, r1=2, len=679, cnt=22, size=82, hs=2
+[2022-09-26 23:26:21.192][Trace][2857][06d73d95] DTLS: State Passive RECV, done=0, arq=0/0, r0=1, r1=0, len=577, cnt=22, size=299, hs=11
+[2022-09-26 23:26:21.193][Trace][2857][06d73d95] DTLS: State Passive SEND, done=1, arq=0/0, r0=1, r1=0, len=554, cnt=22, size=466, hs=4
+[2022-09-26 23:26:21.193][Trace][2857][06d73d95] RTC: DTLS handshake done.
+[2022-09-26 23:26:21.193][Trace][2857][06d73d95] RTC: session pub=1, sub=0, to=30000ms connection established
+[2022-09-26 23:26:21.193][Trace][2857][06d73d95] RTC: Publisher url=/live/live3 established
+[2022-09-26 23:26:21.193][Trace][2857][06d73d95] hls: win=60000ms, frag=10000ms, prefix=, path=./objs/nginx/html, m3u8=[app]/[stream].m3u8, ts=[app]/[stream]-[seq].ts, aof=2.00, floor=0, clean=1, waitk=1, dispose=0ms, dts_directly=1
+[2022-09-26 23:26:21.193][Trace][2857][06d73d95] ignore disabled exec for vhost=__defaultVhost__
+[2022-09-26 23:26:21.194][Trace][2857][06d73d95] http: mount flv stream for sid=/live/live3, mount=/live/live3.flv
+[2022-09-26 23:26:23.847][Trace][2857][y9053053] Hybrid cpu=2.00%,12MB, cid=17,2, timer=61,2,13, clock=0,33,14,1,1,0,0,0,0, free=1, objs=(pkt:59,raw:16,fua:43,msg:59,oth:1,buf:43)
+[2022-09-26 23:26:23.847][Trace][2857][y9053053] RTC: Server conns=1
+[2022-09-26 23:26:25.397][Trace][2857][06d73d95] 39B video sh,  codec(7, profile=High, level=3.1, 960x540, 0kbps, 0.0fps, 0.0s)
+[2022-09-26 23:26:25.397][Trace][2857][06d73d95] set ts=3425798668, header=11222, lost=11223
+[2022-09-26 23:26:25.735][Trace][2857][06d73d95] 7B audio sh, codec(10, profile=LC, 2channels, 0kbps, 48000HZ), flv(16bits, 2channels, 44100HZ)
+[2022-09-26 23:26:25.827][Warn][2857][06d73d95][11] VIDEO: stream not monotonically increase, please open mix_correct.
+[2022-09-26 23:26:27.152][Trace][2857][y9053053] RTC: Need PLI ssrc=713090540, play=[y9053053], publish=[06d73d95], count=1/1
+[2022-09-26 23:26:27.152][Trace][2857][06d73d95] RTC: Request PLI ssrc=713090540, play=[y9053053], count=1/1, bytes=12B
+[2022-09-26 23:26:27.198][Trace][2857][06d73d95] 39B video sh,  codec(7, profile=High, level=3.1, 960x540, 0kbps, 0.0fps, 0.0s)
+[2022-09-26 23:26:27.198][Trace][2857][06d73d95] set ts=3425978578, header=11507, lost=11508
+[2022-09-26 23:26:28.847][Trace][2857][y9053053] Hybrid cpu=4.00%,14MB, cid=17,2, timer=61,2,13, clock=0,33,14,1,1,0,0,0,0, free=1, objs=(pkt:59,raw:16,fua:43,msg:59,oth:1,buf:43)
+[2022-09-26 23:26:28.847][Trace][2857][y9053053] RTC: Server conns=1
+[2022-09-26 23:26:29.436][Trace][2857][06d73d95] 39B video sh,  codec(7, profile=High, level=3.1, 1280x720, 0kbps, 0.0fps, 0.0s)
+[2022-09-26 23:26:29.436][Trace][2857][06d73d95] set ts=3426159028, header=11888, lost=11889
+[2022-09-26 23:26:31.086][Trace][2857][06d73d95] -> HLS time=10003396ms, sno=1, ts=live3-0.ts, dur=5874ms, dva=0p
+[2022-09-26 23:26:31.169][Trace][2857][95933902] <- RTC RECV #13, udp 2086, pps 29/208, schedule 2086
+[2022-09-26 23:26:33.256][Trace][2857][06d73d95] 39B video sh,  codec(7, profile=High, level=3.1, 1280x720, 0kbps, 0.0fps, 0.0s)
+[2022-09-26 23:26:33.256][Trace][2857][06d73d95] set ts=3426522988, header=12796, lost=12797
+[2022-09-26 23:26:33.847][Trace][2857][y9053053] Hybrid cpu=5.00%,14MB, cid=17,2, timer=61,2,13, clock=0,33,14,1,1,0,0,0,0, free=1, objs=(pkt:59,raw:16,fua:43,msg:59,oth:1,buf:43)
+[2022-09-26 23:26:33.847][Trace][2857][y9053053] RTC: Server conns=1
+[2022-09-26 23:26:38.848][Trace][2857][y9053053] Hybrid cpu=4.00%,14MB, cid=51,5, timer=61,10,48, clock=0,31,16,0,0,0,0,0,0, objs=(pkt:499,raw:50,fua:448,msg:635,oth:1,buf:274)
+[2022-09-26 23:26:38.848][Trace][2857][y9053053] RTC: Server conns=1, rpkts=(280,rtp:274,stun:1,rtcp:5), spkts=(14,rtp:0,stun:1,rtcp:23), rtcp=(pli:1,twcc:9,rr:1), snk=(96,a:48,v:48,h:0), fid=(id:0,fid:280,ffid:0,addr:1,faddr:280)
+[2022-09-26 23:26:39.235][Trace][2857][y9053053] RTC: Need PLI ssrc=713090540, play=[y9053053], publish=[06d73d95], count=3/3
+[2022-09-26 23:26:39.235][Trace][2857][06d73d95] RTC: Request PLI ssrc=713090540, play=[y9053053], count=3/3, bytes=12B
+[2022-09-26 23:26:39.296][Trace][2857][06d73d95] 39B video sh,  codec(7, profile=High, level=3.1, 1280x720, 0kbps, 0.0fps, 0.0s)
+[2022-09-26 23:26:39.296][Trace][2857][06d73d95] set ts=3427066588, header=14495, lost=14496
+[2022-09-26 23:26:41.102][Trace][2857][06d73d95] -> HLS time=20007135ms, sno=2, ts=live3-1.ts, dur=1804ms, dva=0p
+
+```
+
+
+
 ### SDP 中音视频存在位置相反的情况
 
 未测试是否有影响，可手动交换一下
