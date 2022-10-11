@@ -71,13 +71,17 @@ cp -rp !(bak1|bak2) bak1
 ls
 # 文件列表，列出权限
 ls -l
+
 # 解压
 tar -xvf repo.tar
 tar -zxvf repo.tar.gz
-# 压缩repo文件夹
-tar -zxvf repo.tar.gz repo
 # 指定解压目录
 tar -zxvf mysql-xxx.tar.gz -C /usr/local
+
+# 压缩repo文件夹
+tar -zcvf repo.tar.gz repo
+# 压缩repo文件夹，保留路径
+tar -zcvf repo.tar.gz /usr/local/repo
 ```
 
 > [!TIP]
