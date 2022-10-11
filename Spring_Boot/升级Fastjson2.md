@@ -4,7 +4,7 @@
 
 fastjson 漏洞频发，又换不掉，那就只能紧跟新版了:dog:
 
-##### maven 删除 fastjson，配置 fastjson2
+### maven 删除 fastjson，配置 fastjson2
 
 ```xml
 <dependency>
@@ -14,7 +14,7 @@ fastjson 漏洞频发，又换不掉，那就只能紧跟新版了:dog:
 </dependency>
 ```
 
-##### 简单使用
+### 简单使用
 
 即序列化、反序列化、对象构建部分，只需更改包名即可：
 
@@ -31,7 +31,7 @@ JSONArray.parseArray();
 JSON.parseArray()
 ```
 
-##### MessageConverter（消息转换器）
+### MessageConverter（消息转换器）
 
 fastjson 和 fastjson2 都是通过实现 WebMvcConfigurer，在`extendMessageConverters`或`configureMessageConverters`方法中添加消息转换器。
 
@@ -69,7 +69,7 @@ public class MessageConverterConfig implements WebMvcConfigurer {
 
 > [fastjson2/spring_support_cn.md at main · alibaba/fastjson2 (github.com)](https://github.com/alibaba/fastjson2/blob/main/docs/spring_support_cn.md)
 
-##### 枚举类型序列化的问题
+### 枚举类型序列化的问题
 
 测试发现枚举类型默认的序列化方式为：
 
