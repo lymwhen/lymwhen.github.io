@@ -1,8 +1,11 @@
 # Windows
 
-Windows操作系统，是由美国[微软](https://baike.baidu.com/item/微软/124767)公司（Microsoft）研发的操作系统，问世于1985年。起初是[MS-DOS](https://baike.baidu.com/item/MS-DOS/1120792)模拟环境，后续由于微软对其进行不断更新升级，提升易用性，使Windows成为了应用最广泛的操作系统 [1] 。
-
-Windows采用了图形用户界面（[GUI](https://baike.baidu.com/item/GUI/479966)），比起从前的[MS-DOS](https://baike.baidu.com/item/MS-DOS/1120792)需要输入指令使用的方式更为人性化。随着计算机硬件和软件的不断升级，Windows也在不断升级，从架构的16位、[32位](https://baike.baidu.com/item/32位/5812218)再到[64位](https://baike.baidu.com/item/64位/2262282)，系统版本从最初的[Windows 1.0](https://baike.baidu.com/item/Windows 1.0/761751)到大家熟知的[Windows 95](https://baike.baidu.com/item/Windows%2095/757614)、[Windows 98](https://baike.baidu.com/item/Windows%2098/758579)、[Windows 2000](https://baike.baidu.com/item/Windows%202000/2769068)、[Windows XP](https://baike.baidu.com/item/Windows%20XP/191927)、[Windows Vista](https://baike.baidu.com/item/Windows%20Vista/214535)、[Windows 7](https://baike.baidu.com/item/Windows%207/1083761)、[Windows 8](https://baike.baidu.com/item/Windows%208/6851933)、[Windows 8.1](https://baike.baidu.com/item/Windows%208.1/768457)、[Windows 10](https://baike.baidu.com/item/Windows%2010/6877791)、[Windows 11](https://baike.baidu.com/item/Windows%2011/57321047)和[Windows Server](https://baike.baidu.com/item/Windows%20Server/271508)服务器企业级操作系统，微软一直在致力于Windows操作系统的开发和完善 [1] [17] 。
+```bash
+# 查看用户信息
+net user administrator
+# 重置密码（须以管理员运行的cmd）
+net user administrator Password123456
+```
 
 # 计划任务
 
