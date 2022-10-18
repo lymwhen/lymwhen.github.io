@@ -71,6 +71,15 @@ cd ZLMediaKit/release/linux/Debug
 ./MediaServer -d &
 ```
 
+> [!TIP]
+>
+> 在 ubuntu 会遇到非 root 用户无法使用 1024 一下端口的问题，可将`MediaServer`所有者设为 root，并授予`u+s`权限（执行文件时临时获得 root 权限）。
+>
+> ```bash
+> sudo chown root MediaServer
+> sudo chmod u+s MediaServer
+> ```
+
 # 测试
 
 查看配置文件：[ZLMediaKit/config.ini at master · ZLMediaKit/ZLMediaKit (github.com)](https://github.com/zlmediakit/ZLMediaKit/blob/master/conf/config.ini)
@@ -284,3 +293,99 @@ streamMicroPhone.getTracks().forEach(track => {
 ```
 
 > [webrtc 浏览器启用麦克风将其当做 audio track 传给对方 | Zach Ke's Notes (kebingzao.com)](https://kebingzao.com/2022/07/04/webrtc-add-microPhone-track/)
+
+### webrtc 断线重连
+
+一直有疑惑 webrtc 断线怎么重连，直到看到这个：
+
+> 参考这个：https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Session_lifetime#ICE_restart
+>
+> ICE重启
+> 有时，在WebRTC会话的生命周期中，网络状况会发生变化。例如，其中一个用户可能会从蜂窝网络过渡到WiFi网络，或者网络可能会拥塞。发生这种情况时，ICE代理可能会选择执行ICE重新启动。这是网络连接重新协商的过程，与初始ICE协商执行的方式完全相同，但有一个例外：媒体继续在原始网络连接上流动，直到新的网络连接启动并运行。然后媒体转移到新的网络连接，旧的关闭。
+>
+> 不同的浏览器在不同的条件下支持ICE重启。例如，由于网络拥塞，并非所有浏览器都会执行ICE重启。
+>
+> 有两个级别的ICE重新启动：完全ICE重新启动会导致会话中的所有媒体流重新协商。部分ICE重新启动允许ICE重新协商特定媒体流，而不是一次性重新谈判所有媒体流。但是，有些浏览器还不支持部分ICE重启。 <<<你如何触发每个？>>>
+>
+> 如果您需要以某种方式更改连接的配置（例如更改为不同的ICE服务器集），则可以在重新启动ICE之前通过使用更新的RTCConfiguration字典调用RTCPeerConnection.setConfiguration（）来重新启动ICE之前完成此操作。
+>
+> 要显式触发ICE重新启动，只需调用RTCPeerConnection.createOffer（），指定iceRestart选项的值为true，即可启动协商过程。然后像以往一样处理连接过程。
+>
+> [DataChannel断网重连 · Issue #3 · JumpingYang001/webrtc (github.com)](https://github.com/JumpingYang001/webrtc/issues/3#issuecomment-388746806)
+
+> [@Janron](https://github.com/Janron) , 你可以试下这个demo：https://webrtc.github.io/samples/src/content/peerconnection/restart-ice/
+> 如果demo没问题，那就是你的代码写得有问题。
+> 如果demo有问题，那可能是bug，类似这个：[webrtc/samples#863](https://github.com/webrtc/samples/issues/863)
+>
+> [DataChannel断网重连 · Issue #3 · JumpingYang001/webrtc (github.com)](https://github.com/JumpingYang001/webrtc/issues/3#issuecomment-396118501)
+
+简单说是通过 ICE 重启导致会话中的所有媒体流重新协商，达到重连的目的。
+
+- 隐式：使用更新的RTCConfiguration字典调用`RTCPeerConnection.setConfiguration()`
+- 显式：调用`RTCPeerConnection.createOffer()`，指定iceRestart选项的值为true，然后像以往一样处理连接过程
+
+大佬的 demo 中重启 ICE 的核心代码：
+
+```javascript
+offerOptions.iceRestart = true;
+pc1.createOffer(offerOptions).then(onCreateOfferSuccess, onCreateSessionDescriptionError);
+```
+
+Android 代码：
+
+```java
+// 显示
+MediaConstraints cons = new MediaConstraints();
+if(isRestart){
+    cons.mandatory.add(new MediaConstraints.KeyValuePair("IceRestart", "true"));
+}
+// 创建offer
+peerConnection.createOffer(new SdpObserver() {...}, cons);
+```
+
+使用 Android 向 ZLM 服务器 webrtc 推流，在 web 端播放观看，ICE 状态为：
+
+```log
+D/peer: remote onSignalingChange "STABLE"
+D/peer: remote onIceGatheringChange "GATHERING"
+D/peer: remote onIceCandidate {"adapterType":"UNKNOWN"...
+D/peer: remote onIceCandidate {"adapterType":"UNKNOWN"...
+D/peer: remote onIceCandidate {"adapterType":"UNKNOWN"...
+D/peer: remote onIceCandidate {"adapterType":"UNKNOWN"...
+D/answer setRemoteSDP: onSetSuccess
+D/peer: remote onIceConnectionChange "CONNECTED"
+D/peer: remote onIceGatheringChange "COMPLETE"
+```
+
+断开 wifi 后立即重新打开，大概2s后
+
+```log
+D/peer: remote onIceConnectionChange "DISCONNECTED"
+```
+
+再过几秒
+
+```log
+2022-10-12 17:33:53.430 8260-8348/com.chunshu.srstest D/peer: remote onIceConnectionChange "FAILED"
+```
+
+测试在`DISCONNECTED`时，显式重启 ICE，播放端可以继续播放，即重连成功
+
+```log
+D/peer: remote onIceGatheringChange "GATHERING"
+D/peer: remote onIceCandidate {"adapterType":"UNKNOWN","sdp":"candidate:1489091541 1 udp 2122260223 192.168.3.213 40859 typ host generation 4 ufrag Yq0W network-id 3 network-cost 10","sdpMLineIndex":0,"sdpMid":"0","serverUrl":""}
+D/peer: remote onIceCandidate {"adapterType":"UNKNOWN","sdp":"candidate:1510613869 1 udp 2122129151 127.0.0.1 45311 typ host generation 4 ufrag Yq0W network-id 1","sdpMLineIndex":0,"sdpMid":"0","serverUrl":""}
+D/peer: remote onIceGatheringChange "COMPLETE"
+D/peer: remote onIceConnectionChange "COMPLETED"
+```
+
+在`FAILED`时，显式重启 ICE，播放端不会继续播放，也会打印以上日志，但后面陆续打印`DISCONNECTED`、`FAILED`。
+
+猜想推流与点对点连接不一样的是对端的等待时间，长时间未重连上，服务端已经关闭了连接？
+
+猜想一种重连思路：`DISCONNECTED`时立马重启 ICE，`FAILED`时重新创建会话
+
+##### 其他问题
+
+> [重新连接WebRTC对等连接的正确步骤？ - 问答 - 腾讯云开发者社区-腾讯云 (tencent.com)](https://cloud.tencent.com/developer/ask/sof/211797)
+
