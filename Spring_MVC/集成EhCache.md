@@ -1,5 +1,9 @@
 # 集成 EhCache
 
+ehcache 使用的是 spring cache：[Integration (spring.io)](https://docs.spring.io/spring-framework/docs/current/reference/html/integration.html#cache-annotations)
+
+spring boot 参看[Integration (spring.io)](https://docs.spring.io/spring-framework/docs/current/reference/html/integration.html#cache-annotation-enable)
+
 # pom.xml
 
 ```xml
@@ -134,8 +138,6 @@ public class UserServiceImpl implements IUserService {
 
 @Cacheable**可以标记在一个方法上，也可以标记在一个类上**。当标记在一个方法上时表示该方法是支持缓存的，当标记在一个类上时则表示该类所有的方法都是支持缓存的。对于一个支持缓存的方法，Spring会在其被调用后将其返回值缓存起来，以保证下次利用同样的参数来执行该方法时可以直接从缓存中获取结果，而不需要再次执行该方法。可使用`value`、`key`、`condition`属性。
 
-### key
-
 Spring在缓存方法的返回值时是以键值对进行缓存的，值就是方法的返回结果，至于键的话，Spring又支持两种策略，默认策略和自定义策略。
 
 ##### 默认策略
@@ -148,47 +150,70 @@ Spring在缓存方法的返回值时是以键值对进行缓存的，值就是�
 
 ##### 自定义策略
 
-自定义策略是指我们可以通过Spring的EL表达式来指定我们的key。这里的EL表达式可以使用方法参数及它们对应的属性。使用方法参数时我们可以直接使用“#参数名”或者“#p参数index”
+自定义策略是指我们可以通过 Spring EL 表达式（spel）来指定`key`、`condition`、`unless`、`sync`等属性。
 
 ```java
 // 将查询结果放入缓存，再次使用同一userNo查询时，直接返回缓存中的值
 @Cacheable(value="myCache", key="'get'+#userNo")
 public String get(String userNo){}
 
+// 参数索引
 @Cacheable(value="users", key="#p0")
 public User find(Integer id) {}
 
+// 参数属性
 @Cacheable(value="users", key="#user.id")
 public User find(User user) {}
-
 @Cacheable(value="users", key="#p0.id")
 public User find(User user) {}
+
+// 条件
+@Cacheable(cacheNames="book", condition="#name.length() < 32", unless="#result.hardback") 
+public Book findBook(String name)
+
+// 当参数为null或结果为null时不缓存
+@Cacheable(value="users", key="'dicCache'+#p0", unless="#p0 == null || #result==null")
+public User find(Integer id) {}
+
+// 多种声明
+@Caching(evict = { @CacheEvict(cacheNames="dicCache" ,key="'dic_pid_'+#dic.pid"),
+                  @CacheEvict(cacheNames="dicCache" ,key="'dic_'+#dic.id", condition = "#dic.id != null"),
+                  @CacheEvict(cacheNames="dicCache" ,key="'dic_'+#dic.name") })
+public boolean saveOrUpdate(Dic dic);
+
+// 清除全部缓存
+@CacheEvict(value="dicCache",allEntries=true)
+public boolean removeById(Serializable id);
 ```
 
-除了上述使用方法参数作为key之外，Spring还为我们提供了一个root对象可以用来生成key。通过该root对象我们可以获取到以下信息。
+spring cache 可用的 spel 表达式：
 
-| 属性名称    | 描述                        | 示例                 |
-| ----------- | --------------------------- | -------------------- |
-| methodName  | 当前方法名                  | #root.methodName     |
-| method      | 当前方法                    | #root.method.name    |
-| target      | 当前被调用的对象            | #root.target         |
-| targetClass | 当前被调用的对象的class     | #root.targetClass    |
-| args        | 当前方法参数组成的数组      | #root.args[0]        |
-| caches      | 当前被调用的方法使用的Cache | #root.caches[0].name |
+| Name          | Location           | Description                                                  | Example                                                      |
+| :------------ | :----------------- | :----------------------------------------------------------- | :----------------------------------------------------------- |
+| `methodName`  | Root object        | The name of the method being invoked                         | `#root.methodName`                                           |
+| `method`      | Root object        | The method being invoked                                     | `#root.method.name`                                          |
+| `target`      | Root object        | The target object being invoked                              | `#root.target`                                               |
+| `targetClass` | Root object        | The class of the target being invoked                        | `#root.targetClass`                                          |
+| `args`        | Root object        | The arguments (as array) used for invoking the target        | `#root.args[0]`                                              |
+| `caches`      | Root object        | Collection of caches against which the current method is run | `#root.caches[0].name`                                       |
+| Argument name | Evaluation context | Name of any of the method arguments. If the names are not available (perhaps due to having no debug information), the argument names are also available under the `#a<#arg>` where `#arg` stands for the argument index (starting from `0`). 任意方法参数的名称、`#a`/`#p` + 参数索引 | `#iban` or `#a0` (you can also use `#p0` or `#p<#arg>` notation as an alias). |
+| `result`      | Evaluation context | The result of the method call (the value to be cached). Only available in `unless` expressions, `cache put` expressions (to compute the `key`), or `cache evict` expressions (when `beforeInvocation` is `false`). For supported wrappers (such as `Optional`), `#result` refers to the actual object, not the wrapper. 方法调用的结果（被缓存的值），**仅可用于 unless 表达式**。 | `#result`                                                    |
 
+> [Integration (spring.io)](https://docs.spring.io/spring-framework/docs/current/reference/html/integration.html#cache-spel-context)
+>
 > [SpringMVC整合Ehcache_半步多-CSDN博客](https://blog.csdn.net/jadyer/article/details/12257865)
 >
 > [Spring缓存注解@Cacheable、@CacheEvict、@CachePut使用 - fashflying - 博客园 (cnblogs.com)](https://www.cnblogs.com/fashflying/p/6908028.html)
 
 # @CachePut
 
-@CachePut也可以声明一个方法支持缓存功能。与@Cacheable不同的是使用@CachePut标注的方法在执行前不会去检查缓存中是否存在之前执行过的结果，而是每次都会执行该方法，并将执行结果以键值对的形式存入指定的缓存中。**也就是这个方法一定执行并更新缓存，而别的方法可以使用这里的缓存**。可使用`value`、`key`、`condition`属性。
+`@CachePut`也可以声明一个方法支持缓存功能。与@Cacheable不同的是使用@CachePut标注的方法在执行前不会去检查缓存中是否存在之前执行过的结果，而是每次都会执行该方法，并将执行结果以键值对的形式存入指定的缓存中。**也就是这个方法一定执行并更新缓存，而别的方法可以使用这里的缓存**。可使用`value`、`key`、`condition`属性。
 
 key 同 @Cacheable
 
 # @CacheEvict
 
- @CacheEvict是用来标注在需要清除缓存元素的方法或类上的。当标记在一个类上时表示其中所有的方法的执行都会触发缓存的清除操作。@CacheEvict可以指定的属性有`value`、`key`、`condition`、`allEntries`和`beforeInvocation`。
+` @CacheEvict`是用来标注在需要清除缓存元素的方法或类上的。当标记在一个类上时表示其中所有的方法的执行都会触发缓存的清除操作。@CacheEvict可以指定的属性有`value`、`key`、`condition`、`allEntries`和`beforeInvocation`。
 
 key 同 @Cacheable
 
@@ -270,3 +295,26 @@ public class UserServiceImpl implements IUserService {
 ```
 
 > [Spring Cache @Cacheable 缓存在部分Service中不生效的解决办法 - JAVA开发 - StoneWu 的博客](https://www.stonewu.com/article/spring-cache-cacheable-not-working-in-some-service)
+
+### 接口注解
+
+直接在接口中使用缓存注解即可正常生效。但当接口中的方法仅在实现类的父类中实现时，接口方法上的缓存注解无效：
+
+例如在接口中声明 Mybatis Plus 的`saveOrUpdate`方法，并使用缓存
+
+```java
+@CacheEvict(value="dicCache" ,key="'dic_pid_'+#dic.pid")
+public boolean saveOrUpdate(Dic dic);
+```
+
+这个方法仅在实现类的父类`ServiceImpl<M extends com.baomidou.mybatisplus.core.mapper.BaseMapper<T>, T>`中实现。
+
+要使注解生效，可以在实现类中实现该方法：
+
+```java
+@Override
+public boolean saveOrUpdate(Dic dic){
+    return super.saveOrUpdate(dic);
+}
+```
+
