@@ -7,6 +7,7 @@
     * [interface](java/基础知识/interface.md)
     * [线程](java/基础知识/线程.md)
     * [线程池](java/基础知识/线程池.md)
+    * [同步锁](java/基础知识/同步锁.md)
     * [反射](java/基础知识/反射.md)
   * [Spring_MVC](Spring_MVC/Spring_MVC.md)
     * [工程搭建](Spring_MVC/工程搭建.md)
