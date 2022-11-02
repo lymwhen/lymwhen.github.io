@@ -58,6 +58,17 @@ cmd - taskschd
 - 每隔 1 天发生一次
 - 重复任务间隔，输入`1分钟`
 
+> [!TIP]
+>
+> 计划任务中运行 tomcat 闪退，可能是在运行的用户下没有环境变量，可以在脚本中加上
+>
+> ```bash
+> set "JAVA_HOME=D:\tools\java\jdk1.6"
+> set "CATALINA_HOME=D:\projects\mtxx\eflow"
+> ```
+>
+> 
+
 # 批处理
 
 ```batch
