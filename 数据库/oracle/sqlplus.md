@@ -392,3 +392,215 @@ CREATE INDEXTYPE
 11 rows selected.
 ```
 
+# 参数调整
+
+##### 连接数
+
+```sql
+# 查询当前使用的process、session数量。
+select count(*) from v$process;
+select count(*) from v$session;
+# 连接数（实测4000会导致数据库无法启动）
+alter system set processes=2000 scope=spfile;
+alter system set sssions=2205 scope=spfile;
+```
+
+> [ORA-00018-超出最大连接数 - kkqq8860928 - 博客园 (cnblogs.com)](https://www.cnblogs.com/apromise/p/9081801.html)
+
+# 调整配置导致实例无法启动
+
+调整数据库参数如内存、最大连接数等导致数据库无法启动。
+
+> **pfile**: 初始化参数文件（Initialization Parameters Files），Oracle 9i之前，ORACLE一直采用pfile方式存储初始化参数，pfile 默认的名称为“init+例程名.ora”文件路径：/data/app/oracle/product/12.1.0/dbhome_1/dbs，这是一个文本文件，可以用任何文本编辑工具打开。
+>
+> **spfile:**服务器参数文件（Server Parameter Files），从Oracle 9i开始，Oracle引入了Spfile文件，spfile 默认的名称为“spfile+例程名.ora”文件路径：/data/app/oracle/product/12.1.0/dbhome_1/dbs 以二进制文本形式存在，不能用vi编辑器对其中参数进行修改，只能通过SQL命令在线修改。
+>
+> [oracle的参数文件：pfile和spfile - 小强斋太 - 博客园 (cnblogs.com)](https://www.cnblogs.com/xqzt/p/4832597.html)
+>
+> 测试发现`show parameter spfile`和`show parameter pfile`返回结果一样：
+>
+> ```bash
+> NAME                                 TYPE        VALUE
+> ------------------------------------ ----------- ------------------------------
+> spfile                               string      D:\APP\LYMLY\PRODUCT\11.1.0\DB
+>                                                  _1\DATABASE\SPFILEORCL.ORA
+> ```
+>
+> 所以猜想 11g 版本已经只通过`spfile`进行参数控制了？
+
+
+
+无法启动实例是因为不合理的改动了`spfile`中的参数，可以用安装数据库时初始的`pfile`启动数据库，再从这个`pfile`重新生成`spfile`。
+
+> [!TIP]
+>
+> 初始的`pfile`位于`D:\app\lymly\admin\orcl\pfile\pfile.ora.xxxxxxxxxxxxxxx`，可以复制一下，改名为`init.ora`备用。
+
+```bash
+cd /d D:\app\lymly\product\11.1.0\db_1\BIN
+
+# 启动监听
+lsnrctl start
+
+# 无实例连接
+sqlplus /nolog
+SQL> conn / as sysdba
+# 或
+sqlplus / as sysdba
+已连接到空闲例程。
+
+# 用初始的pfile启动数据库
+SQL> startup pfile=D:\app\lymly\admin\orcl\pfile\init.ora
+ORACLE 例程已经启动。
+
+Total System Global Area  857903104 bytes
+Fixed Size                  1336540 bytes
+Variable Size             490736420 bytes
+Database Buffers          360710144 bytes
+Redo Buffers                5120000 bytes
+数据库装载完毕。
+数据库已经打开。
+SQL> create spfile from pfile='D:\app\lymly\admin\orcl\pfile\init.ora';
+
+文件已创建。
+
+SQL> exit
+从 Oracle Database 11g Enterprise Edition Release 11.1.0.6.0 - Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options 断开
+```
+
+`services.msc`里重新启动 oracle 服务，如果`OracleServiceORCL`启动的较慢，进度跑到一半才差不多启动启动完，说明启动正常。刚刚启动好可能是连不上的，貌似需要等他反应一会:dog:
+
+> [SQL> startup ORA-01031: insufficient privileges_阿文_ing的博客-CSDN博客](https://blog.csdn.net/qq_41793064/article/details/90404814)
+
+##### 实例/无实例连接报错：ORA-01031: insufficient privileges
+
+这个是比较普遍的错误，连接数据库、startup等时候都可能报，基本上就是因为**当前用户没有在`ora_dba`组里**。所以我遇到的情况就是在`Administrator`用户安装一切正常，在其他用户安装就报`ORA-01031: insufficient privileges`。
+
+当前用户没有在`ora_dba`用户组里
+
+windows cmd 运行`compmgmt.msc` - 本地用户和组
+
+- 检查组`ora_dba`是否存在
+
+- 检查当前用户是否在`ora_dba`组：右键用户名 - 属性 - 隶属于是否包含`ora_dba`，如没有则添加
+
+> [ERROR:ORA-01031:insufficient privileges完美解决方法_jcbiubiubiu的博客-CSDN博客_ora-01031:insufficient privileges](https://blog.csdn.net/qq_41464283/article/details/89684302)
+
+##### 连接报错：ORA-12560: TNS: 协议适配器错误
+
+需要启动windows services 里的 oracle 服务。
+
+##### 连接报错：ORA-12641: 验证服务无法初始化解决
+
+`D:\app\lymly\product\11.1.0\db_1\NETWORK\ADMIN\sqlnet.ora`
+
+```
+SQLNET.AUTHENTICATION_SERVICES= (NTS)
+```
+
+windows 系统下`ALL`无效，应使用`NTS`：操作系统认证，参看下文
+
+# oracle 的认证方式
+
+`D:\app\lymly\product\11.1.0\db_1\NETWORK\ADMIN\sqlnet.ora`
+
+```
+SQLNET.AUTHENTICATION_SERVICES= (NTS)
+```
+
+> #### SQLNET.AUTHENTICATION_SERVICES
+>
+> Use the parameter to enable one or more authentication services. `sqlnet.ora``SQLNET.AUTHENTICATION_SERVICES`
+>
+> Purpose
+>
+> To enable one or more authentication services. If authentication has been installed, then it is recommended that this parameter be set to either or to one of the listed authentication methods. `none`
+>
+> Usage Notes
+>
+> When using the value , the server attempts to authenticate using each of the following methods. The server falls back to the ones lower on the list if the ones higher on the list were unsuccessful. `SQLNET.AUTHENTICATION_SERVICES``all`
+>
+> - Authentication based on a service external to the database, such as a service on the network layer, Kerberos, or RADIUS.
+> - Authentication based on the operating system user's membership in an administrative operating system group. Group names are platform-specific. This authentication is applicable to administrative connections only.
+> - Authentication performed by the database.
+> - Authentication based on credentials stored in a directory server.
+>
+> Operating system authentication allows access to the database using any user name and any password when an administrative connection is attempted, such as using the clause when connecting using SQL*Plus. An example of a connection is as follows. `AS SYSDBA`
+>
+> ```
+> Copy
+> sqlplus ignored_username/ignored_password AS SYSDBA
+> ```
+>
+> When the operating-system user who issued the preceding command is already a member of the appropriate administrative operating system group, then the connection is successful. This is because the user name and password are ignored by the server due to checking the group membership first.
+>
+> See Also:
+>
+> [*Oracle Database Security Guide*](https://docs.oracle.com/pls/topic/lookup?ctx=en/database/oracle/oracle-database/19/netrf&id=DBSEG003) for additional information about authentication methods
+>
+> Default
+>
+> ```
+> all
+> ```
+>
+> Note:When installing the database with Database Configuration Assistant (DBCA), this parameter may be set to `nts` in the `sqlnet.ora` file.
+>
+> Values
+>
+> Authentication methods available with Oracle Net Services:
+>
+> - `none` for no authentication methods, including Microsoft Windows native operating system authentication. When is set to , a valid user name and password can be used to access the database. `SQLNET.AUTHENTICATION_SERVICES``none`
+> - `all` for all authentication methods.
+> - `beq` for native operating system authentication for operating systems other than Microsoft Windows
+> - `kerberos5` for Kerberos authentication
+> - `nts` for Microsoft Windows native operating system authentication
+> - `radius` for Remote Authentication Dial-In User Service (RADIUS) authentication
+> - `tcps` for TLS authentication
+>
+> Example
+>
+> ```
+> Copy
+> SQLNET.AUTHENTICATION_SERVICES=(kerberos5)
+> ```
+>
+> See Also:
+>
+> [*Oracle Database Security Guide*](https://docs.oracle.com/pls/topic/lookup?ctx=en/database/oracle/oracle-database/19/netrf&id=DBSEG9768)
+>
+> **Parent topic:** [sqlnet.ora Profile Parameters](https://docs.oracle.com/en/database/oracle/oracle-database/19/netrf/parameters-for-the-sqlnet.ora.html#GUID-897ABB80-64FE-4F13-9F8C-99361BB4465C)
+>
+> [Parameters for the sqlnet.ora File (oracle.com)](https://docs.oracle.com/en/database/oracle/oracle-database/19/netrf/parameters-for-the-sqlnet.ora.html#GUID-FFDBCCFD-87EF-43B8-84DA-113720FCC095)
+
+> 2、Windows平台 
+>
+> 对于Windows平台 ，参数SQLNET.AUTHENTICATION_SERVICES 主要是以下几种情况： 
+>
+> (1). sqlnet.ora文件为空，或用#注释掉       --密码文件验证通过，操作系统认证无法通过 
+> (2). SQLNET.AUTHENTICATION_SERVICES = (NTS)   --操作系统验证通过，密码文件认证也能通过 
+> (3). SQLNET.AUTHENTICATION_SERVICES = (NONE)   --密码文件验证通过，操作系统认证无法通过 
+> (4). SQLNET.AUTHENTICATION_SERVICES = (NONE,NTS) --操作系统验证通过(前后顺序颠倒也一样)，密码文件认证也能通过
+> (5). SQLNET.AUTHENTICATION_SERVICES = (ALL)  --在windows下，该种为错误方式，会报如下错误： 
+>
+> ![img](190916173245171.png)
+>
+> 3、Linux平台 
+>
+> 对于Linux平台，参数SQLNET.AUTHENTICATION_SERVICES主要是以下几种情况： 
+>
+> (1). sqlnet.ora文件为空，或用#注释掉              --操作系统验证通过，密码文件认证无法通过 
+> (2). SQLNET.AUTHENTICATION_SERVICES = (NTS)   --操作系统验证无法通过，密码文件认证也无法通过 
+> (3). SQLNET.AUTHENTICATION_SERVICES = (NONE)   --操作系统验证无法通过，密码文件认证也无法通过 
+> (4). SQLNET.AUTHENTICATION_SERVICES = (NONE,NTS) --基于操作系统验证(前后顺序颠倒也一样)，密码文件认证也能通过 
+> (5). SQLNET.AUTHENTICATION_SERVICES = (ALL)    --操作系统验证通过，密码文件认证无法通过 
+>
+> 4、总结 
+>
+> (1) 该参数默认值为ALL，当通过DBCA建库时，该参数可能为NTS。
+> (2) 在Windows中，sqlnet.ora文件里默认会包含SQLNET.AUTHENTICATION_SERVICES参数，设置方式参见上述；但是在Linux中默认不包含SQLNET.AUTHENTICATION_SERVICES参数，所以我们刻意配置该参数也没有必要。 
+> (3) SQLNET.AUTHENTICATION_SERVICES参数只会影响我们在数据库服务器本地登录管理员账号(sys)，但是不会影响我们plsql登录数据库。
+>
+> [SQLNET.AUTHENTICATION_SERVICES深入理解_数据库技术_Linux公社-Linux系统门户网站 (linuxidc.com)](https://www.linuxidc.com/Linux/2019-09/160672.htm)
+
