@@ -80,9 +80,26 @@ git add .
 git add .
 ```
 
+或使用 git 命令
+
 ```bash
 git mv -f src/views/List/Home.vue  src/views/list/Home.vue
 git mv -f src/views/List/About.vue  src/views/list/About.vue
+```
+
+# 取消文件追踪
+
+```bash
+# 取消文件追踪
+git rm -r cached .metadata
+# 删除本地文件（也可以不删除）
+git rm -r --f .metadata
+```
+
+每次使用git status 查看状态时总是会列出被跟踪的文件，可以通过 .gitignore文件来达到目的，在 .gitignore 文件中添加：
+
+```
+/.metadata
 ```
 
 
@@ -220,6 +237,6 @@ git 用户配置不对
 
 ```bash
 git config --global user.name "lyml"
-git config --global user.email "1074325187@qq.com"
+git config --global user.email "10743187@qq.com"
 ```
 
