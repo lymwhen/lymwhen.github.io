@@ -136,6 +136,9 @@ function clickEffect() {
     }
 
     function pathContains(arr, tagName) {
+        if(!arr || arr.length == 0) {
+            return false;
+        }
         tagName  = tagName.toUpperCase();
         for (let i = 0; i < arr.length; i++) {
             if (arr[i].nodeName == tagName) {
