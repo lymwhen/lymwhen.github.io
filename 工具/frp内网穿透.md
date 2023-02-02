@@ -12,6 +12,8 @@
 
 从 Releases 下载对应平台的版本，解压后文件中的 frps 是服务端，frpc 是客户端，使用有公网ip的服务器作为服务端。
 
+经实际使用功能非常强大，`tcp`：http、oracle，`udp`：webrtc 都能良好支持。
+
 # 服务端配置
 
 默认 frps.ini
