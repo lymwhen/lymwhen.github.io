@@ -69,6 +69,33 @@ git remote remove origin
 git config --global --add safe.directory D:/projects/jds_web/nzxxx_jwt
 ```
 
+# 冲突处理
+
+自己修改过的文件，其它人也修改并且提交了
+
+```bash
+# 查看本地修改的文件
+git status
+# 拉取
+git pull
+
+# 若报错
+# 暂存、提交
+git add .
+git commit -m ''
+# 拉去
+git pull
+# 处理冲突信息
+# 在编辑器中合并或者手动处理<<<< HEAD 本地修改 ======= 远程修改 >>>>>>块
+
+# 提交合并
+git add .
+git commit -m 'merge'
+git push
+```
+
+> [git上多人对同一文件修改，发生冲突，如何合并_dair6的博客-CSDN博客_git 2个人同时改了一个文件,要同时合并dev,但相互又不能合并](https://blog.csdn.net/dair6/article/details/120724629)
+
 # 大小写不敏感问题
 
 git 默认大小写不敏感，修改文件名大小写提交的办法
