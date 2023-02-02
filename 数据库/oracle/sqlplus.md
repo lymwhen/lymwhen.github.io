@@ -153,7 +153,47 @@ select instance_name from v$instance
 select global_name from global_name
 ```
 
-# 创建表空间、用户
+# session
+
+```sql
+# 查询当前使用的process、session数量。
+select count(*) from v$process;
+select count(*) from v$session;
+# 连接数（实测4000会导致数据库无法启动）
+alter system set processes=2000 scope=spfile;
+alter system set sssions=2205 scope=spfile;
+
+# 查看锁表
+select * from v$session s, v$lock l where s.sid = l.sid and s.username = 'YNXXX_EFLOW' and s.status = 'ACTIVE' order by sid
+
+SELECT s.sid, s.serial#, s.username, s.schemaname, s.osuser, s.process, s.machine, s.terminal, s.logon_time, l.type
+FROM v$session s, v$lock l
+WHERE s.sid = l.sid AND s.username IS NOT NULL ORDER BY sid;
+
+SELECT CONCAT('ALTER SYSTEM KILL SESSION ''',CONCAT(CONCAT(CONCAT(s.sid,','),s.serial#),''';')) 
+FROM v$locked_object lo, dba_objects ao, v$session s WHERE ao.object_id = lo.object_id AND lo.session_id = s.sid;
+
+# 解锁
+alter system kill session 'sid,seial#';
+alter system kill session '2023,4396';
+```
+
+> [Oracle表中一行记录被锁（行锁，表锁，死锁） - 苏州の酱醋茶 - 博客园 (cnblogs.com)](https://www.cnblogs.com/jyj666/p/14665469.html)
+>
+> [Oracle（6）——Oracle查询行锁、解锁 - xu_shuyi - 博客园 (cnblogs.com)](https://www.cnblogs.com/xushuyi/articles/4391977.html)
+>
+> [Oracle plsql 执行update或者delete时卡死(一直执行中）_ruoxiyun的博客-CSDN博客_plsql一直执行中](https://blog.csdn.net/ruoxiyun/article/details/102870966)
+
+```sql
+# 连接超时时间查询
+select * from dba_profiles where profile = 'DEFAULT'
+# 修改（未测试）
+ALTER PROFILE DEFAULT LIMIT IDLE_TIME 10;
+```
+
+
+
+# 表空间、用户
 
 ### 查询已有表空间信息
 
@@ -164,11 +204,28 @@ select * from dba_data_files;
 ### 创建表空间
 
 ```sql
-# 如果不带 datafile 参数则创建在默认位置
+-- 如果不带 datafile 参数则创建在默认位置，创建之前最好查询一下dba_data_files，将表空间文件和已有的表空间文件放在一个目录
 create tablespace TEST2 
 datafile 'E:\APP\ADMINISTRATOR\PRODUCT\11.1.0\DB_1\DATABASE\TEST2' 
 size 10m autoextend on next 10m maxsize unlimited
+
+-- 删除空的表空间，但是不包含物理文件
+drop tablespace tablespace_name;
+-- 删除非空表空间，但是不包含物理文件
+drop tablespace tablespace_name including contents;
+-- 删除空表空间，包含物理文件
+drop tablespace tablespace_name including datafiles;
+-- 删除非空表空间，包含物理文件
+drop tablespace tablespace_name including contents and datafiles;
+-- 如果其他表空间中的表有外键等约束关联到了本表空间中的表的字段，就要加上CASCADE CONSTRAINTS
+drop tablespace tablespace_name including contents and datafiles CASCADE CONSTRAINTS;
 ```
+
+> [!NOTE]
+>
+> 表空间自动扩展是配置在**表空间文件**中的，而 create 中的`maxsize unlimited`事实上最大大小为32GB，如果用户默认表空间的所有表空间文件都已存满，那么将无法自动扩展，存储或导入就会出问题。
+>
+> 应定期检查硬盘剩余空间、表空间文件剩余空间，导入用户前也应查看原数据库的用户表空间，在新数据库创建相应大小的表空间文件。
 
 ### 	创建用户
 
@@ -178,6 +235,9 @@ identified by "password"
 default tablespace TEST2 
 profile DEFAULT 
 ACCOUNT UNLOCK;
+
+# 删除用户，级联删除用户下的表和表空间
+drop user TEST1 cascade
 ```
 
 ### 	授权
@@ -194,6 +254,83 @@ revoke dba from TEST2;
 
 > sid: 实例名
 > 服务名：监听程序名字
+
+
+
+# 查询表空间使用情况
+
+```sql
+-- 查询某用户的缺省（默认）表空间
+select username,default_tablespace from dba_users where username in ('XXX_NOA', 'XXX_EFLOW');
+-- 查询，bytes字段为字节，故此处查询的大小为MB
+select sum(bytes)/1024/1024 from dba_segments where tablespace_name in ('XXX_NOA', 'XXXOA')
+
+-- 查询表空间使用情况
+SELECT a.tablespace_name "表空间名",
+a.bytes / 1024 / 1024 "表空间大小(M)",
+(a.bytes - b.bytes) / 1024 / 1024 "已使用空间(M)",
+b.bytes / 1024 / 1024 "空闲空间(M)",
+round(((a.bytes - b.bytes) / a.bytes) * 100, 2) "使用比"
+FROM (SELECT tablespace_name, sum(bytes) bytes
+FROM dba_data_files
+GROUP BY tablespace_name) a,
+(SELECT tablespace_name, sum(bytes) bytes, max(bytes) largest
+FROM dba_free_space
+GROUP BY tablespace_name) b
+WHERE a.tablespace_name = b.tablespace_name
+ORDER BY ((a.bytes - b.bytes) / a.bytes) DESC
+
+-- 查询表空间数据文件
+SELECT * FROM dba_data_files;
+SELECT * FROM dba_data_files t WHERE t.tablespace_name='XX_NOA';
+```
+
+> [!TIP]
+>
+> dba_data_files 中：
+>
+> FILE_NAME：文件名
+>
+> BYTES：大小
+>
+> AUTOEXTENSIBLE：是否自动扩展
+>
+> MAXBYTES：最大大小，如果设为maxsize unlimited，则值为 34359721984，32G
+>
+> INCREMENT_BY：自动扩展的块数
+>
+> 块大小：show parameter db_block，db_block 为块大小，如块大小8192，块数64000，则自动扩展为 500M
+
+# 增加表空间大小
+
+```sql
+-- 给表空间增加数据文件，一般用这种方式即可
+ALTER TABLESPACE app_data ADD DATAFILE  
+'D:\ORACLE\PRODUCT\10.2.0\ORADATA\EDWTEST\APP03.DBF' SIZE 50M;
+
+ALTER TABLESPACE app_data ADD DATAFILE
+'D:\ORACLE\PRODUCT\10.2.0\ORADATA\EDWTEST\APP04.DBF' SIZE 50M
+AUTOEXTEND ON NEXT 5M MAXSIZE 100M;
+
+ALTER TABLESPACE app_data ADD DATAFILE
+'D:\ORACLE\PRODUCT\10.2.0\ORADATA\EDWTEST\APP04.DBF' SIZE 1G
+AUTOEXTEND ON NEXT 512M MAXSIZE unlimited;
+
+-- 允许已存在的数据文件自动增长
+ALTER DATABASE DATAFILE 'D:\ORACLE\PRODUCT\10.2.0\ORADATA\EDWTEST\APP03.DBF'  
+AUTOEXTEND ON NEXT 5M MAXSIZE 100M;
+
+-- 手工改变已存在数据文件的大小
+ALTER DATABASE DATAFILE 'D:\ORACLE\PRODUCT\10.2.0\ORADATA\EDWTEST\APP02.DBF'  RESIZE 100M;
+```
+
+> [ora-01653 无法通过1024扩展 - wumengjuan - 博客园 (cnblogs.com)](https://www.cnblogs.com/523823-wu/p/8710218.html)
+
+### 疑难问题
+
+##### 已设置自动增长，但项目依然报错ORA-01653 无法通过1024扩展
+
+硬盘空间满了，可增加数据文件在别的盘上解决
 
 # 备份
 
@@ -394,18 +531,25 @@ CREATE INDEXTYPE
 
 # 参数调整
 
-##### 连接数
+### 连接数
 
 ```sql
 # 查询当前使用的process、session数量。
 select count(*) from v$process;
 select count(*) from v$session;
+# 查询最大processes、sessions配置
+select value from v$parameter where name = 'processes';
+select value from v$parameter where name = 'sessions';
 # 连接数（实测4000会导致数据库无法启动）
 alter system set processes=2000 scope=spfile;
 alter system set sssions=2205 scope=spfile;
 ```
 
 > [ORA-00018-超出最大连接数 - kkqq8860928 - 博客园 (cnblogs.com)](https://www.cnblogs.com/apromise/p/9081801.html)
+
+### 连接
+
+
 
 # 调整配置导致实例无法启动
 
@@ -464,10 +608,106 @@ SQL> create spfile from pfile='D:\app\lymly\admin\orcl\pfile\init.ora';
 
 文件已创建。
 
+SQL> shutdown immediate
+Database closed.
+Database dismounted.
+ORACLE instance shut down.
+
+SQL> startup
+ORACLE instance started.
+
+Total System Global Area 1.6034E+10 bytes
+Fixed Size                  2219552 bytes
+Variable Size            8254390752 bytes
+Database Buffers         7717519360 bytes
+Redo Buffers               60084224 bytes
+Database mounted.
+Database opened.
+
+SQL> show parameter memory_target;
+
+NAME                                 TYPE        VALUE
+------------------------------------ ----------- ------------------------------
+memory_target                        big integer 15G
+
 SQL> exit
 从 Oracle Database 11g Enterprise Edition Release 11.1.0.6.0 - Production
 With the Partitioning, OLAP, Data Mining and Real Application Testing options 断开
 ```
+
+> [!TIP]
+>
+> 如果内存是配置在 pfile 里，那么就需要先修改 pfile 中的内存配置。
+>
+> 16G = 1024 * 1024 * 1024 * 16
+>
+> ```properties
+> ###########################################
+> # Miscellaneous
+> ###########################################
+> compatible=11.2.0.0.0
+> diagnostic_dest=/usr/local/oracle
+> memory_target=16106127360
+> ```
+>
+> ```properties
+> ##############################################################################
+> # Copyright (c) 1991, 2001, 2002 by Oracle Corporation
+> ##############################################################################
+> 
+> ###########################################
+> # Cache and I/O
+> ###########################################
+> db_block_size=8192
+> 
+> ###########################################
+> # Cursors and Library Cache
+> ###########################################
+> open_cursors=300
+> 
+> ###########################################
+> # Database Identification
+> ###########################################
+> db_domain=""
+> db_name=ORCL
+> 
+> ###########################################
+> # File Configuration
+> ###########################################
+> control_files=("/usr/local/oracle/oradata/ORCL/control01.ctl", "/usr/local/oracle/flash_recovery_area/ORCL/control02.ctl")
+> db_recovery_file_dest=/usr/local/oracle/flash_recovery_area
+> db_recovery_file_dest_size=4070572032
+> 
+> ###########################################
+> # Miscellaneous
+> ###########################################
+> compatible=11.2.0.0.0
+> diagnostic_dest=/usr/local/oracle
+> memory_target=54003761152
+> 
+> ###########################################
+> # Processes and Sessions
+> ###########################################
+> processes=150
+> 
+> ###########################################
+> # Security and Auditing
+> ###########################################
+> audit_file_dest=/usr/local/oracle/admin/ORCL/adump
+> audit_trail=db
+> remote_login_passwordfile=EXCLUSIVE
+> 
+> ###########################################
+> # Shared Server
+> ###########################################
+> dispatchers="(PROTOCOL=TCP) (SERVICE=orclXDB)"
+> 
+> ###########################################
+> # System Managed Undo and Rollback Segments
+> ###########################################
+> undo_tablespace=UNDOTBS1
+> 
+> ```
 
 `services.msc`里重新启动 oracle 服务，如果`OracleServiceORCL`启动的较慢，进度跑到一半才差不多启动启动完，说明启动正常。刚刚启动好可能是连不上的，貌似需要等他反应一会:dog:
 
@@ -604,3 +844,12 @@ SQLNET.AUTHENTICATION_SERVICES= (NTS)
 >
 > [SQLNET.AUTHENTICATION_SERVICES深入理解_数据库技术_Linux公社-Linux系统门户网站 (linuxidc.com)](https://www.linuxidc.com/Linux/2019-09/160672.htm)
 
+# 问题
+
+### No more data to read from socket
+
+连接池从数据库取得的连接失效
+
+> [No more data to read from socket 问题分析_Mr_Runner的博客-CSDN博客](https://blog.csdn.net/Mr_Runner/article/details/118964470)
+>
+> [oracle profile Idle_time设置_rgb_rgb的博客-CSDN博客_idle_time设置](https://blog.csdn.net/rgb_rgb/article/details/8073030)
