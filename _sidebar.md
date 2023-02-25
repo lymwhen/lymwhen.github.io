@@ -1,6 +1,6 @@
 * [Home](/)
 * [java](java/java.md)
-  * [基础知识](java/基础知识/常用代码.md)
+  * [基础知识](java/基础知识/基础知识.md)
     * [List和Array](java/基础知识/List和Array.md)
     * [数值运算](java/基础知识/数值运算.md)
     * [位运算](java/基础知识/位运算.md)
