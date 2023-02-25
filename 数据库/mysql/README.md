@@ -54,7 +54,52 @@ insert into user (name, age) values ('xiaoming', 12);
 commit;
 ```
 
+# 数据类型
 
+### Decimal
+
+> decimal
+>
+> 美/ˈdesɪm(ə)l/ 英/'desɪm(ə)l/
+>
+> adj.十进位的, 小数的
+>
+> n.小数
+
+Decimal 表示为 `DECIMAL(*`M`*,*`D`*)`，`M`为总位数，默认值10，最大65，`D`为小数位数，默认值0。整数部分位数为`M`-`D`。
+
+整数部分和小数部分占用字节数分开计算，位数与占用关系如下：
+
+| 位数 | 占用字节数 |
+| :--- | :--------- |
+| 0    | 0          |
+| 1–2  | 1          |
+| 3–4  | 2          |
+| 5–6  | 3          |
+| 7–9  | 4          |
+
+所以一个非常常用的 Decimal：`Decimal(11, 2)`，整数9位，小数2位，共占用5字节，取值范围 -999999999.99 - 999999999.99。
+
+> The declaration syntax for a [`DECIMAL`](https://dev.mysql.com/doc/refman/5.7/en/fixed-point-types.html) column is . The ranges of values for the arguments are as follows: `DECIMAL(*`M`*,*`D`*)`
+>
+> - *`M`* is the maximum number of digits (the precision). It has a range of 1 to 65.
+> - *`D`* is the number of digits to the right of the decimal point (the scale). It has a range of 0 to 30 and must be no larger than *`M`*.
+>
+> If *`D`* is omitted, the default is 0. If *`M`* is omitted, the default is 10.
+>
+> The maximum value of 65 for *`M`* means that calculations on [`DECIMAL`](https://dev.mysql.com/doc/refman/5.7/en/fixed-point-types.html) values are accurate up to 65 digits. This limit of 65 digits of precision also applies to exact-value numeric literals, so the maximum range of such literals differs from before. (There is also a limit on how long the text of [`DECIMAL`](https://dev.mysql.com/doc/refman/5.7/en/fixed-point-types.html) literals can be; see [Section 12.22.3, “Expression Handling”](https://dev.mysql.com/doc/refman/5.7/en/precision-math-expressions.html).)
+>
+> Values for [`DECIMAL`](https://dev.mysql.com/doc/refman/5.7/en/fixed-point-types.html) columns are stored using a binary format that packs nine decimal digits into 4 bytes. The storage requirements for the integer and fractional parts of each value are determined separately. Each multiple of nine digits requires 4 bytes, and any remaining digits left over require some fraction of 4 bytes. The storage required for remaining digits is given by the following table.
+>
+> | Leftover Digits | Number of Bytes |
+> | :-------------- | :-------------- |
+> | 0               | 0               |
+> | 1–2             | 1               |
+> | 3–4             | 2               |
+> | 5–6             | 3               |
+> | 7–9             | 4               |
+>
+> [MySQL ：： MySQL 5.7 参考手册 ：： 12.22.2 十进制数据类型特征](https://dev.mysql.com/doc/refman/5.7/en/precision-math-decimal-characteristics.html)
 
 # 字符串
 
