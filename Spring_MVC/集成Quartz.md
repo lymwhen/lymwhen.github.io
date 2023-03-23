@@ -1,5 +1,7 @@
 # 集成 Quartz
 
+Spring Boot 配置参考：[quartz（四）如何在job中使用spring自动注入 - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/341155330)
+
 > Quartz is a [richly featured](http://www.quartz-scheduler.org/documentation/2.4.0-SNAPSHOT/introduction.html#features), open source job scheduling library that can be integrated within virtually any Java application - from the smallest stand-alone application to the largest e-commerce system. Quartz can be used to create simple or complex schedules for executing tens, hundreds, or even tens-of-thousands of jobs; jobs whose tasks are defined as standard Java components that may execute virtually anything you may program them to do. The Quartz Scheduler includes many enterprise-class features, such as support for JTA transactions and clustering.
 >
 > [Quartz Enterprise Job Scheduler (quartz-scheduler.org)](http://www.quartz-scheduler.org/)
