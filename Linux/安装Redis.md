@@ -49,6 +49,31 @@ cd redis/src
 ./redis-server ../redis.conf
 ```
 
+> [!NOTE]
+>
+> 当使用绝对路径启动时，如配置为服务时，需要配置 redis.conf `dir`参数
+>
+> ```
+> # The working directory.
+> #
+> # The DB will be written inside this directory, with the filename specified
+> # above using the 'dbfilename' configuration directive.
+> #
+> # The Append Only File will also be created inside this directory.
+> #
+> # Note that you must specify a directory here, not a file name.
+> # 工作目录，数据库将会被以上面dbfilename配置的文件名写入这个文件夹，AOF文件也会被写入这个文件夹
+> dir /usr/local/server/redis/src
+> ```
+>
+> AOF(Append Only File，仅追加文件)，与RDB(Redis Database，redis 数据库)相对应
+>
+> RDB：优势：单个紧凑文件保存数据，高性能，父进程分配工作，子进程执行磁盘I/O，易于备份，灾难恢复；缺点：一段时间才进行一次fork，完成持久化到磁盘，非正常关闭可能丢失数据
+>
+> AOF：优势：由于仅追加，非正常关闭时容易恢复数据，AOF文件变得太大时重写它；缺点：文件较大，可能较慢
+>
+> [Redis persistence | Redis](https://redis.io/docs/management/persistence/#:~:text=AOF (Append Only File)%3A AOF persistence logs every,the same format as the Redis protocol itself.)
+
 # 测试 redis
 
 ```bash
