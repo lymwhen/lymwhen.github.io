@@ -112,3 +112,12 @@ order by case when ...
 order by (case type when '局领导' then 1 when '办公室' then 2 else 3)
 ```
 
+# 常见问题
+
+### ORA-01461: 仅能绑定要插入 LONG 列的 LONG 值
+
+数据超过字段的存储空间
+
+如 `VARCHAR2` 最长为4000，存入的字符串超过了4000字节，需要将类型改为`CLOB`。表中有数据时，无法直接更改数据类型，可：
+
+新建名为 test1 的`CLOB`字段 → update 到`CLOB`字段 → 删除原字段 → 更改为原字段名
