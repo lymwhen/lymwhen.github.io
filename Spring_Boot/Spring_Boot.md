@@ -174,6 +174,44 @@ public abstract class B {
 >
 > [多个类中 使用@PostConstruct，加载先后顺序_janet1100的博客-CSDN博客_多个postconstruct顺序](https://blog.csdn.net/janet1100/article/details/105657399)
 
+# @RequestMapping 的继承问题
+
+- 子类的`@RequestMapping`注解会覆盖父类的`@RequestMapping`注解，子类配置了`@RequestMapping`之后，父类的`@RequestMapping`（地址、produces等）将失效
+- 子类不配置`@RequestMapping`注解，父类地址将会被继承：父类地址 + 子类方法地址
+
+如果接口有统一的前缀，可以把前缀配置在父类：
+
+```java
+@CrossOrigin(origins = "*", maxAge = 3600)
+@RestController
+@RequestMapping(value="/resApi", produces="application/json;charset=UTF-8")
+public class BaseApiController extends BaseController {
+    
+}
+```
+
+子类：
+
+```java
+@RestController
+public class ADS_BController extends BaseApiController {
+    
+    @RequestMapping("/getXXXX")
+    @ResponseBody
+    public Object getFlightNo(@RequestParam Date beginTime,@RequestParam Date endTime) {
+        return xxx
+    }
+}
+```
+
+接口地址：`/resApi/getXXXX`
+
+---
+
+若子类需要配置另外的前缀，那么就需要在子类重新配置`@RequestMapping`。
+
+
+
 # 打包
 
 ```bash
