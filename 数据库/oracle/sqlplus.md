@@ -195,6 +195,17 @@ ALTER PROFILE DEFAULT LIMIT IDLE_TIME 10;
 
 # 表空间、用户
 
+### 行数
+
+```sql
+-- 指定用户的表行数
+SELECT sum(num_rows) FROM SYS.ALL_TABLES T WHERE T.OWNER in('YNWJW_NOA','YNWST_EFLOW');
+-- 当前用户的表行数
+select sum(num_rows) from user_tables
+```
+
+
+
 ### 查询已有表空间信息
 
 ```sql
