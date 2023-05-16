@@ -1,12 +1,41 @@
 # sql
 
-# 右表最新一条
+### 右表最新一条
 
 ```sql
 select * from base_dorm d left join base_dormstudent ds on d.id = ds.dormid and ds.id = (select id from base_dormstudent where dormid = d.id order by userid desc limit 1)
 ```
 
-# 生成数列
+### 以平均间隔抽取出数据
+
+可从大数据量表中抽取数据
+
+```sql
+select a1.Callsign,a1.icaoAddress,a1.lonDD,a1.latDD,a1.headingDE2,a1.horVelocityCMS,a1.verVelocityCMS,a1.altitudeMM,a1.timeStamp,a1.R_UPDATE_TIME 
+from (
+	select a.*, (@rownum := @rownum + 1 ) as rn from adsb_aircraft a, (SELECT @rownum := 0) r 
+	where a.R_UPDATE_TIME >= '2023-03-22' and a.R_UPDATE_TIME < '2023-03-23' and a.callsign = 'CPA3568' 
+	order by a.R_UPDATE_TIME desc
+) a1, (
+	select case cnt when 0 then 1 else cnt end cnt from (
+		select ceil(count(*) / 500) cnt from adsb_aircraft a
+		where a.R_UPDATE_TIME >= '2023-03-22' and a.R_UPDATE_TIME < '2023-03-23' and a.callsign = 'CPA3568'
+    ) c0
+) c
+where a1.rn % c.cnt = 0 order by a1.R_UPDATE_TIME desc
+```
+
+a1 查询数据并生成序号，c0 根据最大抽取条数求抽取间隔，将序号整除间隔的数据取出
+
+### 中文排序
+
+```sql
+select * from standard_metadata order by convert(number using GBK)
+```
+
+
+
+### 生成数列
 
 ```sql
 select (@count := @count + 1) as count from 
@@ -30,13 +59,13 @@ select (@count := @count + 1) as count from
 
 >生成从1-16的数列
 
-# 本周的7天
+### 本周的7天
 
 ```sql
 select DATE_ADD(CURDATE(),INTERVAL (-WEEKDAY(CURDATE()) + CAST(help_topic_id AS signed)) DAY) from mysql.help_topic where help_topic_id < 7
 ```
 
-# 去重
+### 去重
 
 根据找出的id删除重复项，反复执行，直到受影响行数为0
 
@@ -50,7 +79,7 @@ delete from data_dicset where id in (
 )
 ```
 
-# cxjsxy 设备channelId 生成
+### cxjsxy 设备channelId 生成
 
 ```sql
 update attend_device dr left join (
@@ -60,7 +89,7 @@ select d.id as id , d.ip as ip, (@count := @count + 1) as count from attend_devi
 set dr.channelId = concat('1000044$1$0$', d.count)
 ```
 
-# 查询连续多少天
+### 查询连续多少天
 
 ```sql
 SELECT
@@ -105,7 +134,9 @@ WHERE
     )
 ```
 
-# ITEM_IN_SET
+# 函数
+
+### ITEM_IN_SET
 
 两个set是否有交集，如`'12,34'`和`'12,56'`
 
