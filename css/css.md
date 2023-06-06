@@ -136,3 +136,26 @@ Pseudo-classes
 >
 > 也不仅用于居中，如设置了`translateX(-50%)`之后，可用`left`来调节元素中心所在的位置。
 
+### 渐变色字
+
+<span style="font-family: SegoeUI-SemiBold,Helvetica,Arial,sans-serif; font-size: 57px; line-height: 74px; background: -webkit-linear-gradient(353.97deg,#D83B01 -9.63%,#8F5AD4 29.04%,#0860C7 101.1%); background: oldlinear-gradient(353.97deg,#D83B01 -9.63%,#8F5AD4 29.04%,#0860C7 101.1%) -moz-; background: -o-linear-gradient(353.97deg,#D83B01 -9.63%,#8F5AD4 29.04%,#0860C7 101.1%); background: linear-gradient(96.03deg,#D83B01 -9.63%,#8F5AD4 29.04%,#0860C7 101.1%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; -moz-background-clip: text; -o-background-clip: text; background-clip: text; text-fill-color: transparent;">Office 现在是 Microsoft 365</span>
+
+```css
+{
+    font-family: SegoeUI-SemiBold,Helvetica,Arial,sans-serif;
+    font-size: 57px;
+    line-height: 74px;
+    background: -webkit-linear-gradient(353.97deg,#D83B01 -9.63%,#8F5AD4 29.04%,#0860C7 101.1%);
+    background: oldlinear-gradient(353.97deg,#D83B01 -9.63%,#8F5AD4 29.04%,#0860C7 101.1%) -moz-;
+    background: -o-linear-gradient(353.97deg,#D83B01 -9.63%,#8F5AD4 29.04%,#0860C7 101.1%);
+    background: linear-gradient(96.03deg,#D83B01 -9.63%,#8F5AD4 29.04%,#0860C7 101.1%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -moz-background-clip: text;
+    -o-background-clip: text;
+    background-clip: text;
+    text-fill-color: transparent;
+}
+```
+
+> [登录 | Microsoft 365 (office.com)](https://www.office.com/)
