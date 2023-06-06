@@ -1,3 +1,3 @@
 # Headline
 
-> An awesome project.
+> <span class="ms-beauty-font">An awesome project.</span>
