@@ -59,6 +59,22 @@ $.ajax({
 });
 ```
 
+> [!NOTE]
+>
+> `@RequestBody`接收参数必须指定`contentType:"application/json;charset=UTF-8"`
+>
+> ```java
+> $.post("/schedule/generateTimeTable", {data: JSON.stringify(data.field)},function success(data){
+>    
+> }, "json");
+> ```
+>
+> 这种方式传递会报异常：
+>
+> ```
+> org.springframework.web.HttpMediaTypeNotSupportedException: Content type 'application/x-www-form-urlencoded;charset=UTF-8' not supported
+> ```
+
 > 对应 Postman 的 raw - json
 >
 > 此时`@RequestParam`接收的参数应该通过链接传递，不知道有没有别的方式
