@@ -165,6 +165,12 @@ systemProp.https.proxyHost=127.0.0.1
 systemProp.https.proxyPort=10809
 ```
 
+> [!NOTE]
+>
+> 删除代理时，注意检查是否有全局配置文件，如`当前用户/.gradle/gradle.properties`。
+>
+> 可以在 Project - Android 模式 - Gradle Scripts下看到，显示为`Gradle Properties`。
+
 ### 运行旧项目
 
 根据 IDE 报错更改 gradle 版本号，如 2022-07-23，gradle 最低 4.6，`com.android.tools.build:gradle`最低 3.2.0
