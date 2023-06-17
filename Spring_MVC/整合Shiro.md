@@ -641,7 +641,22 @@ protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principal
 
 登录后浏览器访问`/test1`接口，此时应抛出`UnauthorizedException`异常，说明注解生效
 
+### 配置接口权限的方式
 
+filterChainDefinitionMap 中
+
+```
+map.put("/platform/**", "roles[test2]");
+```
+
+接口注解
+
+```
+@RequiresRoles(value = {"test21"})
+@RequiresPermissions("test21")
+```
+
+几种方式可以叠加使用
 
 # Spring 的异常处理器
 
