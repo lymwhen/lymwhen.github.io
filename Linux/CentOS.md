@@ -78,3 +78,47 @@ chmod 777 start.sh
 ./start.sh
 ```
 
+# 忘记密码
+
+系统选择界面按`e`
+
+在设置语言后面加上`rw single init=/bin/bash`
+
+![image-20230616113137926](image-20230616113137926.png)
+
+按`ctrl`+`x`重启
+
+![img](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2duYWlsX291Zw==,size_16,color_FFFFFF,t_70.png)
+
+# 问题
+
+### 服务器拒绝了密码
+
+使用ssh工具连接服务器，输入密码时提示服务器拒绝了密码
+
+检查 ssh 配置
+
+```bash
+vim /etc/ssh/sshd_config
+PermitRootLogin yes
+PasswordAuthentication yes
+```
+
+如果还是无法连接，需要关闭 selinux
+
+```bash
+vim /etc/selinux/config
+
+# This file controls the state of SELinux on the system.
+# SELINUX= can take one of these three values:
+#     enforcing - SELinux security policy is enforced.
+#     permissive - SELinux prints warnings instead of enforcing.
+#     disabled - No SELinux policy is loaded.
+SELINUX=disabled
+# SELINUXTYPE= can take one of three values:
+#     targeted - Targeted processes are protected,
+#     minimum - Modification of targeted policy. Only selected processes are protected. 
+#     mls - Multi Level Security protection.
+SELINUXTYPE=targeted
+```
+
