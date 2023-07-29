@@ -23,6 +23,8 @@ fdisk -l
 df -h
 # 任务管理器
 top
+# cpu架构
+arch
 ```
 
 # 用户
