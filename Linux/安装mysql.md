@@ -84,12 +84,29 @@ cd /usr/local/mysql
 # 在mysql下创建数据文件夹data
 mkdir data
 chown -R mysql:mysql data
-# 安装
+# 安装，结果末尾会打印root密码，记录密码
 ./bin/mysqld --initialize --user=mysql
-结果末尾会打印root密码，记录密码
+
+# 如果mysql没有放在默认位置/usr/local/mysql,需要指定basedir
+./bin/mysqld --initialize --user=mysql --basedir=/usr/local/server/mysql
 ```
 
+
+
 # 开机启动和系统服务
+
+> [!NOTE]
+>
+> 修改了安装参数或my.cnf指定了basedir之后，还需要在mysql 服务启动文件`.support-files/mysql.server`中指定 `basedir`、`datadir`
+>
+> ```bash
+> vim support-files/mysql.server
+> # If you change base dir, you must also change datadir. These may get
+> # overwritten by settings in the MySQL configuration files.
+> 
+> basedir=/usr/local/server/mysql
+> datadir=/usr/local/server/database
+> ```
 
 ```bash
 # 添加mysql server到系统服务
@@ -164,6 +181,18 @@ ps aux|grep mysqld
 ##### Windows 下修改 basedir 启动报错
 
 新的数据文件夹安全选项卡下需要添加`NETWORK-SERVICE`用户/组，勾选完全控制
+
+##### 没有使用默认的安装路径，但安装时报错默认路径（/usr/local/mysql）不存在
+
+安装时指定basedir
+
+##### 没有使用默认的安装路径，但启动时报错默认路径（/usr/local/mysql）不存在
+
+mysql 服务文件中的需要指定`basedir`、`datadir`
+
+- .support-files/mysql.server
+
+- /etc/rc.d/init.d/mysqld
 
 # 升级 mysql
 
@@ -273,6 +302,10 @@ service mysqld start
 > [记录mysql扫描漏洞，小版本升级_studymary的博客-CSDN博客_mysql漏洞扫描](https://blog.csdn.net/studymary/article/details/125797829)
 
 # 配置文件
+
+> [!TIP]
+>
+> 修改 mysql 监听端口应该修改`[mysqld]`下的`port`。
 
 ### my.cnf
 
