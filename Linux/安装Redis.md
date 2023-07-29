@@ -2,6 +2,10 @@
 
 # 下载
 
+> [Download | Redis](https://redis.io/download/)
+>
+> [Index of /releases/ (redis.io)](https://download.redis.io/releases/)
+
 > 使用3.0.5，高版本redis需要高版本gcc编译器
 
 # 解压
@@ -19,18 +23,12 @@ make
 
 ```bash
 # 安装需要组件
-yum install cpp
-yum install binutils
-yum install glibc
-yum install glibc-common
-yum install glibc-devel
-yum install gcc
+yum install -y cpp binutils glibc glibc-common glibc-devel gcc
 ```
 
 # 配置
 
 ```bash
-cd redis
 vi redis/redis.conf
 # 后台运行，如不配置关闭终端 redis 就会停止运行
 daemonize yes
