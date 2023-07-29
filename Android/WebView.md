@@ -158,7 +158,7 @@ webView.addJavascriptInterface(new JsInterface(this, webView), "$App");
 webView.loadUrl(url);
 ```
 
-Cookie 同步与 Activity 生命周期
+### Cookie 同步与 Activity 生命周期
 
 ```java
 @Override
@@ -181,7 +181,7 @@ protected void onPause() {
 }
 ```
 
-文件选择与回调
+### 文件选择与回调
 
 ```java
 private void openImageChooserActivity() {
@@ -232,8 +232,144 @@ private void onActivityResultAboveL(int requestCode, int resultCode, Intent inte
 }
 ```
 
+### 调用相机拍照
+
+```java
+x5WebView.setWebChromeClient(new WebChromeClient() {
+    // ...
+
+    // For Android >= 5.0
+    @Override
+    public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
+        uploadMessageAboveL = filePathCallback;
+        if(fileChooserParams != null && fileChooserParams.getAcceptTypes() != null && fileChooserParams.getAcceptTypes().length > 0) {
+            Log.d("onShowFileChooser", JSON.toJSONString(fileChooserParams.getAcceptTypes()));
+            openCamera(fileChooserParams.getAcceptTypes()[0]);
+            return true;
+        }
+        return false;
+    }
+});
+```
+
+```java
+public static final int REQUEST_CODE_VIDEO = 1101;
+public static final int REQUEST_CODE_IMG = 1102;
+
+private Uri imageUri;
+
+private void openCamera(String accept) {
+    if (accept.contains("video")) {
+        Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+        intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);//设置视频录制的质量，0为低质量，1为高质量。
+        //intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, 6);//限制时长 单位秒
+        //intent.putExtra(MediaStore.EXTRA_SIZE_LIMIT, 1024L * 1024 * 10);//指定视频最大允许的尺寸，单位为byte
+        //开启摄像机
+        startActivityForResult(intent, REQUEST_CODE_VIDEO);
+
+    } else {
+        // 指定拍照存储位置的方式调起相机
+        String filePath = Environment.getExternalStorageDirectory() + File.separator
+            + Environment.DIRECTORY_PICTURES + File.separator;
+        String fileName = "IMG_" + DateFormat.format("yyyyMMdd_hhmmss", Calendar.getInstance(Locale.CHINA)) + ".jpg";
+        imageUri = Uri.fromFile(new File(filePath + fileName));
+
+        //        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        //        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+        //        startActivityForResult(intent, REQUEST_CODE_IMG);
+
+        // 选择图片（不包括相机拍照）,则不用成功后发刷新图库的广播
+        //        Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+        //        i.addCategory(Intent.CATEGORY_OPENABLE);
+        //        i.setType("image/*");
+        //        startActivityForResult(Intent.createChooser(i, "Image Chooser"), REQUEST_CODE_IMG);
+
+        Intent captureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        captureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+
+        Intent photo = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+        Intent chooserIntent = Intent.createChooser(photo, "Image Chooser");
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Parcelable[]{captureIntent});
+
+        startActivityForResult(chooserIntent, REQUEST_CODE_IMG);
+    }
+}
+
+@Override
+protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+    if (requestCode == REQUEST_CODE_VIDEO) {
+        if (null != uploadMessageAboveL) {
+            Uri result = data == null || resultCode != RESULT_OK ? null : data.getData();
+            if (result != null) {
+                uploadMessageAboveL.onReceiveValue(new Uri[]{result});
+            } else {
+                uploadMessageAboveL.onReceiveValue(null);
+            }
+            uploadMessageAboveL = null;
+        }
+    } else if (requestCode == REQUEST_CODE_IMG) {
+        // 经过上边(1)、(2)两个赋值操作，此处即可根据其值是否为空来决定采用哪种处理方法
+        if (uploadMessageAboveL != null) {
+            chooseAbove(resultCode, data);
+        } else {
+            Toast.makeText(MainActivity.this, "发生错误", Toast.LENGTH_SHORT).show();
+        }
+    }
+}
+
+/**
+     * Android API >= 21(Android 5.0) 版本的回调处理
+     *
+     * @param resultCode 选取文件或拍照的返回码
+     * @param data       选取文件或拍照的返回结果
+     */
+private void chooseAbove(int resultCode, Intent data) {
+    //        LoggerUtils.d(TAG, "返回调用方法--chooseAbove");
+    if (RESULT_OK == resultCode) {
+        updatePhotos();
+        if (data != null) {
+            // 这里是针对从文件中选图片的处理
+            Uri[] results;
+            Uri uriData = data.getData();
+            if (uriData != null) {
+                results = new Uri[]{uriData};
+                for (Uri uri : results) {
+                    //                        LoggerUtils.d(TAG, "系统返回URI：" + uri.toString());
+                }
+                uploadMessageAboveL.onReceiveValue(results);
+            } else {
+                uploadMessageAboveL.onReceiveValue(null);
+            }
+        } else {
+            //                LoggerUtils.d(TAG, "自定义结果：" + imageUri.toString());
+            uploadMessageAboveL.onReceiveValue(new Uri[]{imageUri});
+        }
+    } else {
+        uploadMessageAboveL.onReceiveValue(null);
+    }
+    uploadMessageAboveL = null;
+}
+
+private void updatePhotos() {
+    // 该广播即使多发（即选取照片成功时也发送）也没有关系，只是唤醒系统刷新媒体文件
+    Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+    intent.setData(imageUri);
+    sendBroadcast(intent);
+}
+```
+
+> [!NOTE]
+>
+> 需要申请相机权限
+
+### video 标签
+
 > - 设置video标签默认封面：[各位大佬 Android中 怎么更改 webview中 video 默认图片，有偿_android开发吧_百度贴吧 (baidu.com)](https://tieba.baidu.com/p/6551481556)
 > - play() can only be initiated by a user gesture：[Webview 中 Play() can only be initiated by a user gesture_ieeso的博客-CSDN博客](https://blog.csdn.net/ieeso/article/details/112133163)
+
+
 
 # 执行 js 方法
 
