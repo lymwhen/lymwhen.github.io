@@ -104,21 +104,29 @@ restart.sh
 
 ```bash
 #!/bin/bash
+curUser=$(whoami)
+if [[ $curUser == "root" ]]; then
+echo "user root can't execute this script!"
+exit 0
+fi
+
 cd `dirname $0`
 
 if [ -f ./tomcat.pid ]; then
-	echo "kill tomcat..."
-	kill -9 `cat ./tomcat.pid`
-	rm ./tomcat.pid
+echo "kill tomcat..."
+kill -9 `cat ./tomcat.pid`
+rm ./tomcat.pid
 else
-	echo "tomcat is not running."
+echo "tomcat is not running."
 fi
 
 echo "start tomcat..."
-nohup ./startup.sh &
 if [ ! -f ../logs/catalina.out ]; then
-	sleep 2s
+touch ../logs/catalina.out
+chmod 775 ../logs/catalina.out
 fi
+echo $(date) > ../logs/catalina.out
+nohup ./startup.sh &
 tail -f ../logs/catalina.out
 ```
 
@@ -149,14 +157,23 @@ fi
 
 授权
 
+```bash
+chmod 700 restart.sh
+chmod 700 stop.sh
 ```
-chmod +x restart.sh
-chmod +x stop.sh
-```
 
+> [!TIP]
+>
+> 重启脚本应由tomcat用户执行，可以防止：
+>
+> - 应用权限过高，如果存在安全漏洞会导致严重安全问题
+> - 其他用户创建的 log 或生成的文件导致权限问题
+>
+> 所以设置了`700`或`744`权限，同时在脚本中判断禁止root执行。
 
+# 问题
 
-# 乱码问题
+### 乱码
 
 Linux 不存在控制台编码问题，项目 log4j.properties 和 Tomcat logging.properties 中的编码均配置为UTF-8
 
@@ -166,3 +183,14 @@ Windows 项目 log4j.properties 中的编码配置为GBK，Tomcat logging.proper
 java.util.logging.ConsoleHandler.encoding = UTF-8
 ```
 
+### 启动提示增大缓存的最大空间
+
+```log
+资源添加到Web应用程序[]的缓存中，因为在清除过期缓存条目后可用空间仍不足 - 请 考虑增加缓存的最大空间
+```
+
+/conf/context.xml `Context`标签中添加
+
+```xml
+<Resources cachingAllowed="true" cacheMaxSize="100000" />
+```
