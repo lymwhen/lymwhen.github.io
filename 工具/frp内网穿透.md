@@ -14,6 +14,13 @@
 
 经实际使用功能非常强大，`tcp`：http、oracle，`udp`：webrtc 都能良好支持。
 
+```
+./frps -c frps.ini
+frpc.exe -c frpc.ini
+```
+
+
+
 # 服务端配置
 
 默认 frps.ini
@@ -84,7 +91,68 @@ local_ip = 127.0.0.1
 local_port = 3389
 # 服务端端口
 remote_port = 19102
+
+[rdpudp]
+type = udp
+local_ip = 127.0.0.1
+local_port = 3389
+remote_port = 19102
 ```
 
 即本地的`3389`端口穿透到服务端的`19102`端口
 
+> 同时启用`tcp`和`udp`端口可以改善网络质量
+
+### 本地 http 服务穿透到外网
+
+服务端
+
+```ini
+[common]
+vhost_http_port = 80
+```
+
+客户端
+
+```ini
+[http1]
+type = http
+local_ip = 127.0.0.1
+local_port = 8080
+custom_domains = xxxx.cn
+```
+
+`http://xxxx.cn` → `http://127.0.0.1:8080`
+
+> [!TIP]
+>
+> `custom_domains`指用户访问的地址，填已解析的域名或 IP 地址；填自定义的域名需要配置 hosts。
+
+### 本地 http 服务穿透到外网 https
+
+调试微信支付时需要穿透到外网 https
+
+
+
+服务端
+
+```ini
+[common]
+vhost_http_port = 443
+```
+
+客户端
+
+```ini
+[https1]
+type = https
+custom_domains = xxxx.cn
+plugin = https2http
+plugin_local_addr = 127.0.0.1:8080
+plugin_crt_path = ./xxxx.cn_chain.crt
+plugin_key_path = ./xxxx.cn_key.key
+plugin_host_header_rewrite = xxxx.cn
+plugin_header_X-From-Where = frp
+```
+
+`https://xxxx.cn` → `http://127.0.0.1:8080`
