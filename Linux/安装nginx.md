@@ -22,9 +22,9 @@ yum -y install gcc zlib zlib-devel pcre-devel openssl openssl-devel
 # 解压缩
 tar -zxvf linux-nginx-1.12.2.tar.gz
 cd nginx-1.12.2/
-# 执行配置
-./configure
-# 编译安装(默认安装在/usr/local/nginx)
+# 执行配置(默认安装在/usr/local/nginx)
+./configure --prefix=/usr/local/nginx
+# 编译安装
 make
 make install
 ```
@@ -73,6 +73,8 @@ cp ./objs/nginx /usr/local/nginx/sbin/
 # 常用命令
 
 ```
+配置文件位置：${Nginx}/conf/nginx.conf
+
 测试配置文件：${Nginx}/sbin/nginx -t
 启动命令：${Nginx}/sbin/nginx
 停止命令：${Nginx}/sbin/nginx -s stop/quit
