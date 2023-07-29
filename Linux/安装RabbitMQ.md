@@ -76,3 +76,6 @@ Enabled plugins file: /etc/rabbitmq/enabled_plugins
 [root@localhost ~]# systemctl restart rabbitmq-server
 ```
 
+web 界面中添加 Exchange，type 中包含`x-delayed-message`，说明插件安装成功。
+
+![image-20230621163801136](image-20230621163801136.png)
