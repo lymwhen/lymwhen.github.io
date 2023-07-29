@@ -145,6 +145,25 @@ platform-tools>adb pull /data/app/~~hPzRSKuT3wQJdF-_OdNwng==/net.ossrs.flutter_l
 >
 > [adb 命令大全（简洁明了）adb命令启动应用_ihoudf的博客-CSDN博客_adb启动应用](https://blog.csdn.net/HDFQQ188816190/article/details/98599940)
 
+### emulator offline
+
+`adb devices`出现一个`offline`的模拟器
+
+```bash
+platform-tools>adb devices
+List of devices attached
+emulator-5570   offline
+```
+
+```bash
+# 方法1
+adb kill-server
+# 方法2：杀死占用5555端口的进程
+netstat -ano | findstr 5555
+```
+
+
+
 # Android Studio
 
 ### 使用代理
@@ -154,6 +173,41 @@ platform-tools>adb pull /data/app/~~hPzRSKuT3wQJdF-_OdNwng==/net.ossrs.flutter_l
 貌似这里设置了之后会连同 gradle 也是用代理，可以不用到 gradle.properties 中再去配置。
 
 # Gradle
+
+### 使用国内源
+
+Project: build.gradle
+
+```nginx
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+
+    repositories {
+        google()
+        maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:4.2.2'
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+
+```
+
+
 
 ### 使用代理
 
@@ -348,6 +402,59 @@ distributionUrl=https\://services.gradle.org/distributions/gradle-4.10.1-all.zip
 
 查看 gradle 是否版本过低了，截止 2022-09-22，最低版本要求是 4.6，手动改到支持的版本，然后重新打开工程、gradle sync。
 
+### Gradle 升级 4.2.2
+
+gradle/wrapper/gradle-wrapper.properties
+
+```
+-distributionUrl=https\://services.gradle.org/distributions/gradle-4.10.1-all.zip
++distributionUrl=https\://services.gradle.org/distributions/gradle-6.7.1-all.zip
+```
+
+Project: build.gradle
+
+```nginx
+buildscript {
+
+    repositories {
+        google()
+        maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+    }
+    dependencies {
+-        classpath 'com.android.tools.build:gradle:3.3.1'
++        classpath 'com.android.tools.build:gradle:4.2.2'
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+```
+
+Project: build.gradle
+
+```nginx
+android {
+	repositories {
+        flatDir {
+            dirs 'libs'   // aar放置目录
+        }
+    }
+}
+```
+
+↓
+
+```nginx
+android {
+	sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+    }
+}
+```
+
+
+
 # 问题/报错
 
 ### Manifest merger failed with multiple errors, see logs
@@ -423,3 +530,23 @@ java.lang.NullPointerException: Attempt to invoke virtual method ‘android.cont
 ### Android Studio SDK Manager 中只有已安装的 SDK，没有未安装的
 
 没有正常连接到 SDK Update Sites，可以在 SDK Update Sites Tab 页中添加国内镜像，或着配置 Android Studio 代理，参看上文
+
+### android.view.ViewRootImpl$CalledFromWrongThreadException: Only the original thread that created a view hierarchy can touch its views. Expected: JavaBridge Calling: main
+
+原因：在 JavaBridge 中 show 了 AlertDialog，在主线程中 dismiss
+
+解决：在主线程中 show 和 dismiss
+
+### Google Play 需要最低的 API level
+
+Project: build.gradle
+
+```nginx
+android {
+    lintOptions {
+        checkReleaseBuilds false
+    }
+}
+```
+
+跳过这项验证
