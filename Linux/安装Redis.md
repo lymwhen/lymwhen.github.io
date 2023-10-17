@@ -1,5 +1,13 @@
 # 安装 Redis
 
+> [!TIP]
+>
+> 适用于7.0版本安装
+>
+> [GitHub - redis/redis: Redis is an in-memory database that persists on disk. The data model is key-value, but many different kind of values are supported: Strings, Lists, Sets, Sorted Sets, Hashes, Streams, HyperLogLogs, Bitmaps.](https://github.com/redis/redis)
+
+
+
 # 下载
 
 > [Download | Redis](https://redis.io/download/)
@@ -15,6 +23,9 @@
 ```bash
 cd redis
 make
+
+# 指定动态内存分配
+make MALLOC=libc
 ```
 
 
@@ -72,6 +83,32 @@ cd redis/src
 >
 > [Redis persistence | Redis](https://redis.io/docs/management/persistence/#:~:text=AOF (Append Only File)%3A AOF persistence logs every,the same format as the Redis protocol itself.)
 
+# 允许远程连接
+
+```bash
+# bind 127.0.0.1 -::1
+bind 0.0.0.0 -::1
+protected-mode no
+```
+
+# 问题
+
+##### 启动redis报 Memory overcommit must be enabled
+
+```bash
+[root@localhost redis-7.2.1]# src/redis-server redis.conf 
+10260:C 14 Oct 2023 02:00:08.395 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+```
+
+```bash
+vim /etc/sysctl.conf
+vm.overcommit_memory = 1
+# 使配置生效
+sysctl -p
+```
+
+
+
 # 测试 redis
 
 ```bash
@@ -79,6 +116,8 @@ cd redis/src
 /usr/local/redis-3.0.5/src/redis-cli
 # 鉴权
 auth password
+# 测试
+ping
 # 进行存取测试
 set name test
 keys *
