@@ -56,6 +56,29 @@ oDiv[0]
 $(oDiv[0])
 ```
 
+### 获取选择器
+
+```javascript
+function getpath(obj){
+    if(obj.attr('id')){
+        return "#" + obj.attr("id");
+    }
+    var path = obj.parents().addBack();
+    var cssSelect = path.get().map(function(item) {
+        var self = $(item),
+            name = item.nodeName.toLowerCase();
+        index = self.siblings(name).length ? ':nth-child(' + (self.index() + 1) + ')' : '';
+        if (name === 'html' || name === 'body') {
+            return name;
+        }
+        return name + index;
+    }).join(' > ');
+    return cssSelect;
+}
+```
+
+
+
 # 	获得/设置 属性/样式
 
 > jQuery颜色渐变效果需引入jquery.color.js
