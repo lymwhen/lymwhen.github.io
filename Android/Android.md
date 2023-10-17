@@ -95,6 +95,8 @@ adb disconnect 192.168.3.62
 
 # ADB 命令
 
+> [Android 调试桥 (adb)  | Android 开发者  | Android Developers (google.cn)](https://developer.android.google.cn/studio/command-line/adb?hl=zh-cn#devicestatus)
+
 ```bash
 # adb设备列表
 adb devices
@@ -144,6 +146,21 @@ platform-tools>adb pull /data/app/~~hPzRSKuT3wQJdF-_OdNwng==/net.ossrs.flutter_l
 > [Android adb启动任意app的几种方式_Ang_qq_252390816的博客-CSDN博客_adb打开app](https://blog.csdn.net/ezconn/article/details/99885715)
 >
 > [adb 命令大全（简洁明了）adb命令启动应用_ihoudf的博客-CSDN博客_adb启动应用](https://blog.csdn.net/HDFQQ188816190/article/details/98599940)
+
+### 网络叹号
+
+```bash
+# Android 7.0 之前
+adb shell "settings put global captive_portal_server connect.rom.miui.com"
+
+# Android 7.0 之后
+adb shell "settings put global captive_portal_http_url http://connect.rom.miui.com/generate_204"
+adb shell "settings put global captive_portal_https_url https://connect.rom.miui.com/generate_204"
+```
+
+然后打开飞行模式、关闭
+
+> [一分钟解决类原生安卓系统wifi或移动网络叹号或叉叉 - 哔哩哔哩 (bilibili.com)](https://www.bilibili.com/read/cv16146843/)
 
 ### emulator offline
 
