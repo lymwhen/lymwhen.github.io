@@ -10,9 +10,17 @@ Commercial support is available from [Nginx, Inc.](https://www.nginx.com/)
 
 > [http核心模块-Nginx中文文档](https://www.nginx.cn/doc/standard/httpcore.html)
 
+> [一文带你搞懂Nginx如何配置Http、Https、WS、WSS！-腾讯云开发者社区-腾讯云 (tencent.com)](https://cloud.tencent.com/developer/article/1799117)
 
+> 示例：[Beginner’s Guide (nginx.org)](https://nginx.org/en/docs/beginners_guide.html)
+>
+> 配置：[Module ngx_http_core_module (nginx.org)](https://nginx.org/en/docs/http/ngx_http_core_module.html)
+>
+> 内置变量：[Module ngx_http_core_module (nginx.org)](https://nginx.org/en/docs/http/ngx_http_core_module.html#variables)
+>
+> [nginx自定义变量与内置预定义变量_nginx非内置变量-CSDN博客](https://blog.csdn.net/m0_37556444/article/details/84563520)
 
-# 检查连接数
+### 检查连接数
 
 ```bash
 netstat -a | findstr 8082
@@ -24,7 +32,7 @@ netstat -a | findstr 8082
 > 4. `established`表示是对方与你**已经连接** 正在通信交换数据
 >
 
-# nginx 命令
+### nginx 命令
 
 ```
 # 启动
@@ -41,7 +49,7 @@ nginx -t
 >
 > [nginx Command-line parameters](http://nginx.org/en/docs/switches.html)
 
-# 请求转发
+### 反向代理
 
 ```nginx
 worker_processes  1;
@@ -68,9 +76,115 @@ http {
 }
 ```
 
+##### https
+
+```nginx
+worker_processes  1;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    sendfile        on;
+    keepalive_timeout  65;
+
+    server {
+		listen       38443 ssl;
+		server_name  mywebsite.com;
+
+        ssl_certificate     /usr/local/server/nginx/conf/mywebsite.com_bundle.crt;
+        ssl_certificate_key /usr/local/server/nginx/conf/mywebsite.com_key.key;
+        ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
+        ssl_ciphers         HIGH:!aNULL:!MD5:!DH;
+        ssl_prefer_server_ciphers on;
+
+        location / {
+			proxy_pass https://192.168.100.7:38443/;
+        }
+    }
+}
+```
+
+##### 指定 Host
+
+一些 http 服务需要指定域名，不然代理访问就是一片空白
+
+在 http.server.location 中配置：
+
+```nginx
+proxy_set_header Host $host;
+# 或者直接指定域名
+proxy_set_header Host mywebsite.com;
+```
+
+类似于 httpd 的`ProxyPassReverse On`
+
+> [Nginx 反向代理，保持url不变，内容来自于另一个域名url的nginx配置_nginx 地址不变_Tsai时越的博客-CSDN博客](https://blog.csdn.net/qq_27694835/article/details/121672128)
+>
+> [When nginx is configured as reverse proxy, can it rewrite the host header to the downstream server like Apache's ProxyPreserveHost? - Server Fault](https://serverfault.com/questions/87056/when-nginx-is-configured-as-reverse-proxy-can-it-rewrite-the-host-header-to-the)
+
+##### 根据域名代理不同的端口
+
+配置多个相同端口、不同`server_name`的 http.server
+
+```nginx
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    sendfile        on;
+    keepalive_timeout  65;
+
+    server {
+        listen       80;
+        server_name  mywebsite1.com;
+        
+        proxy_connect_timeout 300;
+        proxy_send_timeout 300;
+        proxy_read_timeout 300;
+        send_timeout 300;
+        uwsgi_read_timeout 300;
+
+        location / {
+            proxy_pass http://localhost:8080/;
+        }
+    }
+    
+    server {
+        listen       80;
+        server_name  mywebsite2.com *.mywebsite2.com;
+        
+        proxy_connect_timeout 300;
+        proxy_send_timeout 300;
+        proxy_read_timeout 300;
+        send_timeout 300;
+        uwsgi_read_timeout 300;
+
+        location / {
+            proxy_set_header Host $host;
+            proxy_pass http://localhost:8081/;
+        }
+    }
+}
+```
+
+> [!TIP]
+>
+> `server_name`可以配置多个，用空格隔开，可以使用通配符，如：
+>
+> ```nginx
+> server_name  mywebsite2.com *.mywebsite2.com;
+> ```
+>
+> [Server names (nginx.org)](https://nginx.org/en/docs/http/server_names.html)
 
 
-# 本地目录映射
+
+### 本地目录映射
 
 ```nginx
 worker_processes  8;
@@ -101,7 +215,7 @@ http {
 }
 ```
 
-> ## sendfile
+> ##### sendfile
 >
 > **syntax:** *sendfile [ on|off ]*
 >
@@ -113,7 +227,7 @@ http {
 >
 > 大多数sendfile配置开启后，Nginx在进行数据传输，会调用sendfile()函数， Linux 2.0+ 以后的推出的一个系统调用。对比一般的数据的网络传输sendfile会有更少的切换和更少的数据拷贝。
 
-> ## send_timeout
+> ##### send_timeout
 >
 > **syntax:** *send_timeout the time*
 >
@@ -127,7 +241,43 @@ http {
 
 > [通过nginx实现windows系统下本地目录的映射_CherishL_的专栏-CSDN博客](https://blog.csdn.net/lovelovelovelovelo/article/details/75038594)
 
-# 负载均衡
+### 静态资源
+
+将静态资源放在 nginx/front 下
+
+```nginx
+worker_processes  1;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    sendfile        on;
+    keepalive_timeout  65;
+
+    server {
+		listen       38443 ssl;
+		server_name  mywebsite.com;
+
+        ssl_certificate     /usr/local/server/nginx/conf/mywebsite.com_bundle.crt;
+        ssl_certificate_key /usr/local/server/nginx/conf/mywebsite.com_key.key;
+        ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
+        ssl_ciphers         HIGH:!aNULL:!MD5:!DH;
+        ssl_prefer_server_ciphers on;
+
+        location / {
+            root   front;
+            index  index.html index.htm;
+        }
+    }
+}
+```
+
+### 负载均衡
 
 ```nginx
 events {
@@ -137,6 +287,7 @@ events {
 http {
     upstream  myserver {
         server    172.16.10.100:8080;
+        server    172.16.10.101:8080;
         ip_hash;
     }
 
@@ -151,7 +302,7 @@ http {
 }
 ```
 
-# hls 流转发
+### hls 流转发
 
 ```nginx
 worker_processes  1;
@@ -230,7 +381,7 @@ http {
 }
 ```
 
-# rtmp 推流
+### rtmp 推流
 
 > 需要使用`nginx-rtmp-win32`
 >
@@ -285,7 +436,7 @@ http {
 }
 ```
 
-### 推流
+##### 推流
 
 ```bash
 ffmpeg  -re -i "rtmp://rtmp.live.com/stream" -vcodec libx264 -vprofile baseline -acodec libmp3lame -ar 44100 -ac 1 -f flv rtmp://127.0.0.1:1935/hls/http8
@@ -293,7 +444,7 @@ ffmpeg  -re -i "rtmp://rtmp.live.com/stream" -vcodec libx264 -vprofile baseline 
 
 参看 [工具/ffmpeg - 推流](工具/ffmpeg.md?id=推流)
 
-### http 流地址
+##### http 流地址
 
 ```
 http://127.0.0.1:28080/hls/http8.m3u8
@@ -301,22 +452,7 @@ http://127.0.0.1:28080/hls/http8.m3u8
 
 
 
-# https 配置
-
-```nginx
-server {
-    listen       83 ssl;
-    server_name  mywebsite.com;
-
-    ssl_certificate     D:/nginx-1.18.0/conf/mywebsite.com_with_chain.crt;
-    ssl_certificate_key D:/nginx-1.18.0/conf/mywebsite.com_server.key;
-    ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
-    ssl_ciphers         HIGH:!aNULL:!MD5:!DH;
-    ssl_prefer_server_ciphers on;
-}
-```
-
-# 代理 mysql/oracle/rtmp
+### 代理 mysql/oracle/rtmp
 > https://blog.csdn.net/jiahao1186/article/details/111501253
 
 ```nginx
@@ -368,7 +504,49 @@ stream {
 >
 > rtsp 不可以这种代理转发
 
-# 跨域
+### 代理WebSocket
+
+```nginx
+map $http_upgrade $connection_upgrade { 
+    default upgrade; 
+    '' close; 
+} 
+upstream wsbackend{ 
+    server ip1:port1; 
+    server ip2:port2; 
+    keepalive 1000; 
+} 
+server{
+    listen 20038 ssl;
+    server_name localhost;
+    ssl_certificate    /usr/local/nginx-1.17.8/conf/keys/binghe.com.pem;
+    ssl_certificate_key /usr/local/nginx-1.17.8/conf/keys/binghe.com.key;
+    ssl_session_timeout 20m;
+    ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE:ECDH:AES:HIGH:!NULL:!aNULL:!MD5:!ADH:!RC4;
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+    ssl_prefer_server_ciphers on;
+    ssl_verify_client off;
+    location /{
+        proxy_http_version 1.1;
+        proxy_pass http://wsbackend;
+        proxy_redirect off; 
+        proxy_set_header Host $host; 
+        proxy_set_header X-Real-IP $remote_addr; 
+        proxy_read_timeout 3600s; 
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; 
+        proxy_set_header Upgrade $http_upgrade; 
+        proxy_set_header Connection $connection_upgrade; 
+    }
+}
+```
+
+> [!TIP]
+>
+> 代理 ws 的话，把 ssl 相关的配置去掉即可
+
+
+
+### 跨域
 
 https 下前台访问 http 网站接口（跨域），可以使用 nginx 代理，需要解决跨域问题
 
@@ -490,7 +668,7 @@ http {
 > [!NOTE]
 > `server`下`if`里不可以写`add_header`，在`location`下可以
 
-# 默认配置文件
+### 默认配置文件
 
 ```nginx
 
@@ -614,7 +792,7 @@ http {
 
 
 
-# 参数配置
+### 参数配置
 
 ```nginx
 keepalive_timeout 60;
@@ -661,7 +839,7 @@ client_max_body_size：上传文件大小限制。
 
 > yzk_web 视频暂停60s后播放会卡住，配置send_timeout解决
 
-### 进程数
+##### 进程数
 
 ```nginx
 worker_processes  8;
@@ -669,7 +847,7 @@ worker_processes  8;
 
 > 一般配置为 CPU 核心数，如 4 核 8 线程，配置为8
 
-### 最大连接数
+##### 最大连接数
 
 ```nginx
 events {
