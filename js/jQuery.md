@@ -27,6 +27,11 @@ $(':checkbox') // checkbox
 $(':checkbox:checked') // 选中的checkbox
 $(':not(:checked)') // 未选中的checkbox
 $('input:checked').not('input[name*="-"]') // 排除
+
+/* table下第一个tr */
+table tr:first-child
+/* table下非第一个tr */
+table tr:not(:first-child)
 ```
 
 ### 当前元素索引
