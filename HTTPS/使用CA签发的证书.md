@@ -10,9 +10,9 @@
 
 > crt ≈ cer
 
-# 加入中间证书
+# 合并证书
 
-为保证所有浏览器的兼容性，需要将中间证书加入到服务器证书中。
+为保证所有浏览器的兼容性，需要配置中间证书，而一些服务器不支持配置中间证书，比如海康，可以合并服务器证书和中间证书。
 
 以文本方式打开 server.crt 和 chain.crt，将 chain.crt 的内容添加到服务器证书后面，形如：
 
@@ -25,7 +25,7 @@
 -----END CERTIFICATE-----
 ```
 
-可命名为 server_with_chain.crt
+可命名为 `bundle.crt`或`server_with_chain.crt`
 
 # Tomcat 配置
 
@@ -54,6 +54,25 @@ openssl pkcs12 -export -clcerts -in G:/openssl_key/server_with_chain.crt -inkey 
     ssl_prefer_server_ciphers on;
 
 nginx 可以用 https 代理 http
+
+# httpd 配置
+
+```nginx
+<VirtualHost *:443>
+ProxyPreserveHost On
+ServerName bsjtwhty.cn
+SSLEngine on
+SSLCertificateFile /etc/httpd/conf.d/bsjtwhty.cn_public.crt
+SSLCertificateChainFile /etc/httpd/conf.d/bsjtwhty.cn_chain.crt
+SSLCertificateKeyFile /etc/httpd/conf.d/bsjtwhty.cn_key.key
+
+SSLProxyEngine on
+ProxyPass / https://localhost:8443/
+ProxyPassReverse /  https://localhost:8443/
+</VirtualHost>
+```
+
+
 
 > [Nginx SSL证书安装 - 如何安装SSL证书 - 服务与支持 - 迅通诚信 (myssl.cn)](https://www.myssl.cn/ssl/nginx/openssl/install.htm)
 
