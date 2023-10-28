@@ -125,7 +125,16 @@ platform-tools>adb shell pm path net.ossrs.flutter_live_example
 package:/data/app/~~hPzRSKuT3wQJdF-_OdNwng==/net.ossrs.flutter_live_example-29dYs9vez7LfOG2uGvHNig==/base.apk
 platform-tools>adb pull /data/app/~~hPzRSKuT3wQJdF-_OdNwng==/net.ossrs.flutter_live_example-29dYs9vez7LfOG2uGvHNig==/base.apk C:\Users\lymly\
 /data/app/~~hPzRSKuT3wQJdF-_OdNwng==/net.ossrs.flutter_liv...le pulled, 0 skipped. 36.5 MB/s (44790407 bytes in 1.170s)
+
+# 搜索包名
+adb shell pm list package |findstr solid
+# 应用授权
+adb shell appops set --uid org.videolan.vlc MANAGE_EXTERNAL_STORAGE allow
+# 推送文件
+adb push C:\Users\lymly\Downloads\VLC-Android-3.5.4-armeabi-v7a_2.apk /sdcard/Download
 ```
+
+> 所有权限：[Manifest.permission  | Android Developers (google.cn)](https://developer.android.google.cn/reference/android/Manifest.permission)
 
 > [!TIP]
 >
