@@ -66,35 +66,8 @@ http {
     keepalive_timeout  65;
 
     server {
-		listen       38443;
-		server_name  mywebsite.com;
-
-        location / {
-			proxy_pass https://192.168.100.7:38443/;
-        }
-    }
-}
-```
-
-##### https
-
-```nginx
-worker_processes  1;
-
-events {
-    worker_connections  1024;
-}
-
-http {
-    include       mime.types;
-    default_type  application/octet-stream;
-
-    sendfile        on;
-    keepalive_timeout  65;
-
-    server {
-		listen       38443 ssl;
-		server_name  mywebsite.com;
+        listen       443 ssl;
+        server_name  mywebsite.com;
 
         ssl_certificate     /usr/local/server/nginx/conf/mywebsite.com_bundle.crt;
         ssl_certificate_key /usr/local/server/nginx/conf/mywebsite.com_key.key;
@@ -102,8 +75,18 @@ http {
         ssl_ciphers         HIGH:!aNULL:!MD5:!DH;
         ssl_prefer_server_ciphers on;
 
+        proxy_connect_timeout 300;
+        proxy_send_timeout 300;
+        proxy_read_timeout 300;
+        send_timeout 300;
+        uwsgi_read_timeout 300;
+
         location / {
-			proxy_pass https://192.168.100.7:38443/;
+            proxy_pass http://localhost:8080/;
+            proxy_set_header Host $host;
+            proxy_set_header   X-Real-IP        $remote_addr;
+            proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
+            proxy_set_header   Remote_Addr      $http_true_client_ip;
         }
     }
 }
@@ -119,6 +102,13 @@ http {
 proxy_set_header Host $host;
 # 或者直接指定域名
 proxy_set_header Host mywebsite.com;
+
+location / {
+    proxy_pass http://localhost:8080/;
+    proxy_set_header Host $host;
+    # 或者直接指定域名
+    # proxy_set_header Host mywebsite.com;
+}
 ```
 
 类似于 httpd 的`ProxyPassReverse On`
@@ -126,6 +116,19 @@ proxy_set_header Host mywebsite.com;
 > [Nginx 反向代理，保持url不变，内容来自于另一个域名url的nginx配置_nginx 地址不变_Tsai时越的博客-CSDN博客](https://blog.csdn.net/qq_27694835/article/details/121672128)
 >
 > [When nginx is configured as reverse proxy, can it rewrite the host header to the downstream server like Apache's ProxyPreserveHost? - Server Fault](https://serverfault.com/questions/87056/when-nginx-is-configured-as-reverse-proxy-can-it-rewrite-the-host-header-to-the)
+
+##### 服务端获取用户真实 ip
+
+```nginx
+location / {
+    proxy_pass http://localhost:8080/;
+    proxy_set_header   X-Real-IP        $remote_addr;
+    proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
+    proxy_set_header   Remote_Addr      $http_true_client_ip;
+}
+```
+
+否则服务端获取的 ip 为 nginx ip。
 
 ##### 根据域名代理不同的端口
 
