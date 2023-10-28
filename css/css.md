@@ -20,6 +20,11 @@ input.test[type="checkbox"]
 .test div
 /* 下一级 */
 .test>div
+
+/* table下第一个tr */
+table tr:first-child
+/* table下非第一个tr */
+table tr:not(:first-child)
 ```
 
 # 伪类
@@ -159,3 +164,16 @@ Pseudo-classes
 ```
 
 > [登录 | Microsoft 365 (office.com)](https://www.office.com/)
+
+### 表格居中
+
+表格为块级元素，所以使用`align="center"`无效
+
+```css
+table{ 
+    margin-right: auto;
+    margin-left: auto;
+}
+```
+
+> [如何使用 CSS 使表格居中（快速指南）_css表格居中_allway2的博客-CSDN博客](https://blog.csdn.net/allway2/article/details/125577140)
