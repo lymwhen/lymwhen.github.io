@@ -101,6 +101,16 @@ Decimal 表示为 `DECIMAL(*`M`*,*`D`*)`，`M`为总位数，默认值10，最�
 >
 > [MySQL ：： MySQL 5.7 参考手册 ：： 12.22.2 十进制数据类型特征](https://dev.mysql.com/doc/refman/5.7/en/precision-math-decimal-characteristics.html)
 
+### Text
+
+text 类型超过长度报错：`Data truncation: Data too long for column 'nodeStr'`
+
+TEXT 最大长度约为65535（64k）。
+
+MEDIUMTEXT最大长度约为16777215（16MB）。
+
+LONGTEXT最大长度为4294967295(4GB)。
+
 # 字符串
 
 ### left(str, 5)
