@@ -116,6 +116,9 @@ strong {
     line-height: 28px;
     font-family: 'KaTeX_Main';
 }
+.markdown-section h5 {
+    font-size: 1.1rem;
+}
 .ms-beauty-font {
     font-family: SegoeUI-SemiBold,Helvetica,Arial,sans-serif;
     /* font-size: 57px;
