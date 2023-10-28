@@ -116,3 +116,59 @@ const utils = require('./utils.js')
 let map = utils.getPars('?id=1')
 ```
 
+# Node 与浏览器支持的模块规范
+
+> | 条目     | Node                         | 浏览器                 |
+> | -------- | ---------------------------- | ---------------------- |
+> | 模块规范 | CommonJS                     | ES6                    |
+> | 导出     | `* modules.exports`; exports | export; export default |
+> | 引入     | require                      | import；require        |
+>
+> [export报错SyntaxError: Unexpected token export_unexpected token 'export-CSDN博客](https://blog.csdn.net/weixin_40817115/article/details/81534819)
+
+##### node
+
+des.js
+
+```nginx
+function strEnc(xxx) {
+    return xxx
+}
+
+module.exports = {
+  strEnc
+}
+```
+
+主 js
+
+```nginx
+let args = process.argv.splice(2)
+
+var des = require('./des')
+console.log(des.strEnc(args[0], args[1], args[2], args[3]))
+```
+
+##### 浏览器
+
+utils.js
+
+```nginx
+function strEnc(xxx) {
+    return xxx
+}
+
+export default {
+  strEnc
+}
+```
+
+主 js
+
+```nginx
+import utils from '../../common/js/utils.js'
+// 或
+const utils = require(`../../common/js/flow/${this.flowParams.code}.js`)
+console.log(des.strEnc(args[0], args[1], args[2], args[3]))
+```
+
