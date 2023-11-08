@@ -7,21 +7,21 @@
 > [基本撰写和格式语法 - GitHub Docs](https://docs.github.com/cn/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)
 
 # 一级标题
-```
+```markdown
 ### 一级标题
 ```
 
 ---
 
 ### 三级标题
-```
+```markdown
 ### 三级标题
 ```
 
 ---
 
 ##### 五级标题
-```
+```markdown
 ##### 五级标题
 ```
 
@@ -29,7 +29,7 @@
 
 **加粗**
 
-```
+```markdown
 **加粗**
 ```
 
@@ -37,7 +37,7 @@
 
 ~~删除线~~
 
-```
+```markdown
 ~~删除线~~
 ```
 
@@ -47,7 +47,7 @@
 >
 > 第二行
 
-```
+```markdown
 > 引用
 >
 > 第二行
@@ -58,7 +58,7 @@
 > [!NOTE]
 >
 > NOTE
-```
+```markdown
 > [!NOTE]
 >
 > NOTE
@@ -67,7 +67,7 @@
 > [!TIP]
 >
 > TIP
-```
+```markdown
 > [!TIP]
 >
 > TIP
@@ -76,7 +76,7 @@
 > [!WARNING]
 >
 > WARNING
-```
+```markdown
 > [!WARNING]
 >
 > WARNING
@@ -85,7 +85,7 @@
 > [!ATTENTION]
 >
 > ATTENTION
-```
+```markdown
 > [!ATTENTION]
 >
 > ATTENTION
@@ -112,7 +112,7 @@ public static void main(String[] args) {
 
 `xt.text`
 
-```
+```markdown
 `xt.text`
 ```
 
@@ -125,7 +125,7 @@ public static void main(String[] args) {
 | td1  | td2  |
 | td3  | td4  |
 
-```
+```markdown
 
 | tr1  | tr2  |
 | ---- | ---- |
@@ -138,19 +138,19 @@ public static void main(String[] args) {
 
 [网页](https://github.com)
 
-```
+```markdown
 [网页](https://github.com)
 ```
 
 引用本工程文档：[工具/ffmpeg](工具/ffmpeg.md)
 
-```
+```markdown
 [工具/ffmpeg - 推流](工具/ffmpeg.md)
 ```
 
 引用本工程文档，定位到标题：[工具/ffmpeg - 推流](工具/ffmpeg.md#推流)
 
-```
+```markdown
 [工具/ffmpeg - 推流](工具/ffmpeg.md#推流)
 [工具/ffmpeg - 推流](工具/ffmpeg.md?id=推流)
 ```
@@ -162,7 +162,7 @@ public static void main(String[] args) {
 
 :dog:
 
-```
+```markdown
 ![图片](../con/test.png)
 ```
 
@@ -170,7 +170,7 @@ public static void main(String[] args) {
 
 emoji shortcode: :dog:
 
-```
+```markdown
 :dog:
 ```
 
@@ -194,7 +194,7 @@ emoji shortcode: :dog:
 - 无序 2
   - 无序 2.1
 
-```
+```markdown
 - 无序 1
 - 无序 2
   - 无序 2.1
@@ -206,7 +206,7 @@ emoji shortcode: :dog:
 2. 有序 2
    1. 有序 2.1
 
-```
+```markdown
 1. 有序 1
 2. 有序 2
    1. 有序 2.1
@@ -217,7 +217,7 @@ emoji shortcode: :dog:
 - [ ] 任务 2
   - [ ] 任务 2.1
 
-```
+```markdown
 - [x] 任务 1
 - [ ] 任务 2
   - [ ] 任务 2.1
@@ -229,7 +229,7 @@ emoji shortcode: :dog:
 > 
 > 在行文中，使用 $ ... $ 可以插入行内公式，使用 \\[ ... \\] 可以插入行间公式，如果需要对行间公式进行编号，则可以使用 equation 环境：
 > 
-> ```
+> ```markdown
 > \begin{equation}
 > ...
 > \end{equation}
@@ -256,7 +256,7 @@ x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}\\
 当\Delta \lt 0时，方程无实数解
 $$
 
-```
+```markdown
 $$
 ax^2 + bx + c = 0(a \neq 0)\\
 判别式：\Delta = b^2 - 4ac\\
@@ -273,7 +273,7 @@ $$
 下标符号：$y_1$  
 组合符号：$a^{x^{2}+y^{2}}$  
 
-```
+```markdown
 上标符号：$x^2$  
 下标符号：$y_1$  
 组合符号：$a^{x^{2}+y^{2}}$  
@@ -295,7 +295,7 @@ $$
 积分符号：$\displaystyle \int^{\infty}_{0}{xdx}$ 
 微分符号：`\partial`，如：$\frac{\partial x}{\partial y}$  
 矩阵符号：$\left[ \begin{matrix} &1 &2 &\cdots &4 &5 &6 &\cdots &8\\ &\vdots &\ddots &\cdots &13 &14 &15 &\cdots &16\end{matrix} \right]$
-```
+```markdown
 加减：$\pm$     
 分数：$\frac{x}{y}$     
 平均数符号：$\overline{xyz}$    
@@ -339,7 +339,7 @@ $$
 普赛：$\Psi$，$\psi$  
 欧米伽：$\Omega$，$\omega$  
 
-```
+```markdown
 阿尔法：$\Alpha$，$\alpha$  
 贝塔：$\Beta$，$\beta$  
 伽玛：$\Gamma$，$\gamma$  
@@ -366,7 +366,13 @@ $$
 欧米伽：$\Omega$，$\omega$  
 ```
 
----
+### 转义
+
+**\$Android_SDK**
+
+```markdown
+**\$Android_SDK**
+```
 
 
 
