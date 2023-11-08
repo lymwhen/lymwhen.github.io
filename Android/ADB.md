@@ -81,6 +81,12 @@ adb push D:\test1\VLC-Android-3.5.4-armeabi-v7a_2.apk /sdcard/Download
 adb pull /sdcard/Download/VLC-Android-3.5.4-armeabi-v7a_2.apk D:\test1\
 ```
 
+> 文件访问权限（Android 10）：WRITE_EXTERNAL_STORAGE（包含了 READ 权限）、READ_EXTERNAL_STORAGE
+>
+> 文件访问权限（Android 11）：MANAGE_EXTERNAL_STORAGE
+>
+> 允许显示在其他应用上层：SYSTEM_ALERT_WINDOW
+>
 > 所有权限：[Manifest.permission  | Android Developers (google.cn)](https://developer.android.google.cn/reference/android/Manifest.permission)
 
 > [!TIP]
@@ -170,3 +176,4 @@ netstat -ano | findstr 5571
 ```
 
 例如通联支付的输入控件:dog:
+
