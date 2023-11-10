@@ -42,6 +42,10 @@ adb disconnect 192.168.3.62
 ```bash
 # adb设备列表
 adb devices
+# 推送文件
+adb push D:\test1\VLC-Android-3.5.4-armeabi-v7a_2.apk /sdcard/Download
+# 拉文件
+adb pull /sdcard/Download/VLC-Android-3.5.4-armeabi-v7a_2.apk D:\test1\
 # 进入shell
 adb shell
 adb -s 553cdf21 shell
@@ -52,8 +56,11 @@ adb -s 553cdf21 shell
 ```bash
 # root
 su
+
 # 所有应用列表
 pm list package
+# 搜索包名
+pm list package |findstr solid
 # 停用应用
 pm disable-user com.edu.xxx
 # 启用应用
@@ -61,31 +68,32 @@ pm enable com.edu.xxx
 
 # 启动activity
 am start com.xxx.xxxx/.SplashActivity
+# 停止应用
+am force-stop com.xxx.xxxx
 # 查看前台activity
 dumpsys activity | grep -i run
+
+# 应用授权
+appops set --uid org.videolan.vlc MANAGE_EXTERNAL_STORAGE allow
+# 屏幕截图
+screencap /sdcard/screen.png
+```
+
+```bash
 # 导出apk
 pm path net.ossrs.flutter_live_example
 package:/data/app/~~hPzRSKuT3wQJdF-_OdNwng==/net.ossrs.flutter_live_example-29dYs9vez7LfOG2uGvHNig==/base.apk
 adb pull /data/app/~~hPzRSKuT3wQJdF-_OdNwng==/net.ossrs.flutter_live_example-29dYs9vez7LfOG2uGvHNig==/base.apk D:\test1\
 /data/app/~~hPzRSKuT3wQJdF-_OdNwng==/net.ossrs.flutter_liv...le pulled, 0 skipped. 36.5 MB/s (44790407 bytes in 1.170s)
-
-# 搜索包名
-pm list package |findstr solid
-# 应用授权
-appops set --uid org.videolan.vlc MANAGE_EXTERNAL_STORAGE allow
-# 屏幕截图
-screencap /sdcard/screen.png
-# 推送文件
-adb push D:\test1\VLC-Android-3.5.4-armeabi-v7a_2.apk /sdcard/Download
-# 拉文件
-adb pull /sdcard/Download/VLC-Android-3.5.4-armeabi-v7a_2.apk D:\test1\
 ```
 
-> 文件访问权限（Android 10）：WRITE_EXTERNAL_STORAGE（包含了 READ 权限）、READ_EXTERNAL_STORAGE
+
+
+> 文件访问权限（Android 10）：`WRITE_EXTERNAL_STORAGE`（包含了 READ 权限）、`READ_EXTERNAL_STORAGE`
 >
-> 文件访问权限（Android 11）：MANAGE_EXTERNAL_STORAGE
+> 文件访问权限（Android 11）：`MANAGE_EXTERNAL_STORAGE`
 >
-> 允许显示在其他应用上层：SYSTEM_ALERT_WINDOW
+> 允许显示在其他应用上层：`SYSTEM_ALERT_WINDOW`
 >
 > 所有权限：[Manifest.permission  | Android Developers (google.cn)](https://developer.android.google.cn/reference/android/Manifest.permission)
 
@@ -118,9 +126,14 @@ adb shell "settings put global captive_portal_server connect.rom.miui.com"
 # Android 7.0 之后
 adb shell "settings put global captive_portal_http_url http://connect.rom.miui.com/generate_204"
 adb shell "settings put global captive_portal_https_url https://connect.rom.miui.com/generate_204"
+
+# 关闭检测
+adb shell settings put global captive_portal_mode 0
 ```
 
 然后打开飞行模式、关闭
+
+> [解决Oculus Quest2连接受限、不自动连接WiFi - LittleJake's Blog](https://blog.littlejake.net/archives/534/)
 
 > [一分钟解决类原生安卓系统wifi或移动网络叹号或叉叉 - 哔哩哔哩 (bilibili.com)](https://www.bilibili.com/read/cv16146843/)
 
@@ -164,7 +177,7 @@ adb devices
 >
 > [adb 的工作原理 - Android 调试桥 (adb)  | Android 开发者  | Android Developers (google.cn)](https://developer.android.google.cn/studio/command-line/adb?hl=zh_cn#howadbworks)
 
-根据文档描述，ADB服务会扫描 5555 到 5585 之间（该范围供前 16 个模拟器使用）的奇数号端口查找模拟器，即**占用 5555 到 5585 之间的奇数端口的程序，会被识别为模拟器，如果序列号为`emulator-5570`，那么它占用端口为 5571**。
+根据文档描述，ADB 服务会扫描 5555 到 5585 之间（该范围供前 16 个模拟器使用）的奇数号端口查找模拟器，即**占用 5555 到 5585 之间的奇数端口的程序，会被识别为模拟器，如果序列号为`emulator-5570`，那么它占用端口为 5571**。
 
 ```bash
 platform-tools>adb devices
