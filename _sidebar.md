@@ -206,15 +206,11 @@
   * [ZLMediaKit](开源项目/ZLMediaKit/Ubuntu安装.md)
     * [WVP-GB28181](开源项目/ZLMediaKit/WVP-GB28181.md)
   * [WebGIS](开源项目/WebGIS/WebGIS.md)
-    
     * [OpenLayers](开源项目/WebGIS/OpenLayers.md)
     * [MBTiles服务](开源项目/WebGIS/MBTiles服务.md)
-    
-    [VLC-Android](开源项目/VLC-Android.md)
-    
-    [Kodi skin.unity](开源项目/Kodi-skin.unity.md)
+  * [VLC-Android](开源项目/VLC-Android.md)
+  * [Kodi skin.unity](开源项目/Kodi-skin.unity.md)
 * [文档](文档/文档.md)
-  
   * [Markdown](Markdown.md)
   * [docsify](文档/docsify.md)
 * [OTS](OTS.md)
