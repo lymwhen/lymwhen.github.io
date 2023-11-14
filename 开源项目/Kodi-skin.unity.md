@@ -26,7 +26,17 @@ zip 解包大佬修改的 skin.unity，打开代码一看，全是布局文件�
 
 经过研究，玩明白的：
 
-### 语法
+# 开发手册
+
+> 开发目录：[Category:Skin development - Official Kodi Wiki](https://kodi.wiki/view/Category:Skin_development)
+>
+> 开发手册：[Skinning Manual - Official Kodi Wiki](https://kodi.wiki/view/Skinning_Manual)
+>
+> 内置变量：[Kodi Documentation: Infolabels and Boolean conditions (xbmc.github.io)](https://xbmc.github.io/docs.kodi.tv/master/kodi-base/d5/d11/modules__infolabels_boolean_conditions.html)
+>
+> 内置方法：[Kodi Documentation: List of built-in functions (xbmc.github.io)](https://xbmc.github.io/docs.kodi.tv/master/kodi-base/d0/d3e/page__list_of_built_in_functions.html)
+>
+> 官方论坛：[Kodi Community Forum (3)](https://forum.kodi.tv/)
 
 歌曲封面图：`$INFO[MusicPlayer.offset(0).Cover]`
 
@@ -905,3 +915,60 @@ Kodi 的鼎鼎大名已经印在我心里了，这里就不用显示了，另外
 ```
 
 ![image-20231114183441400](assets/image-20231114183441400.png)
+
+# 高级设置
+
+> ```xml
+> <advancedsettings>
+>     <loglevel hide="true">2</loglevel>
+> </advancedsettings>
+> ```
+>
+> [advancedsettings.xml - Official Kodi Wiki](https://kodi.wiki/index.php?title=Advancedsettings.xml)
+
+> [!NOTE]
+>
+> 官网提示：advancedsettings.xml 默认不存在，需要手动在`userdata`目录创建。
+>
+> The Userdata folder is a subfolder of the ***[Kodi Data Folder](https://kodi.wiki/view/Kodi_data_folder)*** and is located as shown in the table below.
+>
+> |        Operating system         |                       Userdata Folder                        |
+> | :-----------------------------: | :----------------------------------------------------------: |
+> |           **Android**           | Android/data/org.xbmc.kodi/files/.kodi/userdata/ *(see [note](https://kodi.wiki/view/Userdata#Android_location))* |
+> |             **iOS**             |    /private/var/mobile/Library/Preferences/Kodi/userdata/    |
+> |          **LibreELEC**          |                   /storage/.kodi/userdata/                   |
+> |            **Linux**            |                      ~/.kodi/userdata/                       |
+> |             **Mac**             | /Users/<your_user_name>/Library/Application Support/Kodi/userdata/ |
+> |     **Nvidia Shield (SMB)**     | smb://<nvidiashieldurl>/internal/Android/data/org.xbmc.kodi/files/.kodi/userdata |
+> |            **OSMC**             |                  /home/osmc/.kodi/userdata/                  |
+> |            **tvOS**             |    /private/var/mobile/Library/Preferences/Kodi/userdata/    |
+> |           **Windows**           |                   %APPDATA%\Kodi\userdata                    |
+> |      **Windows Portable**       |  <*Install location chosen by you*>\portable_data\userdata\  |
+> | **Windows via Microsoft Store** | %LOCALAPPDATA%\Packages\XBMCFoundation.Kodi_4n2hpmxwrvr6p\LocalCache\Roaming\Kodi\ |
+> |        **Windows Xbox**         | %LOCALAPPDATA%\Packages\XBMCFoundation.Kodi_4n2hpmxwrvr6p\LocalCache\Roaming\Kodi\ |
+>
+> [Userdata - Official Kodi Wiki](https://kodi.wiki/view/Userdata)
+
+### 缓存图片的最大分辨率
+
+某天突然发现歌曲封面出奇的高清，随后便又一如既往的模糊，打印大佬的网易云插件歌曲接口报文，打开歌曲封面连接，发现分辨率高达`3000*3000`，不能看邓紫棋的美照这怎么行。
+
+研究半天无果，在官方论坛发了一个帖子询问[How to make the image control display high-resolution image？ (kodi.tv)](https://forum.kodi.tv/showthread.php?tid=375033&pid=3171997#pid3171997)，没想到过了一个多小时就收到大佬[Hitcher](https://forum.kodi.tv/member.php?action=profile&uid=27820)的回复🤩
+
+> Use `imageres` for advanced settings so the image is cached at a higher resolution.
+>
+> [https://kodi.wiki/index.php?title=Advanc...l#imageres](https://kodi.wiki/index.php?title=Advancedsettings.xml#imageres)
+>
+> Note: This will only affect newer images so you might want to delete the `Thumbnails` folder and `Texturesxx.db` file so they get recached.
+>
+> 清除图片缓存：删除`userdata`下`Thumbnails`文件夹和`Texturesxx.db`文件
+
+> Specify the maximum resolution that [cached artwork](https://kodi.wiki/view/Artwork/Cache#Texture_optimization) (other than fanart / 16:9 images) should be resized to in pixels. The width is automatically calculated as being 16/9*height. The image will be resized to fit within this size. e.g. an image that is 2000x500 will be cached at size 1280x320. An image that is 500x800 will be cached at size 450x720 using the default value of 720.
+>
+> 如设置 720，按`16:9`换算，即`1280*720`，宽或高超过的图片，会被等比例压缩到不超过此分辨率。
+>
+> ```xml
+> <imageres>720</imageres>
+> ```
+
+所以如果在 1080p 屏幕上原分辨率显示，应设置`1920`。
