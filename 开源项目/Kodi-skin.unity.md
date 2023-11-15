@@ -330,7 +330,73 @@ Player.ShowInfo | Window.IsActive(MusicOSD)
 
 ![image-20231111131633406](assets/image-20231111131633406.png)
 
-### 删除歌词右下角来源
+### 修改歌词样式
+
+打开歌词页`script-cu-lrclyrics-main`（`xml/script-cu-lrclyrics-main`）
+
+歌词最主要的问题是白色背景不太看得清，可以给文字加上阴影属性`shadowcolor`，考虑到性能问题，用不透明色应该会好一些。
+
+标题
+
+```xml
+<control type="label">
+    <centerleft>50%</centerleft>
+    <top>100</top>
+    <width>1300</width>
+    <height>40</height>
+    <font>font28_title</font>
+    <textcolor>white</textcolor>
+    <label>$INFO[MusicPlayer.Artist,, - ]$INFO[MusicPlayer.Title]</label>
+    <align>center</align>
+    <aligny>center</aligny>
+    <shadowcolor>FFA0A0A0</shadowcolor>
+</control>
+```
+
+歌词
+
+```xml
+<!-- ** Required ** Do not change <id> or <type> (Lyrics, will autoscroll if lrc based lyrics are shown) -->
+<control type="list" id="110">
+    <centerleft>50%</centerleft>
+    <top>180</top>
+    <width>1300</width>
+    <height>600</height>
+    <scrolltime>200</scrolltime>
+    <itemlayout height="60">
+        <control type="label">
+            <left>0</left>
+            <top>0</top>
+            <width>1300</width>
+            <height>60</height>
+            <font>font14</font>
+            <aligny>center</aligny>
+            <align>center</align>
+            <textcolor>white</textcolor>
+            <shadowcolor>FFA0A0A0</shadowcolor>
+            <selectedcolor>$INFO[Skin.String(color.500)]</selectedcolor>
+            <label>$INFO[ListItem.Label]</label>
+        </control>
+    </itemlayout>
+    <focusedlayout height="60">
+        <control type="label">
+            <left>0</left>
+            <top>0</top>
+            <width>1300</width>
+            <height>60</height>
+            <font>font16</font>
+            <aligny>center</aligny>
+            <align>center</align>
+            <shadowcolor>FFA0A0A0</shadowcolor>
+            <textcolor>$INFO[Skin.String(color.500)]</textcolor>
+            <selectedcolor>$INFO[Skin.String(color.500)]</selectedcolor>
+            <label>$INFO[ListItem.Label]</label>
+        </control>
+    </focusedlayout>
+</control>
+```
+
+##### 删除歌词右下角来源
 
 虽然尊重版权，但视觉上有点太影响了，删掉吧🥰
 
@@ -920,15 +986,11 @@ Kodi 的鼎鼎大名已经印在我心里了，这里就不用显示了，另外
 
 > ```xml
 > <advancedsettings>
->     <loglevel hide="true">2</loglevel>
+>  <loglevel hide="true">2</loglevel>
 > </advancedsettings>
 > ```
 >
 > [advancedsettings.xml - Official Kodi Wiki](https://kodi.wiki/index.php?title=Advancedsettings.xml)
-
-> [!NOTE]
->
-> 官网提示：advancedsettings.xml 默认不存在，需要手动在`userdata`目录创建。
 >
 > The Userdata folder is a subfolder of the ***[Kodi Data Folder](https://kodi.wiki/view/Kodi_data_folder)*** and is located as shown in the table below.
 >
@@ -949,6 +1011,35 @@ Kodi 的鼎鼎大名已经印在我心里了，这里就不用显示了，另外
 >
 > [Userdata - Official Kodi Wiki](https://kodi.wiki/view/Userdata)
 
+> [!NOTE]
+>
+> 官网提示：advancedsettings.xml 默认不存在，需要手动在`userdata`目录创建。
+>
+
+### 在 Android 下创建 advancedsettings.xml
+
+##### 手机操作
+
+使用 RE 管理器打开`Android/data`，会打开手机文件管理器授权，点使用这个文件夹，此时可在 RE 管理器中操作
+
+> [!NOTE]
+>
+> TV 可能不提供这个授权功能
+
+##### ADB
+
+```bash
+adb push advancedsettings.xml /sdcard/Android/data/org.xbmc.kodi/files/.kodi/userdata/
+```
+
+> [!NOTE]
+>
+> 可能提示无权限
+
+##### Kodi 文件管理
+
+打开 Kodi 文件管理，左侧打开`用户配置目录`，此目录就是`userdata`目录；将 advancedsettings.xml 发送到内部存储，在右侧打开内部存储空间，选中配置文件 - 长按 - 复制，即可复制到左侧。
+
 ### 缓存图片的最大分辨率
 
 某天突然发现歌曲封面出奇的高清，随后便又一如既往的模糊，打印大佬的网易云插件歌曲接口报文，打开歌曲封面连接，发现分辨率高达`3000*3000`，不能看邓紫棋的美照这怎么行。
@@ -961,14 +1052,33 @@ Kodi 的鼎鼎大名已经印在我心里了，这里就不用显示了，另外
 >
 > Note: This will only affect newer images so you might want to delete the `Thumbnails` folder and `Texturesxx.db` file so they get recached.
 >
-> 清除图片缓存：删除`userdata`下`Thumbnails`文件夹和`Texturesxx.db`文件
+> 清除图片缓存：删除`userdata`下`Thumbnails`文件夹和`Texturesxx.db`文件，可用 kodi 文件管理操作。
 
+> ### imageres
+>
 > Specify the maximum resolution that [cached artwork](https://kodi.wiki/view/Artwork/Cache#Texture_optimization) (other than fanart / 16:9 images) should be resized to in pixels. The width is automatically calculated as being 16/9*height. The image will be resized to fit within this size. e.g. an image that is 2000x500 will be cached at size 1280x320. An image that is 500x800 will be cached at size 450x720 using the default value of 720.
 >
-> 如设置 720，按`16:9`换算，即`1280*720`，宽或高超过的图片，会被等比例压缩到不超过此分辨率。
+> 如设置 720，即最大分辨率为`1280*720`，宽或高超过的图片，会按原比例等比例压缩到不超过此分辨率。
 >
 > ```xml
 > <imageres>720</imageres>
 > ```
 
-所以如果在 1080p 屏幕上原分辨率显示，应设置`1920`。
+所以如果在 1080p 屏幕上原分辨率显示，应设置`1080`。
+
+> ### fanartres
+>
+> Specify the maximum resolution that [cached fanart](https://kodi.wiki/view/Artwork/Cache#Texture_optimization) should be resized to in pixels. The width is automatically calculated as being 16/9*height. Only images that are exactly 16x9 and equal to or greater than this resolution will be cached at this size - all other images will be cached using <imageres>. The default value is 1080.
+>
+> 宽高比为`16:9`的图片会按此值压缩缓存，其他按照`imageres`压缩。
+>
+> ```xml
+> <fanartres>1080</fanartres>
+> ```
+
+### 禁止启动图
+
+```xml
+<splash>false</splash>
+```
+
