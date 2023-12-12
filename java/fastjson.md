@@ -21,6 +21,36 @@ JSON.toJSONString(obj);
 public ACSubject subject;
 ```
 
+# SerializeFilter 序列化过滤器
+
+> - PropertyPreFilter 根据PropertyName判断是否序列化；
+> - PropertyFilter 根据PropertyName和PropertyValue来判断是否序列化；
+> - NameFilter 修改Key，如果需要修改Key，process返回值则可；
+> - ValueFilter 修改Value；
+> - BeforeFilter 序列化时在最前添加内容；
+> - AfterFilter 序列化时在最后添加内容。
+>
+> [fastjson（五）通过SerializeFilter定制序列化-CSDN博客](https://blog.csdn.net/liupeifeng3514/article/details/79167734)
+
+将 byte[] 字段显示为 16 进制
+
+```java
+@Override
+public String toString() {
+    return JSON.toJSONString(this, new ValueFilter() {
+        @Override
+        public Object process(Object object, String name, Object value) {
+            if(value instanceof byte[]) {
+                return ByteUtils.unsignedBytes2String(16, (byte[]) value);
+            }
+            return value;
+        }
+    });
+}
+```
+
+
+
 # 疑难问题
 
 ### json 字符串转对象时 get/set 方法、构造方法的影响
@@ -58,9 +88,27 @@ public class T1{
 }
 ```
 
+> [!TIP]
+>
 > 如果一个属性只通过 set 方法传入时，应保证有空的构造方法（众所周知，如果写了带参数的构造方法，需要空的构造方法应手动写出）
 
 ### 类修饰符
 
 经测试内部类转换时属性为`null`，应由`public`修饰类
+
+### fastjson2 序列化枚举问题
+
+fastjson2 有的版本处理枚举时，会将枚举处理为自定义的“value”，如果需要使用名称，需要配置`JSONWriter.Feature`使用`toString方法`：`JSONWriter.Feature.WriteEnumUsingToStrings`
+
+```java
+// 设置fastjson2 features
+JSON.config(
+    JSONWriter.Feature.WriteMapNullValue, 
+    JSONWriter.Feature.WriteNullNumberAsZero, 
+    JSONWriter.Feature.WriteNullStringAsEmpty,
+    JSONWriter.Feature.WriteNullListAsEmpty, 
+    JSONWriter.Feature.WriteNullBooleanAsFalse, 
+    JSONWriter.Feature.WriteEnumUsingToString
+);
+```
 
