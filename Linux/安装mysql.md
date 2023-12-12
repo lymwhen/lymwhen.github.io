@@ -86,12 +86,12 @@ mkdir data
 chown -R mysql:mysql data
 # 安装，结果末尾会打印root密码，记录密码
 ./bin/mysqld --initialize --user=mysql
-
-# 如果mysql没有放在默认位置/usr/local/mysql,需要指定basedir
-./bin/mysqld --initialize --user=mysql --basedir=/usr/local/server/mysql
+./bin/mysqld --initialize --user=mysql --basedir=/usr/local/svr/mysql --datadir=/usr/local/svr/database
 ```
 
-
+> [!NOTE]
+>
+> 如果mysql没有放在默认位置`/usr/local/mysql`，需要指定`basedir`和`datadir`，否则无法启动
 
 # 开机启动和系统服务
 
