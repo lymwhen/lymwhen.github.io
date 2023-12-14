@@ -23,7 +23,28 @@ public class C implements Power {
 }
 ```
 
+# Functional Interface
 
+函数式接口：JDK8 中新增，含有一个抽象方法的接口，为 lambda 表达式和方法引用提供目标类型。
+
+[java.util.function (Java Platform SE 8 ) (oracle.com)](https://docs.oracle.com/javase/8/docs/api/java/util/function/package-summary.html)
+
+JDK8 根据几种常见的输入输出类型，定义了一些函数式接口，来实现不同的功能，文档中看起来共有三四十种，且广泛的用在各种链式操作中，乍一看挺复杂，但概括下来就以下几种：
+
+| 接口            | 抽象方法            | 功能   | 描述                       |
+| --------------- | ------------------- | ------ | -------------------------- |
+| `Predicate<T>`  | `boolean test(T t)` | 断言   | 输入`t`，输出`boolean`结果 |
+| `Supplier<T>`   | `T get()`           | 生产者 | 输出`t`                    |
+| `Consumer<T>`   | `void accept(T t)`  | 消费者 | 对输入`t`进行处理，不输出  |
+| `Function<T,R>` | `R apply(T t)`      | 函数   | 输入`t`，输出`r`           |
+
+> [!TIP]
+>
+> `Bi`开头的接口，表示：`Binary`，二元，指输入变为两个。如`BiPredicate<T, U>`：输入`t`和`u`，输出`boolean`结果。
+
+> [!TIP]
+>
+> `xxBinaryOperator`：与`BiFunction`类似，基本都是输入`t`和`u`，输出`u`，另有一些静态的构造方法。
 
 # Lambda 表达式
 
