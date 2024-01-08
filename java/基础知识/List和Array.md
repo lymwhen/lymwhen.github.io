@@ -52,6 +52,9 @@ Integer[] arr = new ArrayList<Integer>(){{
     add(1);
     add(2);
 }}.toArray(new Integer[0]);
+
+// Array逗号隔开
+String ss = String.join(",", arr)
 ```
 
 > [java中List和Array相互转换 - 古兰精 - 博客园 (cnblogs.com)](https://www.cnblogs.com/goloving/p/7740100.html)
