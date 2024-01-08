@@ -5,25 +5,27 @@ Cascading Style Sheets：层叠样式表
 # 样式选择器
 
 ```css
-/* id */
+// id
 #test
-/* class */
+// class
 .test
-/* 标签 */
+// 标签
 div
-/* 属性 */
+// 属性
 input[type="checkbox"]
 
-/* 一个元素同时包含 */
+// 一个元素同时包含
 input.test[type="checkbox"]
-/* 子元素 */
+// 子元素
 .test div
-/* 下一级 */
+// 下一级
 .test>div
+// 同级
+.test:hover~.test2
 
-/* table下第一个tr */
+// table下第一个tr
 table tr:first-child
-/* table下非第一个tr */
+// table下非第一个tr
 table tr:not(:first-child)
 ```
 
@@ -78,6 +80,48 @@ Pseudo-classes
 `2n+1`/`odd`：倒数奇数行
 
 `2n`/`even`：倒数偶数行
+
+# 垂直居中
+
+### flex
+
+```css
+// ---- 父 ----
+display: flex;
+// 垂直
+align-items: center;
+// 水平（text-align无效）
+justify-content: center;
+```
+
+貌似没有缺点
+
+### line-height
+
+```css
+// ---- 父 ----
+// 垂直
+line-height: 50px;
+// 水平
+text-align: center;
+```
+
+缺点：`line-height`必须指定确定的值，因为`100%`貌似指的是它自身的`100%`，所以等于没用。
+
+### table-cell
+
+```css
+// ---- 父的父 ----
+display:table;
+
+// ---- 父 ----
+// table-cell布局自带水平居中
+display:table-cell;
+// 垂直
+vertical-align:middle;
+```
+
+缺点：必须指定父的父为`table`布局，比较局限
 
 # 实例
 
@@ -177,3 +221,9 @@ table{
 ```
 
 > [如何使用 CSS 使表格居中（快速指南）_css表格居中_allway2的博客-CSDN博客](https://blog.csdn.net/allway2/article/details/125577140)
+
+# 奇怪问题
+
+##### 图片设置`height: 100%`无效
+
+最外层的父必须是确定的高度，如`max-height`是不行的。
