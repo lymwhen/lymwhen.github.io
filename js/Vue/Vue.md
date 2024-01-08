@@ -20,6 +20,56 @@ vue create test1
 >
 > [Installation | Vue CLI (vuejs.org)](https://cli.vuejs.org/guide/installation.html)
 
+### 引入图片
+
+```javascript
+import noPic from '@/assets/images/no-pic.png'
+// 或者
+// let noPic2 = require('@/assets/images/marker_blue.png')
+// let noPic2 = require('../../assets/images/marker_blue.png')
+
+export default {
+  name: 'Mine',
+  data() {
+    return {
+      noPic: noPic,
+      noPic2: require('../../common/image/defaultHead.png')
+    }
+  },
+}
+```
+
+```html
+<img :src="noPic"/>
+<img :src="noPic2"/>
+```
+
+> [!TIP]
+>
+> 使用`@`作为`src`路径别名需要在`vue.config.js`中配置：
+>
+> ```javascript
+> module.exports: {
+>   configureWebpack: {
+>     name: name,
+>     resolve: {
+>       alias: {
+>         '@': resolve('src')
+>         // 或者
+>         // '@': path.resolve(__dirname, 'src')
+>       }
+>     },
+>   }
+> }
+> ```
+
+### 动态引入
+
+```javascript
+let script = require(`../../common/js/scripts/${this.module.code}.js`)
+let icon = require(`../../common/js/scripts/icon_${this.module.code}.png`)
+```
+
 # stylus
 
 ### 帧动画
