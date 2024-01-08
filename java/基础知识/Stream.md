@@ -107,58 +107,6 @@
 >
 > [jdk1.8新特性：stream流 报错：stream has already been operated upon or closed-CSDN博客](https://blog.csdn.net/qq_20446879/article/details/120111221)
 
-### `reduce`三个重载的解释
-
-```java
-Optional<T>	reduce(BinaryOperator<T> accumulator);
-T			reduce(T identity, BinaryOperator<T> accumulator);
-<U> U		reduce(U identity, BiFunction<U,? super T,U> accumulator, BinaryOperator<U> combiner)
-```
-
-##### 第一重载
-
-使用累加器聚合，由于流可能为空，所以返回`Optional<T>`。
-
-累加器`accumulator.apply(T i, T a)`中，`i`为之前计算的累加数，`a`：当前元素
-
-##### 第二重载
-
-在第一重载的基础上，增加了默认值，避免保证了流为空的情况下没有元素参与聚合，所以返回`T`
-
-> [!NOTE]
->
-> 官方文档指出了参数`T identity`的两个重要使用原则：
->
-> 1. 它应该被理解为默认值，而非累加的起始值
->
-> 此重载等效于：
->
-> ```java
-> T result = identity;
-> for (T element : this stream)
->     result = accumulator.apply(result, element)
-> return result;
-> ```
->
-> 2. 它的值应该被严格规定，对于所有的`t`（stream种的元素），必须满足 `accumulator.apply(identity, t)`
->
-> 综上，`T identity`会参与聚合计算，但它只应该作为默认值使用，否则并行计算时，结果会出错。例如进行累加计算，那么它的值应该是`0`。
-
-##### 第三重载
-
-在第二重载的基础，默认值`identity`的类型不限定为流元素`T`，可自由指定为`U`，同`accumulator.apply`第一参数、返回值。例如可以求流元素的某一属性值的和，并使用`Integer`返回。
-
-第三参数`BinaryOperator<U> combiner`看似很费解，测试也感觉貌似没有用，事实上，它是**对第三重载聚合结果类型自由指定特性在并行计算时的必要补充**。官方文档上`identity`/`u`/`t`/`accmulator`/`combiner`的关系：
-
-```java
-combiner.apply(u, accumulator.apply(identity, t)) == accumulator.apply(u, t)
-```
-
-恒等式具有以下含义：
-
-- 等式中的`u`指两个或多个流元素`t`聚合的结果，简化来说就是`u + (identity + t) == u + t`，即默认值`U identity`的使用原则同第二重载
-- 第三参数的意义：第二重载累加器为`T accumulator.apply(T, T)`，即两个`t`聚合成一个`t`，并行计算时每个线程都累加产生一个`t`，聚合成最终结果`t`时，同样适用这个累加器；第三重载累加器为`U accumulator.apply(U, T)`，即`u`和`t`聚合成`u`，并行计算时每个线程都累加产生一个`u`，聚合成最终结果`u`时，就需要指定一个`U combiner.apply(U, U)`的合并器了，只有多线程计算时，这个合并器才会被调用。
-
 ### 示例
 
 ```java
@@ -230,3 +178,58 @@ list.stream().filter(v -> v.age > 10).toArray(A[]::new);
 // toArray：{"age":12,"name":"张一"}{"age":13,"name":"张二"}
 ```
 
+### reduce 三个重载的解释
+
+```java
+Optional<T>	reduce(BinaryOperator<T> accumulator);
+T			reduce(T identity, BinaryOperator<T> accumulator);
+<U> U		reduce(U identity, BiFunction<U,? super T,U> accumulator, BinaryOperator<U> combiner)
+```
+
+##### 第一重载
+
+使用累加器聚合，由于流可能为空，所以返回`Optional<T>`。
+
+累加器`accumulator.apply(T i, T a)`中，`i`为之前计算的累加数，`a`：当前元素
+
+##### 第二重载
+
+在第一重载的基础上，增加了默认值，避免保证了流为空的情况下没有元素参与聚合，所以返回`T`
+
+> [!NOTE]
+>
+> 官方文档指出了参数`T identity`的两个重要使用原则：
+>
+> 1. 它应该被理解为默认值，而非累加的起始值
+>
+> 此重载等效于：
+>
+> ```java
+> T result = identity;
+> for (T element : this stream)
+>     result = accumulator.apply(result, element)
+> return result;
+> ```
+>
+> 2. 它的值应该被严格规定，对于所有的`t`（stream种的元素），必须满足 `accumulator.apply(identity, t)`
+>
+> 综上，`T identity`会参与聚合计算，但它只应该作为默认值使用，否则并行计算时，结果会出错。例如进行累加计算，那么它的值应该是`0`。
+
+##### 第三重载
+
+在第二重载的基础，默认值`identity`的类型不限定为流元素`T`，可自由指定为`U`，同`accumulator.apply`第一参数、返回值。例如可以求流元素的某一属性值的和，并使用`Integer`返回。
+
+第三参数`BinaryOperator<U> combiner`看似很费解，测试也感觉貌似没有用，事实上，它是**对第三重载聚合结果类型自由指定特性在并行计算时的必要补充**。官方文档上`identity`/`u`/`t`/`accmulator`/`combiner`的关系：
+
+```java
+combiner.apply(u, accumulator.apply(identity, t)) == accumulator.apply(u, t)
+```
+
+恒等式具有以下含义：
+
+- 等式中的`u`指两个或多个流元素`t`聚合的结果，简化来说就是`u + (identity + t) == u + t`，即默认值`U identity`的使用原则同第二重载
+- 第三参数的意义：第二重载累加器为`T accumulator.apply(T, T)`，即两个`t`聚合成一个`t`，并行计算时每个线程都累加产生一个`t`，聚合成最终结果`t`时，同样适用这个累加器；第三重载累加器为`U accumulator.apply(U, T)`，即`u`和`t`聚合成`u`，并行计算时每个线程都累加产生一个`u`，聚合成最终结果`u`时，就需要指定一个`U combiner.apply(U, U)`的合并器了，只有多线程计算时，这个合并器才会被调用。
+
+### distinct 适用于对象
+
+`distinct`基于`equals`方法判断重复，`Integer`/`Long`/`String`等实现了`equals`方法，所以可以被排重。当我们自己的对象需要排重时，也需要在`equals`方法中实现重复逻辑。
