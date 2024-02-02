@@ -72,6 +72,18 @@ ProxyPassReverse /  https://localhost:8443/
 </VirtualHost>
 ```
 
+# Tomcat 配置
+
+```xml
+    <Connector port="8443"  protocol="org.apache.coyote.http11.Http11NioProtocol"
+           maxThreads="150" SSLEnabled="true" scheme="https">
+          <SSLHostConfig sslProtocol="TLS">
+               <Certificate certificateFile="conf/zfcgxq.com_bundle.crt" certificateKeyFile="conf/zfcgxq.com.key"
+                              type="RSA"/>
+          </SSLHostConfig>
+     </Connector>
+```
+
 
 
 > [Nginx SSL证书安装 - 如何安装SSL证书 - 服务与支持 - 迅通诚信 (myssl.cn)](https://www.myssl.cn/ssl/nginx/openssl/install.htm)
