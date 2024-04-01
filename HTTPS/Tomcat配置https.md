@@ -75,6 +75,16 @@ key + 中间证书 + 服务器证书
      INTEGRAL: 要保证服务器和client之间传输的数据不能够被修改
      NONE: 指示容器必须能够在任一的连接上提供数据。（即用HTTP或HTTPS，由客户端来决定）
 
+> [!NOTE]
+>
+> 发现坑点之一，使用 vs code 编辑 web.xml 后可能报错：
+>
+> ```log
+> Unable to locate the default servlet for serving static content. Please set the 'defaultServletName'
+> ```
+>
+> 解决办法，将 web.xml 替换回原版，可使用 notepad3 编辑。
+
 # 启动 Tomcat
 在控制台中出现端口信息
 ```log
