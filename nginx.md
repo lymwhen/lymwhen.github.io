@@ -185,6 +185,18 @@ http {
 >
 > [Server names (nginx.org)](https://nginx.org/en/docs/http/server_names.html)
 
+##### 强制 https
+
+可使用地址`rewrite`实现
+
+```nginx
+server{
+    listen 80;
+    server_name kmhjxx.com www.kmhjxx.com;
+    rewrite ^(.*)$ https://$host$1  permanent;
+}
+```
+
 
 
 ### 本地目录映射
@@ -662,6 +674,23 @@ http {
         }
     }
 }
+```
+
+代理腾讯地图服务端接口
+
+```nginx
+		location /qqmap/ {
+			if ($request_method = 'OPTIONS') {
+				add_header Access-Control-Allow-Origin *;
+				add_header Access-Control-Allow-Headers *;
+				add_header Access-Control-Allow-Methods "GET, POST, PUT, OPTIONS";
+				return 204;
+			}
+			add_header Access-Control-Allow-Origin *;
+			add_header Access-Control-Allow-Headers *;
+			add_header Access-Control-Allow-Methods "GET, POST, PUT, OPTIONS";
+			proxy_pass https://apis.map.qq.com/;
+		}
 ```
 
 使用场景为https代理支持跨域的网站，aka https请求前会发送`OPTION`请求，关键在于 nginx 给`OPTION`请求添加允许跨域请求头
