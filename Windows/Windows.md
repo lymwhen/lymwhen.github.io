@@ -129,6 +129,19 @@ echo %date:~0,4%-%date:~5,2%-%date:~8,2% %time:~0,2%:%time:~3,2%:%time:~6,2%
 
 均继承于`无`，应用于`此文件夹、子文件夹和文件`
 
+# 删除提示文件被占用
+
+使用 git 带的 base
+
+```bash
+rm -f xxx
+rf -rf xxx
+```
+
+> [!TIP]
+>
+> 这是一个非常牛逼的不费劲的完美的解决方案
+
 # PowerShell：因为在此系统上禁止运行脚本
 
 管理员运行 powershell
