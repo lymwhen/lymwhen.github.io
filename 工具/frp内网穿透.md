@@ -52,7 +52,8 @@ webServer.password = "1234"
 
 ```bash
 # 服务端地址（域名也可）
-serverAddr = "192.168.31.222"
+# serverAddr = "192.168.31.222"
+serverAddr = "0.0.0.0"
 serverPort = 20211
 
 # token，与服务端一致
@@ -74,6 +75,10 @@ localPort = 3389
 remotePort = 20212
 ```
 
+> [!TIP]
+>
+> 这种方式也适用于通过 ip 访问 http 服务。
+
 ### Windows 远程端口
 
 ```toml
@@ -92,7 +97,27 @@ localPort = 3389
 remotePort = 20212
 ```
 
+### Http
 
+##### 服务端
+
+```toml
+vhostHttpPort = 20240
+```
+
+##### 客户端
+
+```
+[[proxies]]
+name = "web1"
+type = "http"
+localPort = 8080
+customDomains = ["www.yourdomain.com"]
+```
+
+> [!NOTE]
+>
+> 这种方式必须使用域名访问，如果以 ip 访问，参看 tcp 配置。
 
 > # 旧版本配置
 >
