@@ -584,3 +584,24 @@ make clean
 接下来就可以从`configure`那一步开始重新安装了
 
 > [一个软件包通过编译源代码安装后，如何完全的卸载？？ _advance1989的博客-CSDN博客_编译安装的软件包如何卸载](https://blog.csdn.net/advance1989/article/details/6527704)
+
+
+
+# 删除 history 历史
+
+```
+# 删除本次会话的历史
+history -c
+```
+
+##### 完全不留痕
+
+删除本次会话、历史会话
+
+```bash
+vim ~/.bash_profile
+# dd删除记录，保存
+history -c
+```
+
+> [不留痕迹的清除部分history历史命令记录-CSDN博客](https://blog.csdn.net/vic_qxz/article/details/77774701)
