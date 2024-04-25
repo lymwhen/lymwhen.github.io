@@ -87,6 +87,8 @@ fastboot flash recovery E:\flash\tools\recovery.img
 > [!NOTE]
 >
 > 测试 TWRP 和 狐橙可以，LineageOS rec 没有`mkfs.fat`命令。
+>
+> 但 TWRP 测试无法解密 data，狐橙可以，所以用狐橙吧。
 
 # 使用 parted 工具分区
 
@@ -369,3 +371,205 @@ OOBE\BYPASSNRO
 cmd `regedit`打开注册表编辑器，导航到**HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa**，再双击打开**“LimitBlankPasswordUse”**（若没有，则手动添加一项），将数值修改为0，重启系统。
 
 > [win10 win11无密码远程桌面连接怎么设置 - Tank电玩&米多贝克 (mi-d.cn)](https://www.mi-d.cn/6114)
+
+# 刷入 LineageOS
+
+##### 备份 UEFI boot
+
+进入 rec，备份 UEFI 的 boot。
+
+由于刷入 Android 会格式化 data 分区，所以要将备份的 boot 拉到电脑上暂存：
+
+```
+adb pull /sdcard/Fox ./
+```
+
+在 adb 目录下，打开`Fox/BACKUPS`，下面会有一个备份的文件夹，将它改名为`Windows`
+
+##### 刷入系统
+
+开启 ADB Sideload，输入系统：
+
+```bash
+adb sideload xxx.zip
+```
+
+等待开机。
+
+##### 备份 Android boot
+
+进入 rec，备份 boot，将其改名为`Android`
+
+##### 放回 UEFI boot 备份
+
+将暂存的 UEFI boot 备份放回狐橙备份目录中
+
+```bash
+adb push ./Fox/BACKUPS/Windows /sdcard/Fox/BACKUPS
+```
+
+##### 利用 rec 切换启动的系统
+
+此时 rec 第二个 tab 中，应该会显示`Android`、`Windows`两个备份，需要启动哪个系统，就还原哪一个即可。
+
+# Simpleinit 启动菜单
+
+> 目前`edk2-msm`内置了SimpleInit作为启动菜单，你可以通过修改`logfs`分区中的`simpleinit.static.uefi.cfg`来进行配置
+>
+> SimpleInit能自动检测到Windows并生成启动项，所以你不需要添加Windows启动项
+>
+> 目前仅有几款基于骁龙845的设备支持启动安卓
+>
+> [启动菜单 | Renegade Project (renegade-project.tech)](https://renegade-project.tech/zh/config/bootmenu)
+
+##### 将 boot 分区导出到 esp 分区
+
+进入 rec
+
+如果此时的 boot 不是 Android boot，需要恢复它。
+
+```bash
+adb shell
+
+# 挂载esp分区
+mkdir /esp
+mount /dev/block/by-name/esp /esp
+
+# 提取boot分区到esp分区中
+dd if=/dev/block/by-name/boot of=/esp/boot.img
+
+# 挂载logfs分区
+mkdir /logfs
+mount /dev/block/by-name/logfs /logfs
+exit
+
+# 拉出logfs分区中的文件
+adb pull /logfs ./
+```
+
+> [!TIP]
+>
+> 通过`df -h`可以看到，根目录`/`并未挂载在任何分区，所以再次创建的文件夹，重启之后需要重新创建。
+
+在`logfs/simpleinit.static.uefi.cfg`文件中添加启动项配置
+
+```nginx
+# boot.default = "continue"
+boot.default = "android-img"
+boot.second = "simple-init"
+boot.timeout = 10
+boot.console_log = false
+gui.guiapp.page = 1
+language = "zh_CN"
+logger {
+    file_output = "@part_logfs:\\simpleinit.log"
+    use_console = false
+}
+boot {
+    // 默认启动项，请先删除simpleinit.uefi.cfg中的boot.default配置
+    // default = "android"
+    configs {
+        // Recovery配置样例
+        recovery {
+            mode = "linux"
+            desc = "Recovery"
+            show = true
+            enabled = true
+            icon = "twrp.png"
+            extra {
+                use_uefi = false
+                abootimg = "#part_rec"
+                // boot镜像中的设备树model值，因设备而异，某些设备上能自动识别，从而不需要该项
+                // 从/sys/firmware/devicetree/base/model读取
+                dtb_model = "Xiaomi Technologies, Inc. Polaris P2 v2.1"
+                // 指向下方locates配置中的dtbo分区，某些时候可能不需要
+                // dtbo = "#part_dtbo"
+                // dtbo id，因设备而异，某些时候可能不需要
+                // dtbo_id = 6
+            }
+        }
+        // 从文件启动安卓配置样例
+        android-img {
+            mode = "linux"
+            desc = "Boot Android From File"
+            show = true
+            enabled = true
+            icon = "distributor-logo-android.svg"
+            extra {
+                use_uefi = false
+                // 从esp分区中的boot.img启动
+                abootimg = "@part_esp:\\boot.img"
+                dtb_id = 6
+                // dtbo = "#part_dtbo"
+                // boot镜像中的设备树model值，因设备而异，某些设备上能自动识别，从而不需要该项
+                // 从/sys/firmware/devicetree/base/model读取
+                dtb_model = "Xiaomi Technologies, Inc. Polaris P2 v2.1"
+                // 指向下方locates配置中的dtbo分区，某些时候可能不需要
+                // dtbo = "#part_dtbo"
+                // dtbo id，因设备而异，某些时候可能不需要
+                // dtbo_id = 6
+            }
+        }
+    }
+}
+locates {
+    part_boot {
+        by_disk_label = "gpt"
+        // 分区名
+        by_gpt_name = "boot"
+    }
+    part_dtbo {
+        by_disk_label = "gpt"
+        by_gpt_name = "dtbo"
+    }
+    part_system {
+        by_disk_label = "gpt"
+        by_gpt_name = "system"
+    }
+    part_logfs {
+        by_disk_label = "gpt"
+        by_gpt_name = "logfs"
+    }
+    part_rec {
+        by_disk_label = "gpt"
+        by_gpt_name = "recovery"
+    }
+    part_esp {
+        by_disk_label = "gpt"
+        by_gpt_name = "esp"
+    }
+}
+```
+
+但是测试 LineageOS 21 无法进入，狐橙 rec 卡在启动画面。
+
+所以改为不倒计时，直接启动 windows 吧，老老实实用 rec 切换系统：
+
+```nginx
+# -*- coding: utf-8 -*-
+##
+## Simple Init Configuration Store For UEFI
+##
+
+boot.default = "continue"
+boot.second = "simple-init"
+boot.timeout = 0
+boot.console_log = false
+gui.guiapp.page = 1
+
+# vim: ts=8 sw=8
+
+# language = "zh_CN"
+```
+
+将配置文件放回 logfs 分区：
+
+```bash
+adb shell
+mkdir /logfs
+mount /dev/block/by-name/logfs
+exit
+
+adb push ./logfs/simpleinit.static.uefi.cfg /logfs
+```
+
