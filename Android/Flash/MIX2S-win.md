@@ -99,7 +99,7 @@ fastboot flash recovery E:\flash\tools\recovery.img
 adb push E:\flash\tools\parted /tmp/
 
 adb shell
-chomd 755 /tmp/parted
+chmod 755 /tmp/parted
 ```
 
 ### 取消挂载`data`下的分区
@@ -109,18 +109,25 @@ chomd 755 /tmp/parted
 df -h
 # 取消挂载分区，如
 umount /data
+umount /sdcard
 ```
 
 > [!TIP]
 >
-> 或者在 rec 中取消挂载
+> 如果`umount`提示：
+>
+> ```bash
+> Device or resource busy
+> ```
+>
+> 在 rec 中取消挂载
 
 ### 分区
 
 查看分区情况
 
 ```bash
-polaris:/sbin # parted /dev/block/sda
+polaris:/tmp # parted /dev/block/sda
 GNU Parted 3.2
 Using /dev/block/sda
 Welcome to GNU Parted! Type 'help' to view a list of commands.
@@ -159,6 +166,16 @@ Number  Start   End     Size    File system  Name        Flags
 在`userdata`分区中分出 windows 所需的`esp`和`系统分区`，剩下空间给`userdata`
 
 > 64GB，留了800MB给ESP分区，留了40GB左右给Windows系统，~~留了4GB左右给PE系统~~，剩下7GB左右给安卓系统。
+
+对于原来的`userdata`分区，可以修改大小（resizepart）或者删除（rm）
+
+##### 删除
+
+```
+(parted) rm 21
+```
+
+##### 创建新分区
 
 ```bash
 #创建820MB大小的esp分区，格式为fat32
@@ -211,6 +228,15 @@ mkfs.ntfs -f /dev/block/by-name/win
 mke2fs -t ext4 /dev/block/by-name/userdata
 ```
 
+给 esp 分区添加标记
+
+```bash
+#添加esp标记，21是ESP分区的编号
+set 21 esp on
+```
+
+
+
 # 刷入 Devcfg 分区
 
 下载 Devcfg 文件：[设备 | Renegade Project (renegade-project.tech)](https://renegade-project.tech/zh/devices) 或 http://files.renegade-project.org/devcfg-polaris_FixTS.img
@@ -247,7 +273,11 @@ fastboot flash boot boot-polaris-v2.0rc2.img
 
 ### 释放映像
 
-启动Dism++, 选择`文件 -> 释放镜像`，填入`映像路径` 和`安装路径` ，选中`添加引导`和`格式化`，然后点击确定。此时会提示会在xx磁盘xx分区添加引导，注意确认是上面分配的21分区。
+启动Dism++
+
+`选项 - 详细设置`，勾选专家模式。
+
+选择`文件 -> 释放镜像`，填入`映像路径` 和`安装路径` ，选中`添加引导`和`格式化`，然后点击确定。此时会提示会在xx磁盘xx分区添加引导，注意确认是上面分配的21分区。
 
 映像路径：挂载 Windows ISO 镜像，选中里面的`sources/install.wim`文件
 
@@ -299,6 +329,26 @@ bcdedit /store BCD /set {default} nointegritychecks on
 # 进入 windows
 
 强制关机，重启进入 windows 系统。大概8分钟后，进入引导界面。
+
+### 跳过 OOBE
+
+新版系统首次开机用户引导界面（OOBE）强制要求联网、登录微软账户，如果只想只使用本地账户，需要跳过 OOBE
+
+在任意界面输入`shift`+`F10`，笔记本可能为`shift`+`Fn`+`F10`，打开命令行界面，输入：
+
+```bash
+OOBE\BYPASSNRO
+```
+
+等待设备自动重启。
+
+> [!TIP]
+>
+> 触屏设备可以点击左下角或右下角的无障碍选项打开键盘。或者借助输入框打开键盘。
+
+> [!NOTE]
+>
+> 在 OOBE 界面中不能连接网络，否则无法跳过登录微软账户。
 
 ### 关闭 Windows Defender
 
