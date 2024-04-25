@@ -116,20 +116,50 @@ git mv -f src/views/List/About.vue  src/views/list/About.vue
 
 # 取消文件追踪
 
+### 取消追踪
+
+- 文件未提交
+
+即只是add
+
 ```bash
-# 取消文件追踪
-git rm -r cached .metadata
-# 删除本地文件（也可以不删除）
-git rm -r --f .metadata
+# 取消某一文件
+git reset .metadata
+# 取消全部文件
+git reset .
+# 重置到某一版本
+git reset --soft head
 ```
 
-每次使用git status 查看状态时总是会列出被跟踪的文件，可以通过 .gitignore文件来达到目的，在 .gitignore 文件中添加：
+
+
+- 文件已被提交
+
+```bash
+# 查看取消文件追踪，只是查看，并不会产生效果
+git rm -r -n cached .metadata
+# 取消文件追踪
+git rm -r cached .metadata
+# 取消文件追踪，同时删除本地文件
+git rm -r --f .metadata 
+```
+
+### 在 .gitignore 文件中添加
 
 ```
 /.metadata
 ```
 
+### 提交
 
+```bash
+git add .
+git push origin master
+```
+
+> [!TIP]
+>
+> 可以使用`git status`查看已被追踪或未被追踪的文件情况
 
 # 使用旧项目创建新项目保留提交记录
 
