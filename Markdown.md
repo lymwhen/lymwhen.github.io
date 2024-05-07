@@ -120,17 +120,17 @@ public static void main(String[] args) {
 
 表格
 
-| tr1  | tr2  |
-| ---- | ---- |
-| td1  | td2  |
-| td3  | td4  |
+| tr1  | tr2  | 居左| 居中 | 居右|
+| ---- | ---- | :-- |:---:|----:|
+| td1  | td2  | td  | td  | td  |
+| td3  | td4  | td  | td  | td  |
 
 ```markdown
 
-| tr1  | tr2  |
-| ---- | ---- |
-| td1  | td2  |
-| td3  | td4  |
+| tr1  | tr2  | 居左| 居中 | 居右|
+| ---- | ---- | :-- |:---:|----:|
+| td1  | td2  | td  | td  | td  |
+| td3  | td4  | td  | td  | td  |
 
 ```
 
