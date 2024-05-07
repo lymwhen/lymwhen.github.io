@@ -118,6 +118,29 @@ tar -zcvf repo.tar.gz /usr/local/repo
 >
 > [linux mv命令排除某个文件或文件夹_庭前荷雨的博客-CSDN博客_mv 排除](https://blog.csdn.net/motingqian/article/details/84308629)
 
+# 服务管理
+
+管理服务的启动、重启、停止、重载、查看状态等常用命令区分
+
+| System V init 命令（RHEL 6） | systemctl 命令（RHEL 7）      | 作用                           |
+| ---------------------------- | ----------------------------- | ------------------------------ |
+| service foo start            | systemctl start foo.service   | 启动服务                       |
+| service foo restart          | systemctl restart foo.service | 重启服务                       |
+| service foo stop             | systemctl stop foo.service    | 停止服务                       |
+| service foo reload           | systemctl reload foo.service  | 重新加载配置文件（不终止服务） |
+| service foo status           | systemctl status foo.service  | 查看服务状态                   |
+
+设置服务开机启动、不启动、查看各级别下服务启动状态等常用命令
+
+chkconfig 是Redhat下的程序。使用 chkconfig 把服务加到开机自动启动列表里，开机就能自启动了；
+
+| System V init 命令（RHEL 6） | systemctl 命令（RHEL 7）                 | 作用                               |
+| ---------------------------- | ---------------------------------------- | ---------------------------------- |
+| chkconfig foo on             | systemctl enable foo.service             | 开机自动启动                       |
+| chkconfig foo off            | systemctl disable foo.service            | 开机不自动启动                     |
+| chkconfig foo                | systemctl is-enabled foo.service         | 查看特定服务是否为开机自动启动     |
+| chkconfig --list             | systemctl list-unit-files --type=service | 查看各个级别下服务的启动与禁用情况 |
+
 # 权限
 
 ### 十位权限
