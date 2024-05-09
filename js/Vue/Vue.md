@@ -70,7 +70,51 @@ let script = require(`../../common/js/scripts/${this.module.code}.js`)
 let icon = require(`../../common/js/scripts/icon_${this.module.code}.png`)
 ```
 
-# stylus
+# css
+
+### 仅在本组件生效
+
+在`style`标签中使用`scoped`
+
+```css
+<style lang="scss" scoped>
+.avatar-uploader .el-upload {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.avatar-uploader .el-upload:hover {
+  border-color: #409EFF;
+}
+</style>
+```
+
+> [!NOTE]
+>
+> `scoped`默认仅在本组件生效，在其他组件、子组件中均不生效。
+
+在子组件中也生效
+
+```css
+<style lang="scss" scoped>
+.avatar-uploader::v-deep .el-upload {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.avatar-uploader::v-deep .el-upload:hover {
+  border-color: #409EFF;
+}
+</style>
+```
+
+> [深度解析为什么vue组件中添加scoped后某些样式不生效？给出解决办法_vue scoped 样式不生效-CSDN博客](https://blog.csdn.net/qq_41800366/article/details/107062781)
+>
+> [Scoped CSS | Vue Loader (vuejs.org)](https://vue-loader.vuejs.org/guide/scoped-css.html#deep-selectors)
 
 ### 帧动画
 
@@ -113,6 +157,8 @@ stylus
   width 50px
   height 50px
 ```
+
+> stylus
 
 > [css预处理框架stylus——@keyframes 帧动画 和@font-face字体引入_@红@旗下的小兵的博客-CSDN博客](https://blog.csdn.net/qq_42778001/article/details/101540267)
 
