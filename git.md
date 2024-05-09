@@ -161,6 +161,101 @@ git push origin master
 >
 > 可以使用`git status`查看已被追踪或未被追踪的文件情况
 
+# 分支合并
+
+```bash
+# 查看所有分支
+git branch -a
+```
+
+> [!TIP]
+>
+> ![image-20240315165158689](assets/image-20240315165158689.png)
+>
+> - 白色、绿色为本地分支，`*`表示当前分支
+> - `remotes/`开头、红色为远程分支
+
+```
+# git clone从远程仓库下载代码后切换远程分支
+git checkout -b dev origin/dev
+```
+
+> [!TIP]
+>
+> 表示创建本地仓库dev，并关联远程仓库dev。
+>
+> 由于此时没有其他本地分支，所以如果直接`git checkout dev`，会进入分支游离状态。
+>
+> **用于远程有分支，本地没有的情况**
+
+```bash
+# 创建新分支
+git branch fix
+# 切换分支
+git checkout fix
+# 提交分支
+git push origin fix
+```
+
+> [!TIP]
+>
+> **用于远程没有分支，创建本地分支或将本地分支推送到远程**
+
+##### 合并分支到master
+
+本地合并
+
+```bash
+# 更新fix分支
+git checkout fix
+git pull origin fix
+
+# 切换并更新master分支
+git checkout master
+git pull origin master
+
+# 合并
+git merge fix
+# 取消合并
+git merge --abort
+```
+
+远程合并
+
+```bash
+# 切换并更新master分支
+git checkout master
+git pull origin master
+
+# 直接pull fix分支到master
+git pull origin fix
+```
+
+提交合并
+
+```bash
+# 冲突处理
+
+# 提交合并
+git add .
+git commit -m "merge fix"
+git push origin master
+```
+
+> [!TIP]
+>
+> 以上操作在idea的工具栏`git`菜单或者工程右键`git`菜单均可以操作，非常方便
+>
+> 切换分支：branchs - 选择一个分支 - checkout
+>
+> 合并分支：git - merge - 选择一个分支
+>
+> 冲突处理：git - resolve conflicts（有冲突未处理时才会出现此项）
+
+
+
+
+
 # 使用旧项目创建新项目保留提交记录
 
 ```bash
