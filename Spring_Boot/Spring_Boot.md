@@ -255,6 +255,19 @@ java -jar stream_server-0.0.1-SNAPSHOT.jar --server.port=8086 --hlsdir=C:\Users\
                 <includeSystemScope>true</includeSystemScope>
             </configuration>
         </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.8.1</version>
+            <configuration>
+                <source>1.8</source>
+                <target>1.8</target>
+                <encoding>UTF-8</encoding>
+                <compilerArguments>
+                    <extdirs>${project.basedir}/libs</extdirs>
+                </compilerArguments>
+            </configuration>
+        </plugin>
     </plugins>
 </build>
 ```
@@ -291,6 +304,8 @@ java -jar stream_server-0.0.1-SNAPSHOT.jar --server.port=8086 --hlsdir=C:\Users\
 </build>
 ```
 
+> [Maven打包时引入本地jar包_maven将本地jar包打入一个包里供其他项目引用-CSDN博客](https://blog.csdn.net/ycd500756/article/details/88764716)
+
 > I have a similar issue today, and stuck me half day to fix it.
 >
 > For most case, using below is fine for developing.
@@ -299,11 +314,11 @@ java -jar stream_server-0.0.1-SNAPSHOT.jar --server.port=8086 --hlsdir=C:\Users\
 >
 > ```xml
 > <dependency>
->     <groupId>com.netease</groupId>
->     <artifactId>thrift</artifactId>
->     <version>1.0</version>
->     <scope>system</scope>
->     <systemPath>${project.basedir}/lib/prome-thrift-client-1.0.0.jar</systemPath>
+>  <groupId>com.netease</groupId>
+>  <artifactId>thrift</artifactId>
+>  <version>1.0</version>
+>  <scope>system</scope>
+>  <systemPath>${project.basedir}/lib/prome-thrift-client-1.0.0.jar</systemPath>
 > </dependency>
 > ```
 >
@@ -317,11 +332,11 @@ java -jar stream_server-0.0.1-SNAPSHOT.jar --server.port=8086 --hlsdir=C:\Users\
 >
 > ```xml
 > <plugin>
->     <groupId>org.springframework.boot</groupId>
->     <artifactId>spring-boot-maven-plugin</artifactId>
->     <configuration>
->             <includeSystemScope>true</includeSystemScope>
->     </configuration>
+>  <groupId>org.springframework.boot</groupId>
+>  <artifactId>spring-boot-maven-plugin</artifactId>
+>  <configuration>
+>          <includeSystemScope>true</includeSystemScope>
+>  </configuration>
 > </plugin>
 > ```
 >
@@ -332,22 +347,22 @@ java -jar stream_server-0.0.1-SNAPSHOT.jar --server.port=8086 --hlsdir=C:\Users\
 > 如果是 war 包，还需要以下插件：
 >
 > ```xml
->  <plugin>
->         <groupId>org.apache.maven.plugins</groupId>
->         <artifactId>maven-war-plugin</artifactId>
->         <configuration>
->             <webResources>
->                 <resource>
->                         <directory>lib</directory>
->                         <targetPath>BOOT-INF/lib/</targetPath>
->                         <!-- <targetPath>WEB_INF/lib/</targetPath> just for none spring-boot project -->
->                         <includes>
->                             <include>**/*.jar</include>
->                         </includes>
->                 </resource>
->             </webResources>
->         </configuration>
->  </plugin>
+> <plugin>
+>      <groupId>org.apache.maven.plugins</groupId>
+>      <artifactId>maven-war-plugin</artifactId>
+>      <configuration>
+>          <webResources>
+>              <resource>
+>                      <directory>lib</directory>
+>                      <targetPath>BOOT-INF/lib/</targetPath>
+>                      <!-- <targetPath>WEB_INF/lib/</targetPath> just for none spring-boot project -->
+>                      <includes>
+>                          <include>**/*.jar</include>
+>                      </includes>
+>              </resource>
+>          </webResources>
+>      </configuration>
+> </plugin>
 > ```
 >
 > -----------------Another Way--------------------
@@ -357,15 +372,15 @@ java -jar stream_server-0.0.1-SNAPSHOT.jar --server.port=8086 --hlsdir=C:\Users\
 > 可以使用这个插件代替`maven-war-plugin`：
 >
 > ```xml
->  <plugin>  
->       <artifactId>maven-compiler-plugin</artifactId>  
->        <configuration>  
->             <source>1.8</source>  
->             <target>1.8</target>  
->             <compilerArguments>  
->                 <extdirs>${project.basedir}/lib</extdirs>  
->             </compilerArguments>  
->       </configuration>  
+> <plugin>  
+>    <artifactId>maven-compiler-plugin</artifactId>  
+>     <configuration>  
+>          <source>1.8</source>  
+>          <target>1.8</target>  
+>          <compilerArguments>  
+>              <extdirs>${project.basedir}/lib</extdirs>  
+>          </compilerArguments>  
+>    </configuration>  
 > </plugin>  
 > ```
 >
@@ -375,17 +390,17 @@ java -jar stream_server-0.0.1-SNAPSHOT.jar --server.port=8086 --hlsdir=C:\Users\
 >
 > ```xml
 > <resources>  
->     <resource>  
->         <directory>lib</directory>  
->         <targetPath>BOOT-INF/lib/</targetPath>  
->         <includes>  
->             <include>**/*.jar</include>  
->         </includes>  
->     </resource>
->     <resource>
->         <directory>src/main/resources</directory>
->         <targetPath>BOOT-INF/classes/</targetPath>
->     </resource> 
+>  <resource>  
+>      <directory>lib</directory>  
+>      <targetPath>BOOT-INF/lib/</targetPath>  
+>      <includes>  
+>          <include>**/*.jar</include>  
+>      </includes>  
+>  </resource>
+>  <resource>
+>      <directory>src/main/resources</directory>
+>      <targetPath>BOOT-INF/classes/</targetPath>
+>  </resource> 
 > </resources>
 > ```
 >
