@@ -41,15 +41,41 @@ moonlight 支持 PC、Android 等端。
 
 xbox 游戏：下载 UWPHook，勾选游戏，比如地平线4，点击右下角`Export selected apps to steam`，重启 steam 后，可以在库中看到游戏。
 
-# 问题历程😌
+# 串流到电视 + 手柄
 
-### 电视连接手柄
+问题历程😌
 
-steam 游戏和 xbox 地平线4 都能正常，但是没有手柄震动。
+### 手柄连接电视 + moonlight
+
+<!-- panels:start -->
+
+<!-- div:left-panel -->
+
+利用 Moonlight 自带的手柄功能，steam 游戏和 xbox 地平线4 都能正常，但是没有手柄震动。
 
 结论：**Moonlight 模拟的是 xbox 360 手柄，不支持震动。**
 
-### virtualhere 连接手柄
+<!-- div:right-panel -->
+
+> [!RESULT]
+>
+> - ✅ steam 大屏幕：moonlight
+> - ✅ steam 游戏：moonlight
+>   - ✖️ 震动
+> - ✅ 非 steam 游戏：moonlight
+>   - ✖️ 震动
+> - ✅ 桌面：moonlight
+>   - ✅ 自由运行游戏
+
+<!-- panels:end -->
+
+---
+
+### 手柄连接电视 + virtualhere 
+
+<!-- panels:start -->
+
+<!-- div:left-panel -->
 
 电视作为服务端，插手柄，PC 作为客户端，远程使用手柄。
 
@@ -57,51 +83,97 @@ steam 游戏和震动都正常，但 xbox 地平线4 识别不到手柄，似乎
 
 结论：**似乎 virtualhere 并不能完美的映射 xbox 手柄。**
 
-### PC 连接手柄
+<!-- div:right-panel -->
+
+> [!RESULT]
+>
+> - ✅ steam 大屏幕：steam 输入
+> - ✅ steam 游戏：steam 输入
+>   - ✅ 震动
+> - ✖️ 非 steam 游戏：手柄被识别为键盘
+>   - ✖️ 震动
+> - ✅ 桌面：steam 输入
+>   - ✖️ 自由运行游戏：手柄被识别为键盘
+
+<!-- panels:end -->
+
+---
+
+### 手柄连接 PC + steam 输入
+
+<!-- panels:start -->
+
+<!-- div:left-panel -->
 
 使用 USB 延长线将手柄直接连接到 PC
 
 steam 游戏和震动都正常，但 xbox 地平线4 手柄和键鼠冲突，不能正常控制。
 
-结论：**steam 输入和 xbox 手柄冲突。**验证方式：游戏中推动右摇杆，屏幕上鼠标会移动，说明存在冲突。
+结论：**steam 输入和 xbox 手柄冲突。**这个与延长线无关，**steam 输入和 非 steam 游戏有冲突**。
 
-这个问题有一个解决方案：
+验证方式：游戏中推动右摇杆，屏幕上鼠标会移动，说明存在冲突。
+
+<!-- div:right-panel -->
+
+> [!RESULT]
+>
+> - ✅ steam 大屏幕：steam 输入
+> - ✅ steam 游戏：steam 输入
+>   - ✅ 震动
+> - ❌ 非 steam 游戏：原生输入 + steam 输入冲突
+>   - ✅ 震动
+> - ✅ 桌面：steam 输入
+>   - ❌ 自由运行游戏：原生输入 + steam 输入冲突
+
+<!-- panels:end -->
+
+---
+
+### 手柄连接 PC + steam 输入（手柄）
+
+<!-- panels:start -->
+
+<!-- div:left-panel -->
+
+作为上一问题的一个解决方案：
 
 steam - 设置 - 控制器 - 非游戏控制器布局 - 桌面布局 - 编辑 - 点击当前按键布局 - 模板 - 选择手柄 - 应用布局。此时右摇杆应该不能控制鼠标了，测试 steam 游戏和 xbox 地平线4 游戏和震动都正常。
 
-结论：可以解决手柄和键鼠冲突，但是会导致手柄无法控制鼠标操作 steam 和 steam 之外的东西，**因为这个操作依赖于 steam 控制器的非游戏桌面布局**
-
-# 最终方案🥰
-
-前两种连接方式都无法完整识别到 xbox one s 手柄，无法完美的支持 steam 游戏和 xbox 地平线4 的震动，所以否决，只能采用最麻烦最原始的延长线方案了。:dog:，而且经过测试，10m 延长线几乎没有延迟，也算比较完美了。
-
-第三种方式，经过多方查阅，无法完美兼容 xbox 游戏和 steam 的桌面键鼠控制，两者只能选其一，所以只能从 sunshine 上来解决了。同时顺便解决串流分辨率和电脑原分辨率切换的问题。
-
-##### Sunshine 中文
-
-Configurations - lacate - 选择简体中文，重启 sunshine。
-
-### Desktop
-
-由于采用手柄连接 PC，无法使用 Moonlight 的手柄输入，要控制电脑必须依赖 steam，所以此处要打开 steam。同时切换分辨率。
-
-do
-
-```cmd
-cmd /C D:\tools\qres\qres.exe /x:%SUNSHINE_CLIENT_WIDTH% /y:%SUNSHINE_CLIENT_HEIGHT%
-```
-
-> [!NOTE]
+> [!TIP]
 >
-> 使用 qres 工具实现。
+> 此处可以通过在 steam 添加非 steam 游戏的方式打开游戏。
 
-undo
+结论：可以解决手柄和键鼠冲突，**但是会导致手柄无法控制鼠标操作游戏和 steam 之外的东西，因为这个操作依赖于 steam 控制器的非游戏桌面布局**
 
-```cmd
-cmd /C D:\tools\qres\qres.exe /x:2560 /y:1080
-```
+<!-- div:right-panel -->
+
+> [!RESULT]
+>
+> - ✅ steam 大屏幕：steam 输入
+> - ✅ steam 游戏：steam 输入
+>   - ✅ 震动
+> - ✅ 非 steam 游戏：原生输入
+>   - ✅ 震动
+> - ✖️ 桌面：steam 输入（手柄布局）无法控制桌面
+>   - ✖️ 自由运行游戏
+
+<!-- panels:end -->
 
 ---
+
+### 手柄连接 PC + steam 输入 + sunshine 启停 steam
+
+<!-- panels:start -->
+
+<!-- div:left-panel -->
+
+前两种连接方式都无法完整识别到 xbox one s 手柄，无法完美支持 xbox 地平线4 的震动，所以否决，只能采用最麻烦最原始的延长线方案了。:dog:，而且经过测试，10m 延长线几乎没有延迟，也算比较完美了。
+
+经过多方查阅，无法完美兼容非 steam 游戏和 steam 键鼠输入，两者只能选其一，而 steam 输入是很不方便开启和关闭切换的，所以只能从 sunshine 上来解决了，在运行非 steam 游戏之前，强行停止 steam。
+
+##### Desktop
+
+由于采用手柄连接 PC，无法使用 Moonlight 的手柄输入，要控制电脑必须依赖 steam，所以此处要打开 steam。同时切换分辨率。
 
 command
 
@@ -109,23 +181,9 @@ command
 C:\Program Files (x86)\Steam\Steam.exe
 ```
 
-### Steam
 
-切换分辨率
 
-do
-
-```cmd
-cmd /C D:\tools\qres\qres.exe /x:%SUNSHINE_CLIENT_WIDTH% /y:%SUNSHINE_CLIENT_HEIGHT%
-```
-
-undo
-
-```cmd
-cmd /C D:\tools\qres\qres.exe /x:2560 /y:1080
-```
-
-### Forza Horizon 4
+##### Forza Horizon 4
 
 关闭 steam，切换分辨率，启动地平线4
 
@@ -154,7 +212,59 @@ cmd /C "taskkill /f /im steam* 2>nul || exit /b 0"
 > 0
 > ```
 
+
+
+<!-- div:right-panel -->
+
+> [!RESULT]
+>
+> - ✅ steam 大屏幕：steam 输入
+> - ✅ steam 游戏：steam 输入
+>   - ✅ 震动
+> - ✅ 非 steam 游戏：原生输入
+>   - ✅ 震动
+> - ✅ 桌面：steam 输入
+>   - ❌ 自由运行游戏：原生输入 + steam 输入冲突
+
+<!-- panels:end -->
+
 ---
+
+### PC 连接手柄 + steam 输入（手柄） + 手柄伴侣
+
+<!-- panels:start -->
+
+<!-- div:left-panel -->
+
+手柄伴侣：Controller Companion，能够替代 steam 输入（键鼠）进行桌面控制，且**可以用快捷键启用/停用，不会造成游戏时冲突**。
+
+<!-- div:right-panel -->
+
+> [!RESULT]
+>
+> - ✅ steam 大屏幕：steam 输入
+> - ✅ steam 游戏：steam 输入/手柄伴侣
+>   - ✅ 震动
+> - ✅ 非 steam 游戏：原生输入/手柄伴侣
+>   - ✅ 震动
+> - ✅ 桌面：手柄伴侣
+>   - ✅ 自由运行游戏：原生输入/手柄伴侣
+
+<!-- panels:end -->
+
+---
+
+# Sunshine 配置
+
+由于`PC 连接手柄 + steam 输入（手柄布局） + 手柄伴侣`方案已经不依赖 steam 输入（键鼠）了，所以不存在冲突，不再需要启动/关闭 steam。
+
+##### Sunshine 中文
+
+Configurations - lacate - 选择简体中文，重启 sunshine。
+
+### 设置分辨率
+
+启动串流时设置为客户端分辨率，关闭串流时恢复电脑分辨率。
 
 do
 
@@ -167,6 +277,12 @@ undo
 ```cmd
 cmd /C D:\tools\qres\qres.exe /x:2560 /y:1080
 ```
+
+> [!NOTE]
+>
+> 使用 qres 工具实现。
+
+### 启动 UWP
 
 command
 
