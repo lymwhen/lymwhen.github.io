@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css" /> -->
   <link rel="stylesheet" href="./custom/plugins/vue.css">
   <link rel="stylesheet" href="./custom/plugins/katex.min.css" />
-
+  
   <link rel="stylesheet" href="./custom/website.css" />
   <script src="./custom/utils.js"></script>
 </head>
@@ -43,6 +43,13 @@
         },
         attention: {
           label: "Attention"
+        },
+        result: {
+          label: 'RESULT',
+
+          // Assuming that we use Font Awesome
+          icon: 'icon icon-result',
+          className: 'result'
         }
       }
     }
@@ -51,11 +58,12 @@
   <!-- <script src="//cdn.jsdelivr.net/npm/docsify@4"></script> -->
   <script src="./custom/plugins/docsify@4.js"></script>
 
+  <!-- <script src="https://cdn.jsdelivr.net/npm/docsify-example-panels"></script> -->
+  <script src="./custom/plugins/docsify-example-panels.js"></script>
+
   <!-- plugins -->
   <!-- <script src="//cdn.jsdelivr.net/npm/docsify-sidebar-collapse/dist/docsify-sidebar-collapse.min.js"></script> -->
   <script src="./custom/plugins/docsify-sidebar-collapse.min.js"></script>
-
-  <!-- <script type="text/javascript" src="//cdn.jsdelivr.net/gh/ygbhf/clicklove/clickfireworks.min.js"></script> -->
 
   <!-- <script src="//cdn.jsdelivr.net/npm/docsify-katex@latest/dist/docsify-katex.js"></script>
   <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
