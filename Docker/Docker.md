@@ -44,6 +44,8 @@ systemctl restart docker
 
 # 命令
 
+##### 镜像
+
 ```bash
 # 查找镜像
 docker search nginx
@@ -51,7 +53,11 @@ docker search nginx
 docker pull nginx:latest
 # 查看镜像
 docker images
+```
 
+##### 运行容器
+
+```bash
 # 运行容器
 # --name nginx-test：容器名称。
 # -p 8080:80： 端口进行映射，将本地 8080 端口映射到容器内部的 80 端口。
@@ -112,6 +118,21 @@ docker update --restart=always redis1
 >
 > link参数连接容器后，使用的端口应该是容器内的端口，而不是宿主机端口
 
+##### 日志
+
+```bash
+docker logs mysql57
+
+docker logs -f --tail=200 tomcat1
+# 参数说明
+# -f : 跟踪日志输出
+# --since :显示某个开始时间的所有日志
+# -t : 显示时间戳
+# --tail :仅列出最新N条容器日志
+```
+
+
+
 ### 查看 docker 安装命令
 
 借助第三方包`get_command_4_run_container`
@@ -120,7 +141,9 @@ docker update --restart=always redis1
 # 拉取包
 docker pull cucker/get_command_4_run_container
 
-# docker run --rm -v /var/run/docker.sock:/var/run/docker.sock cucker/get_command_4_run_container [容器名称]/[容器ID]
+# 查看命令
+docker run --rm -v /var/run/docker.sock:/var/run/docker.sock cucker/get_command_4_run_container [容器名称]/[容器ID]
+
 get_run_command mysql8
 docker run -d \
  --name mysql8 \
@@ -134,7 +157,7 @@ docker run -d \
  mysql:8.0
 ```
 
-将其封装成一个别名：
+##### 封装命令别名
 
 ```bash
 # 添加别名
@@ -145,6 +168,28 @@ docker_command mysql8
 ```
 
 > [Docker--查看容器的启动参数(命令)--方法/实例_path=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr-CSDN博客](https://blog.csdn.net/feiying0canglang/article/details/126435646)
+
+> [!TIP]
+>
+> 上述命令在 root 用户下使用，如果需要在其他用户下`sudo docker_command xxx`使用，需要在使用别名的用户下也要执行上述命令，同时添加`sudo`别名：
+>
+> ```bash
+> echo "alias sudo='sudo '" >> ~/.bashrc && . ~/.bashrc
+> ```
+>
+> ##### 原因
+>
+> > `sudo`会忽略通过`.bashrc`文件、`.bash_aliases`文件或者`alias`命令设置的别名命令(aliased commands)。
+> >
+> > [如何在 sudo 提权后使用别名命令-CSDN博客](https://blog.csdn.net/easylife206/article/details/129019611)
+>
+> ##### 解决办法
+>
+> Linux 会检查命令的**第一个单词**是否有别名，且如果**别名的末尾有空格或制表符，还会检查下一个单词是否有别名**，所以将`sudo`添加别名可解决此问题。
+>
+> > [如何在 Linux 中使用 sudo 运行别名 (linux-console.net)](https://cn.linux-console.net/?p=20072)
+
+
 
 # 访问外部端口
 
