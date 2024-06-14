@@ -292,7 +292,9 @@ E:\tools\UWPHook\UWPHook.exe Microsoft.SunriseBaseGame_8wekyb3d8bbwe!SunriseRele
 
 > [!TIP]
 >
-> UWP 应用的启动参数，可以按照上述添加 xbox 游戏到 steam，在 steam 中右键该游戏 - 属性查看，然后就可以在 steam 中删除该游戏了。
+> UWP 应用的启动参数可以打开 UWPHook 查看。
+>
+> ![image-20240613194301018](assets/image-20240613194301018.png)
 
 > [!NOTE]
 >
