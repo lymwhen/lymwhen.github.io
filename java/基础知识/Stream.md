@@ -62,6 +62,12 @@
 
 [reduce](https://docs.oracle.com/javase/8/docs/api/java/util/stream/Stream.html#reduce-java.util.function.BinaryOperator-)：根据初始值和累加器`BinaryOperator`聚合
 
+### 基本数据类型流特有的操作
+
+如`Arrays.stream(new Int[])`可以创建一个`IntStream`
+
+[mapToObj](https://docs.oracle.com/javase/8/docs/api/java/util/stream/IntStream.html#mapToObj-java.util.function.IntFunction-)：返回一个对象类型的流
+
 ### 其他实例方法
 
 [forEach](https://docs.oracle.com/javase/8/docs/api/java/util/stream/Stream.html#forEach-java.util.function.Consumer-)：循环（不保证顺序）
@@ -178,7 +184,7 @@ list.stream().filter(v -> v.age > 10).toArray(A[]::new);
 // toArray：{"age":12,"name":"张一"}{"age":13,"name":"张二"}
 ```
 
-### reduce 三个重载的解释
+### reduce （聚合）三个重载的解释
 
 ```java
 Optional<T>	reduce(BinaryOperator<T> accumulator);
