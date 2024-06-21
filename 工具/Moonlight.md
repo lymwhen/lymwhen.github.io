@@ -53,7 +53,7 @@ xbox 游戏：下载 UWPHook，勾选游戏，比如地平线4，点击右下角
 
 利用 Moonlight 自带的手柄功能，steam 游戏和 xbox 地平线4 都能正常，但是没有手柄震动。
 
-结论：**Moonlight 模拟的是 xbox 360 手柄，不支持震动。**
+结论：**Moonlight 模拟的是 xbox 360 手柄，而且依赖于 steam 输入，不支持震动。**
 
 <!-- div:right-panel -->
 
@@ -262,7 +262,7 @@ cmd /C "taskkill /f /im steam* 2>nul || exit /b 0"
 
 Configurations - lacate - 选择简体中文，重启 sunshine。
 
-### 设置分辨率
+# ❌~~设置分辨率~~
 
 启动串流时设置为客户端分辨率，关闭串流时恢复电脑分辨率。
 
@@ -282,7 +282,83 @@ cmd /C D:\tools\qres\qres.exe /x:2560 /y:1080
 >
 > 使用 qres 工具实现。
 
-### 启动 UWP
+# ✅切换虚拟显示器
+
+效果：
+
+- 串流时原物理显示器无显示，不会吵到眼睛
+- 可以自由定制分辨率和帧率，秒杀各种显卡欺骗器
+
+### 安装虚拟显示器
+
+Virtual Display Driver 简称 VDD，可以安装一个虚拟显示器，自定义想要的分辨率和帧率，用于串流。
+
+> 1. Download the latest version from the releases page, and extract the contents to a folder.
+> 2. Copy `option.txt` to `C:\IddSampleDriver\option.txt` before installing the driver **(important!)**.
+> 3. Right click and run the *.bat file **as an Administrator** to add the driver certificate as a trusted root certificate.
+> 4. Don't install the inf. Open device manager, click on any device, then click on the "Action" menu and click "Add Legacy Hardware".
+> 5. Select "Add hardware from a list (Advanced)" and then select Display adapters
+> 6. Click "Have Disk..." and click the "Browse..." button. Navigate to the extracted files and select the inf file.
+> 7. You are done! Go to display settings to customize the resolution of the additional displays. These displays show up in Sunshine, your Oculus or VR settings, and should be able to be streamed from.
+> 8. You can enable/disable the display adapter to toggle the monitors.
+>
+> 1. 从发布页面下载最新版本，并将内容提取到文件夹中。
+> 2. 在安装驱动程序之前将`option.txt`复制到`C:\IddSampleDriver\option.txt`（重要！）。
+> 3. 右键单击并**以管理员身份**运行*. bat文件以将驱动程序证书添加为受信任的根证书。
+> 4. 不要安装inf。打开设备管理器，单击任意设备，然后单击“操作”菜单并单击“添加旧版硬件”。
+> 5. 选择“从列表中添加硬件（高级）”，然后选择显示适配器
+> 6. 单击“从磁盘…”并单击“浏览…”按钮。导航到提取的文件并选择inf文件。
+> 7. 你完成了！转到显示设置以自定义附加显示器的分辨率。这些显示器显示在阳光、您的Oculus或VR设置中，并且应该能够从中流式传输。
+> 8. 您可以启用/禁用显示适配器以切换显示器
+>
+> [itsmikethetech/Virtual-Display-Driver: Add virtual monitors to your windows 10/11 device! Works with VR, OBS, Sunshine, and/or any desktop sharing software. (github.com)](https://github.com/itsmikethetech/Virtual-Display-Driver)
+
+> [!TIP]
+>
+> 可以在`C:\IddSampleDriver\option.txt`中添加自己想要的分辨率和帧率🥰。
+
+### 串流是切换虚拟显示器
+
+按照 VDD 说的通过启用/禁用显示适配器以切换显示器，手动操作还是有些蛋疼，这时非常方便好用的 MultiMonitorTool 就很顶了
+
+> [Enable/disable/configure multiple monitors on Windows (nirsoft.net)](https://www.nirsoft.net/utils/multi_monitor_tool.html)
+
+利用`Sunshine`的`do` 和`undo`，在启动串流时，只启用虚拟服务器，结束串流时，只启用物理显示器，串流与用电脑两不误，美滋滋🥰。
+
+do 脚本
+
+```bash
+@echo off
+MultiMonitorTool.exe /enable LNX0000
+MultiMonitorTool.exe /disable ACR067F
+ping 127.0.0.1 -n 2 >nul
+MultiMonitorTool.exe /SetMonitors "Name=LNX0000 Primary=1 Width=1920 Height=1080 DisplayFrequency=120"
+exit 0
+```
+
+undo 脚本
+
+```bash
+@echo off
+MultiMonitorTool.exe /enable ACR067F
+MultiMonitorTool.exe /disable LNX0000
+ping 127.0.0.1 -n 2 >nul
+exit 0
+```
+
+> [!TIP]
+>
+> 在安装目录有一个 chm 文档。
+>
+> 控制最好用的命令是`/SetMonitors`，可以控制显示器所有参数。打开 exe，选中一个显示器，`Edit - Copy /SetMonitor Command`，可以复制他的`/SetMonitor`命令，非常方便：
+>
+> ```bash
+> MultiMonitorTool.exe /SetMonitors "Name=Default_Monitor Primary=1 BitsPerPixel=32 Width=2560 Height=1080 DisplayFlags=0 DisplayFrequency=144 DisplayOrientation=0 PositionX=0 PositionY=0"
+> ```
+>
+> `Name`参数决定了对哪一个显示器进行配置，可以是`Name`/`Short Monitor Id`/`Monitor Id`/`Serial Number(Name后面的数字)`等，实测序号会变动，使用短 id `Short Monitor Id`比较好，可以配置`Option - Copy /SetMonitor Command Mode - Use Short Monitor Id As Name`，这样上面复制的命令中的`Name`就是`Short Monitor Id`了。
+
+# 启动 UWP
 
 command
 
