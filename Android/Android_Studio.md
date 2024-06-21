@@ -1,6 +1,28 @@
 # Android Studio
 
-### 使用代理
+# 创建资源文件
+
+![image-20240620154828342](assets/image-20240620154828342.png)
+
+- Image Asset 可以创建应用图标
+- Vector Asset 可以创建资源文件，如图标
+
+![image-20240620154947170](assets/image-20240620154947170.png)
+
+矢量图标创建后，如果放在`ImageView`中，可以使用 tint 修改颜色
+
+```xml
+<ImageView
+   android:id="@+id/iv_expand_indicator"
+   android:layout_width="24dp"
+   android:layout_height="24dp"
+   android:src="@drawable/baseline_expand_more_24"
+   app:tint="?attr/colorOnBackground" />
+```
+
+
+
+# 使用代理
 
 ![image-20220922171206542](assets/image-20220922171206542.png)
 
@@ -9,6 +31,22 @@
 # Gradle
 
 ### 使用国内源
+
+gradle 下载
+
+gradle/wrapper/gradle-wrapper.properties
+
+```pro
+#Tue Jun 18 09:57:09 CST 2024
+distributionBase=GRADLE_USER_HOME
+distributionPath=wrapper/dists
+distributionUrl=https://mirrors.cloud.tencent.com/gradle/gradle-8.6-bin.zip
+zipStoreBase=GRADLE_USER_HOME
+zipStorePath=wrapper/dists
+
+```
+
+国内仓库
 
 Project: build.gradle
 
@@ -41,7 +79,41 @@ task clean(type: Delete) {
 
 ```
 
+##### 新版国内仓库
 
+Project: settings.gradle
+
+```nginx
+pluginManagement {
+    repositories {
+//        maven { url 'https://plugins.gradle.org/m2/' }
+        maven { url 'https://maven.aliyun.com/nexus/content/repositories/google' }
+        maven { url 'https://maven.aliyun.com/nexus/content/groups/public' }
+        maven { url 'https://maven.aliyun.com/nexus/content/repositories/jcenter'}
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+//        maven { url 'https://plugins.gradle.org/m2/' }
+        maven { url 'https://maven.aliyun.com/nexus/content/repositories/google' }
+        maven { url 'https://maven.aliyun.com/nexus/content/groups/public' }
+        maven { url 'https://maven.aliyun.com/nexus/content/repositories/jcenter'}
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.name = "CodecTest"
+include ':app'
+
+```
+
+> [新版本 Android Studio settings.gradle 中切换国内源 - Android - 大象笔记 (sunzhongwei.com)](https://www.sunzhongwei.com/android-studio-settings-gradle-switching-source-in-china)
+>
 
 ### 使用代理
 
