@@ -239,6 +239,16 @@ emoji shortcode: :dog:
   - [ ] 任务 2.1
 ```
 
+---
+
+<font color="#FF4081">HTML 样式</font>
+
+```html
+<font color="#FF4081">HTML 样式</font>
+```
+
+
+
 # 公式
 
 > LaTeX 的数学模式有两种：行内模式 (inline) 和行间模式 (display)。前者在正文的行文中，插入数学公式；后者独立排列单独成行，并自动居中。
