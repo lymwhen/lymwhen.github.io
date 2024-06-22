@@ -246,4 +246,6 @@
 * [文档](文档/文档.md)
   * [Markdown](Markdown.md)
   * [docsify](文档/docsify.md)
+* [杂谈](杂谈.md)
+  * [Wi-Fi](杂谈/Wi-Fi.md)
 * [OTS](OTS.md)
