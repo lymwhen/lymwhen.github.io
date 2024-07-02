@@ -1,5 +1,101 @@
 # Docker
 
+# 安装
+
+##### 1、卸载系统之前可能安装的 docker（防止冲突）
+
+卸载系统之前可能安装的 docker（防止版本不一致，发生冲突）
+
+```shell
+sudo yum remove docker \
+    docker-client \
+    docker-client-latest \
+    docker-common \
+    docker-latest \
+    docker-latest-logrotate \
+    docker-logrotate \
+    docker-engine
+12345678
+```
+
+##### 2、安装 Docker-CE 基本环境
+
+安装必须的依赖
+
+```shell
+sudo yum install -y yum-utils \ 
+device-mapper-persistent-data \ 
+lvm2
+123
+```
+
+设置 docker repo 的 yum 位置
+
+```shell
+sudo yum-config-manager \ 
+--add-repo \ 
+https://download.docker.com/linux/centos/docker-ce.repo 
+123
+```
+
+安装 docker，以及 docker-cli
+
+```shell
+sudo yum install docker-ce docker-ce-cli containerd.io
+1
+```
+
+这样就安装好`docker`和基本环境了，接下来就可以启动`docker`了
+
+##### 3、启动 docker
+
+```shell
+#启动docker
+sudo systemctl start docker
+#查看docker服务状态 running 就是启动成功
+sudo systemctl status docker
+1234
+```
+
+##### 4、设置 docker 开机自启
+
+```shell
+sudo systemctl enable docker
+1
+```
+
+##### 5、测试 docker 常用命令
+
+> docker命令官方文档 https://docs.docker.com/engine/reference/commandline/docker/
+
+`Docker`的常用命令：
+
+```shell
+#镜像命令
+docker images：列出所有镜像
+docker search [image]：搜索 Docker 镜像
+docker pull [image]：拉取指定镜像
+docker rmi [image]：删除指定镜像
+#容器命令
+docker ps：列出当前所有正在运行的容器
+docker ps -a：列出所有容器，包括已经停止的容器
+docker create [image]：创建一个新的容器，但不启动它
+docker start [container]：启动一个容器
+docker stop [container]：停止一个容器
+docker rm [container]：删除一个容器
+docker exec -it [container] [command]：在运行中的容器中执行命令
+#其他命令
+docker info：显示 Docker 系统信息
+docker version：显示 Docker 版本信息
+docker logs [container]：查看容器的日志
+docker network ls：列出 Docker 网络
+docker network create [network]：创建一个新的 Docker 网络
+docker network connect [network] [container]：将容器连接到指定的 Docker 网络
+docker network disconnect [network] [container]：将容器从指定的 Docker 网络中断开连接
+```
+
+
+
 # 设置镜像
 
 windows
@@ -42,6 +138,36 @@ vim /etc/docker/daemon.json
 systemctl restart docker
 ```
 
+众所周知的原因，目前能用的镜像
+
+```bash
+{
+    "registry-mirrors": [
+        "https://hub.uuuadc.top",
+        "https://docker.anyhub.us.kg",
+        "https://dockerhub.jobcher.com",
+        "https://dockerhub.icu",
+        "https://docker.ckyl.me",
+        "https://docker.awsl9527.cn"
+    ]
+}
+```
+
+> [DockerHub 国内镜像源列表（2024 年 6 月 18 日 亲测可用） - V2EX](https://www.v2ex.com/t/1050454)
+
+> ```bash
+> # 1. 拉取镜像
+> docker pull dockerhub.icu/library/alpine:latest
+> # 2. 重命名镜像
+> docker image tag dockerhub.icu/library/alpine:latest library/alpine:latest
+> # 3. 删除镜像
+> docker rmi dockerhub.icu/library/alpine:latest
+> ```
+>
+> [镜像使用说明 (dockerhub.icu)](https://dockerhub.icu/)
+
+
+
 # 命令
 
 ##### 镜像
@@ -53,6 +179,8 @@ docker search nginx
 docker pull nginx:latest
 # 查看镜像
 docker images
+# 删除惊喜那个
+docker rmi nginx
 ```
 
 ##### 运行容器
@@ -250,3 +378,35 @@ server {
 > [!TIP]
 >
 > 如果被访问容器向宿主机映射了端口，那么可以通过上述的宿主机本地端口访问，也可以使用连接方式（`link`）访问；否则只能通过连接方式访问。
+
+# 代理
+
+```bash
+sudo mkdir -p /etc/systemd/system/docker.service.d
+# 创建代理配置文件，名称不限制
+sudo touch proxy.conf
+
+[Service]
+Environment="HTTP_PROXY=http://proxy.example.com:8080/"
+Environment="HTTPS_PROXY=http://proxy.example.com:8080/"
+Environment="NO_PROXY=localhost,127.0.0.1,.example.com"
+
+// 重新加载系统配置
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+```
+
+> [快速设置 Docker 的三种网络代理配置_docker 代理-CSDN博客](https://blog.csdn.net/peng2hui1314/article/details/124267333)
+
+### 取消代理
+
+注释`/etc/systemd/system/docker.service.d/proxy.conf`中的配置，或者修改文件名，然后重新加载系统配置，重启 docker。
+
+# 问题
+
+### missing signature key
+
+> 重装，测试有效：[Docker提示missing signature key解决方案 | 时鹏亮的Blog (shipengliang.com)](https://shipengliang.com/other/docker提示missing-signature-key解决方案.html)
+>
+> 不重装，暂未测试成功：[docker拉取镜像错误missing signature key - 岁月淡忘了谁 - 博客园 (cnblogs.com)](https://www.cnblogs.com/henuyuxiang/p/17879277.html)
+
