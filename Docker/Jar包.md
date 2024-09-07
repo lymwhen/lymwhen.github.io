@@ -26,11 +26,16 @@ docker run -d \
  --name admin \
  -p 8080:8080 \
  --restart=always \
+ -e TZ=Asia/Shanghai \
  -v /data/docker/admin/uploadPath:/home/ruoyi/uploadPath \
  -v /data/docker/admin/logs:/home/ruoyi/logs \
  -v /data/docker/admin/app:/app \
- openjdk:8 java -jar /app/admin.jar
+ openjdk:8 java -jar -Dspring.profiles.active=prod /app/admin.jar
 ```
+
+> [!TIP]
+>
+> 顺便解决时区问题
 
 这样后续更新程序只需重新打包传到 app 挂载目录，然后重启容器：
 
