@@ -122,3 +122,26 @@ SELINUX=disabled
 SELINUXTYPE=targeted
 ```
 
+# 时间同步
+
+### 使用NTP服务时间同步
+
+#### 安装ntp
+
+```bash
+yum -y install ntp
+```
+
+#### 启动ntp服务
+
+```bash
+ systemctl start  ntpd
+ systemctl enable  ntpd
+```
+
+查看时间
+
+```
+date
+```
+
