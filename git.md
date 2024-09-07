@@ -67,7 +67,14 @@ git remote remove origin
 
 # 添加safe文件夹
 git config --global --add safe.directory D:/projects/jds_web/nzxxx_jwt
+
+# 删除本地分支
+git branch -d localBranchName
+# 删除远程分支
+git push origin --delete remoteBranchName
 ```
+
+> [Git 操作——如何删除本地分支和远程分支 (freecodecamp.org)](https://www.freecodecamp.org/chinese/news/how-to-delete-a-git-branch-both-locally-and-remotely/)
 
 # 冲突处理
 
@@ -302,6 +309,29 @@ git checkout release
 # 更新当前分支到master
 git checkout -b master
 ```
+
+# 不安全 https
+
+```
+warning: ----------------- SECURITY WARNING ----------------
+warning: | TLS certificate verification has been disabled! |
+warning: ---------------------------------------------------
+warning: HTTPS connections may not be secure. See https://aka.ms/gcmcore-tlsverify for more information.
+```
+
+或
+
+```
+SEC_E_UNTRUSTED_ROOT
+```
+
+### 解决方式
+
+```
+git config --global http.sslVerify false
+```
+
+
 
 # 使用代理
 
