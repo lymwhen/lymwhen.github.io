@@ -21,12 +21,18 @@ if (Build.VERSION.SDK_INT >= 21) {
     // 在此模式下，WebView 将允许安全源从任何其他源加载内容，即使该源不安全也是如此。这是 WebView 最不安全的操作模式，在可能的情况下，应用不应设置此模式。
     webView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
 }
+
+// 设置UA，注意UA设置会影响uniapp h5的返回
 webView.getSettings().setUserAgentString("Mozilla/5.0 (Linux; U; Android 2.0; en-us; Droid Build/ESD20) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17");
+
 webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
 webView.getSettings().setPluginState(WebSettings.PluginState.ON_DEMAND);
+
 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
     // Sets whether the WebView requires a user gesture to play media. The default is true.
     // 设置 WebView 是否需要用户手势才能播放媒体。缺省值为 true
+    // 解决报错：DOMException : play() can only be initiated by a user gesture
+    // video.play()方法默认仅可以用户手势启动，关闭后可由代码直接调用
     webView.getSettings().setMediaPlaybackRequiresUserGesture(false);
 }
 
@@ -38,39 +44,37 @@ if (Build.VERSION.SDK_INT >= 21) {
 }
 
 // 开启localStorage
-x5WebView.getSettings().setDomStorageEnabled(true);
-x5WebView.getSettings().setAppCacheMaxSize(1024*1024*8);
+webView.getSettings().setDomStorageEnabled(true);
+webView.getSettings().setAppCacheMaxSize(1024*1024*8);
 String appCachePath = getApplicationContext().getCacheDir().getAbsolutePath();
-x5WebView.getSettings().setAppCachePath(appCachePath);
-x5WebView.getSettings().setAllowFileAccess(true);
-x5WebView.getSettings().setAppCacheEnabled(true);
-
-// 解决报错：DOMException : play() can only be initiated by a user gesture
-// video.play()方法默认仅可以用户手势启动，关闭后可由代码直接调用
-if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-    webSetting.setMediaPlaybackRequiresUserGesture(false);
-}
+webView.getSettings().setAppCachePath(appCachePath);
+webView.getSettings().setAllowFileAccess(true);
+webView.getSettings().setAppCacheEnabled(true);
 
 // 默认背景，对于底色不是白色的页面可以设置
 // webView.setBackgroundColor(Color.argb(1, 0, 0, 0));
 
 webView.setWebViewClient(new WebViewClient() {
-    //覆盖shouldOverrideUrlLoading 方法
+    // 覆盖shouldOverrideUrlLoading 方法
+    // return true表示已经处理了这个URL，WebView不会继续加载它。
+	// 通常用于拦截特定的URL，可以在return true之前执行自定义的行为，比如打开一个新的Activity或者通知用户。
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
         // 拨打电话、发短信特殊处理
         if (url.startsWith("tel:")) {
             Intent sendIntent = new Intent(Intent.ACTION_DIAL, Uri.parse(url));
             startActivity(sendIntent);
+            return true;
+
         } else if (url.startsWith("sms:")) {
             Intent sendIntent = new Intent(Intent.ACTION_SENDTO, Uri.parse(url));
             startActivity(sendIntent);
-        } else {
-            view.loadUrl(url);
-        }
+            return true;
 
-        Log.d("noa", "loadUrl: " + url);
-        return true;
+        } else {
+            // view.loadUrl(url);
+            return super.shouldOverrideUrlLoading(view, url);
+        }
     }
 
     @Override
@@ -86,10 +90,8 @@ webView.setWebViewClient(new WebViewClient() {
         // super.onReceivedSslError(view, handler, error);
         // super中默认的处理方式，WebView变成空白页
         // handler.cancel();
-        if (handler != null) {
-            // 忽略证书的错误继续加载页面内容，不会变成空白页面
-            handler.proceed();
-        }
+        // 忽略证书的错误继续加载页面内容，不会变成空白页面
+        handler.proceed();
     }
 });
 
@@ -116,6 +118,22 @@ webView.setWebChromeClient(new WebChromeClient() {
                 progressBar.setProgress(newProgress);
             }
         }
+    }
+
+    @Override
+    public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
+        // 修改警示窗为Toast，可选
+		Log.d(TAG, "jsAlert: " + message);
+		Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+		result.confirm();
+		return true;
+    }
+
+    @Override
+    public void onPermissionRequest(PermissionRequest request) {
+        // 授予h5所需的权限，如麦克风
+		Log.d(TAG, "onPermissionRequest: " + Arrays.toString(request.getResources()));
+		request.grant(request.getResources());
     }
 
     // For Android < 3.0
@@ -155,6 +173,8 @@ webView.setDownloadListener(new DownloadListener() {
 
 // 添加js接口，添加$App到window
 webView.addJavascriptInterface(new JsInterface(this, webView), "$App");
+
+// 访问url
 webView.loadUrl(url);
 ```
 
@@ -235,7 +255,7 @@ private void onActivityResultAboveL(int requestCode, int resultCode, Intent inte
 ### 调用相机拍照
 
 ```java
-x5WebView.setWebChromeClient(new WebChromeClient() {
+webView.setWebChromeClient(new WebChromeClient() {
     // ...
 
     // For Android >= 5.0
@@ -376,9 +396,9 @@ private void updatePhotos() {
 ```java
 // 两者区别：evaluateJavascript可接收返回值
 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-    x5WebView.evaluateJavascript(String.format("javascript:onNativeResult('%s', '%s')", type, json.toJSONString()), null);
+    webView.evaluateJavascript(String.format("javascript:onNativeResult('%s', '%s')", type, json.toJSONString()), null);
 }else{
-    x5WebView.loadUrl(String.format("javascript:onNativeResult('%s', '%s')", type, json.toJSONString()));
+    webView.loadUrl(String.format("javascript:onNativeResult('%s', '%s')", type, json.toJSONString()));
 }
 ```
 
@@ -504,16 +524,46 @@ webview.setWebChromeClient(new WebChromeClient() {
 
 # 疑难问题
 
-### logcat: Uncaught TypeError: Cannot read property 'getItem' of null
+### Uncaught TypeError: Cannot read property 'getItem' of null
 
 很有可能是没有开启`localStorage`，因为`setItem`和`getItem`是它的常用方法
 
+```java
+// 开启localStorage
+webView.getSettings().setDomStorageEnabled(true);
+```
+
+### localStorage 相关方法失效
+
+同上
+
 ### DOMException : play() can only be initiated by a user gesture
 
-参看上文
+默认浏览器中 `video/audio`等允许调用`play()`的情形：
+
+- 用户手动点击触发（user gesture）
+- 静音播放
+
+在 webView 中可以取消这个限制：
 
 ```java
 webSetting.setMediaPlaybackRequiresUserGesture(false);
 ```
 
 > [Webview 中 Play() can only be initiated by a user gesture_ieeso的博客-CSDN博客](https://blog.csdn.net/ieeso/article/details/112133163)
+
+### uniapp 打包 h5 在 Android WebView 中返回无效
+
+测试发现以下方式返回无效：
+
+- `uni.navigateBack()`
+- `this.$router.back()`
+- `history.back()`
+- Android 下`webView.goBack()`
+
+经过费劲的测试发现是由于设置了以下浏览器 UA，删除后，返回功能正常。
+
+```java
+webView.getSettings().setUserAgentString("Mozilla/5.0 (Linux; U; Android 2.0; en-us; Droid Build/ESD20) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17");
+```
+
