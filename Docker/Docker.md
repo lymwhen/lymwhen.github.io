@@ -15,7 +15,6 @@ sudo yum remove docker \
     docker-latest-logrotate \
     docker-logrotate \
     docker-engine
-12345678
 ```
 
 ##### 2、安装 Docker-CE 基本环境
@@ -23,26 +22,25 @@ sudo yum remove docker \
 安装必须的依赖
 
 ```shell
-sudo yum install -y yum-utils \ 
-device-mapper-persistent-data \ 
-lvm2
-123
+sudo yum install -y yum-utils device-mapper-persistent-data lvm2
 ```
 
 设置 docker repo 的 yum 位置
 
 ```shell
-sudo yum-config-manager \ 
---add-repo \ 
-https://download.docker.com/linux/centos/docker-ce.repo 
-123
+sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+```
+
+如果无法连接，可以使用阿里云源
+
+```bash
+sudo yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
 ```
 
 安装 docker，以及 docker-cli
 
 ```shell
-sudo yum install docker-ce docker-ce-cli containerd.io
-1
+sudo yum -y install docker-ce docker-ce-cli containerd.io
 ```
 
 这样就安装好`docker`和基本环境了，接下来就可以启动`docker`了
@@ -54,14 +52,12 @@ sudo yum install docker-ce docker-ce-cli containerd.io
 sudo systemctl start docker
 #查看docker服务状态 running 就是启动成功
 sudo systemctl status docker
-1234
 ```
 
 ##### 4、设置 docker 开机自启
 
 ```shell
 sudo systemctl enable docker
-1
 ```
 
 ##### 5、测试 docker 常用命令
@@ -401,6 +397,36 @@ sudo systemctl restart docker
 ### 取消代理
 
 注释`/etc/systemd/system/docker.service.d/proxy.conf`中的配置，或者修改文件名，然后重新加载系统配置，重启 docker。
+
+# 普通用户 Docker 权限
+
+例如用户 user1
+
+```bash
+# 如果没有docker用户组
+cat /etc/group | grep docker
+groupadd docker
+
+# 将用户添加到docker用户组
+usermod -aG docker user1
+# 或，$USER表示当前登录用户
+usermod -aG docker $USER
+# 如果不生效：
+gpasswd -a user1 docker
+
+# Docker 守护进程在启动时自动以 docker 用户组运行
+vim /etc/docker/daemon.json
+{
+  "group": "docker"
+}
+systemctl daemon-reload
+systemctl restart docker
+
+# 测试
+docker ps
+```
+
+
 
 # 问题
 
