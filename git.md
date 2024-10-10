@@ -221,7 +221,7 @@ git pull origin fix
 git checkout master
 git pull origin master
 
-# 合并
+# 合并，合并fix分支到当前，即master
 git merge fix
 # 取消合并
 git merge --abort
@@ -259,9 +259,20 @@ git push origin master
 >
 > 冲突处理：git - resolve conflicts（有冲突未处理时才会出现此项）
 
+### 问题
 
+git merge dev 报错：fatal: refusing to merge unrelated histories
 
+表示当前分支和 dev 没有相同的祖先分支，比如当前分支是一个新建的分支，git 默认不允许合并
 
+```bash
+# 允许没有相同的祖先的合并
+git merge dev --allow-unrelated-histories
+```
+
+> [!TIP]
+>
+> 执行后，需要填入一个初始化的 comment，这里类似 Linux vi 编辑器，填入后`Esc` - `wq`。
 
 # 使用旧项目创建新项目保留提交记录
 
