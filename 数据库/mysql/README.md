@@ -8,6 +8,66 @@
 >
 > https://dev.mysql.com/doc/refman/5.7/en/sql-function-reference.html
 
+# 性能优化
+
+> 可以看 mysql 默认的配置文件
+>
+> ```bash
+> vim /opt/mysql/conf/my.cnf
+> [mysqld]
+> # Remove leading # and set to the amount of RAM for the most important data
+> # cache in MySQL. Start at 70% of total RAM for dedicated server, else 10%.
+> # innodb_buffer_pool_size = 128M
+> #
+> # Remove the leading "# " to disable binary logging
+> # Binary logging captures changes between backups and is enabled by
+> # default. It's default setting is log_bin=binlog
+> # disable_log_bin
+> #
+> # Remove leading # to set options mainly useful for reporting servers.
+> # The server defaults are faster for transactions and fast SELECTs.
+> # Adjust sizes as needed, experiment to find the optimal values.
+> # join_buffer_size = 128M
+> # sort_buffer_size = 2M
+> # read_rnd_buffer_size = 2M
+> #
+> # Remove leading # to revert to previous value for default_authentication_plugin,
+> # this will increase compatibility with older clients. For background, see:
+> # https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_default_authentication_plugin
+> # default-authentication-plugin=mysql_native_password
+> ```
+>
+> 1. **InnoDB Buffer Pool Size**:
+>
+>    - 建议将`innodb_buffer_pool_size`设置为大多数重要数据缓存的RAM量。
+>    - 对于专用服务器，建议从总RAM的70%开始设置。
+>    - 对于非专用服务器，建议从总RAM的10%开始设置。
+>    - 如果不特意配置，这个值设置为128MB。
+>
+>    **通常这个是生产环境中 MYSQL 唯一需要的性能参数**，如`innodb_buffer_pool_size=12G`。
+>
+> 2. **Binary Logging**:
+>
+>    - 二进制日志记录了备份之间的更改，并默认启用（`log_bin=binlog`）。
+>    - 如果要禁用二进制日志，可以移除`disable_log_bin`前的注释符号`#`。
+>
+> 3. **Reporting Servers**:
+>
+>    - 如果服务器主要用于报告生成，可以调整以下缓冲区大小以优化性能：
+>      - `join_buffer_size`：用于连接操作的缓冲区大小。
+>      - `sort_buffer_size`：用于排序操作的缓冲区大小。
+>      - `read_rnd_buffer_size`：用于随机读取操作的缓冲区大小。
+>
+>    **默认情况下，这些值被设置为适合快速事务和快速SELECT查询的值。增大这些值，性能可能反而会下降**，因为分配内存也是花费时间，而大多数查询并不需要很大的缓冲区，所以通常不需要更改这些值。
+>
+> 4. **Default Authentication Plugin**:
+>
+>    - 从MySQL 8.0开始，默认的身份验证插件是`caching_sha2_password`，这可能会与旧版本的客户端不兼容。
+>    - 如果需要提高与旧客户端的兼容性，可以将`default_authentication_plugin`的值改回`mysql_native_password`。
+>    - 要这样做，需要移除`default-authentication-plugin=mysql_native_password`前的注释符号`#`。
+
+
+
 # 事务
 
 MySQL 事务主要用于处理操作量大，复杂度高的数据。比如说，在人员管理系统中，你删除一个人员，你既需要删除人员的基本资料，也要删除和该人员相关的信息，如信箱，文章等等，这样，这些数据库操作语句就构成一个事务！
@@ -24,6 +84,38 @@ MySQL 事务主要用于处理操作量大，复杂度高的数据。比如说�
 - **持久性：**事务处理结束后，对数据的修改就是永久的，即便系统故障也不会丢失。
 
 > 在 MySQL 命令行的默认设置下，事务都是自动提交的，即执行 SQL 语句后就会马上执行 COMMIT 操作。因此要显式地开启一个事务务须使用命令 BEGIN 或 START TRANSACTION，或者执行命令 SET AUTOCOMMIT=0，用来禁止使用当前会话的自动提交。
+
+### 事务隔离级别
+
+SQL标准定义了4类隔离级别，包括了一些具体规则，用来限定事务内外的哪些改变是可见的，哪些是不可见的。低级别的隔离级一般支持更高的并发处理，并拥有更低的系统开销。
+
+#### Read Uncommitted（读取未提交内容）
+
+在该隔离级别，所有事务都可以看到其他未提交事务的执行结果。本隔离级别很少用于实际应用，因为它的性能也不比其他级别好多少。读取未提交的数据，也被称之为脏读（Dirty Read）。
+
+#### Read Committed（读取提交内容）
+
+这是大多数数据库系统的默认隔离级别（但不是MySQL默认的）。它满足了隔离的简单定义：一个事务只能看见已经提交事务所做的改变。这种隔离级别 也支持所谓的不可重复读（Nonrepeatable Read），因为同一事务的其他实例在该实例处理其间可能会有新的commit，所以同一select可能返回不同结果。
+
+#### Repeatable Read（可重读）
+
+这是MySQL的默认事务隔离级别，它确保同一事务的多个实例在并发读取数据时，会看到同样的数据行。不过理论上，这会导致另一个棘手的问题：幻读 （Phantom Read）。简单的说，幻读指当用户读取某一范围的数据行时，另一个事务又在该范围内插入了新行，当用户再读取该范围的数据行时，会发现有新的“幻影” 行。InnoDB和Falcon存储引擎通过多版本并发控制（MVCC，Multiversion Concurrency Control）机制解决了该问题。
+
+#### Serializable（可串行化）
+
+这是最高的隔离级别，它通过强制事务排序，使之不可能相互冲突，从而解决幻读问题。简言之，它是在每个读的数据行上加上共享锁。在这个级别，可能导致大量的超时现象和锁竞争。
+
+这四种隔离级别采取不同的锁类型来实现，若读取的是同一个数据的话，就容易发生问题。例如：
+
+> - 脏读(Drity Read)：某个事务已更新一份数据，另一个事务在此时读取了同一份数据，由于某些原因，前一个RollBack了操作，则后一个事务所读取的数据就会是不正确的。
+> - 不可重复读(Non-repeatable read):在一个事务的两次查询之中数据不一致，这可能是两次查询过程中间插入了一个事务更新的原有的数据。
+> - 幻读(Phantom Read):在一个事务的两次查询中数据笔数不一致，例如有一个事务查询了几列(Row)数据，而另一个事务却在此时插入了新的几列数据，先前的事务在接下来的查询中，就有几列数据是未查询出来的，如果此时插入和另外一个事务插入的数据，就会报错。
+
+在MySQL中，实现了这四种隔离级别，分别有可能产生问题如下所示：
+
+![img](assets/856cf031b7ef4796d760bb5633da4bf4.png)
+
+> [MySQL 四种事务隔离级别详解介绍_mysql中的四种事务隔离级别是什么-CSDN博客](https://blog.csdn.net/justlpf/article/details/106835122)，这里包含了隔离级别的测试哦。
 
 ### 事务控制语句：
 
