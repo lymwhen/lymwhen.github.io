@@ -167,7 +167,7 @@ lower_case_table_names=1
 
 > [!TIP]
 >
-> 可以修改 my.cnf 配置文件位置：
+> ~~可以修改 my.cnf 配置文件位置：~~，实测修改配置文件后，临时密码不对，且配置文件和数据目录并没有使用我们指定的。
 >
 > ```bash
 > # 复制配置文件
@@ -176,16 +176,29 @@ lower_case_table_names=1
 > /usr/sbin/mysqld --defaults-file=/data/mysql/my.cnf --user=mysql --initialize
 > 
 > # 完整命令：
-> # mysqld --defaults-file=/etc/my.cnf (--basedir=/usr/local/mysql/ 可选项) --datadir=/data/mysql/(自定义路径) --user=mysql --initialize
+> /usr/sbin/mysqld --defaults-file=/etc/my.cnf (--basedir=/usr/local/mysql/) --datadir=/data/mysql/data --user=mysql --initialize
 > ```
+>
+> 
 
 > [linux安装mysql8.0使用rpm，以及解决更改datadir路径问题_mysql8.0.35rpm安装 linux 修改安装目录-CSDN博客](https://blog.csdn.net/m0_46661708/article/details/135084980)
+
+> [!TIP]
+>
+> 如果报错，尝试：
+>
+> ```bash
+> # 将相关目录所有者设为mysql
+> chown -R mysql:mysql /data/mysql
+> ```
+
+
 
 ### 启动mysql
 
 ```bash
 # 启动mysql
-systemctl start mysql
+systemctl start mysqld
 ```
 
 查看 mysql 临时密码
