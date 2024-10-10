@@ -1,10 +1,96 @@
+# Mysql8
+
+# 安装
+
+```bash
+# 持久化目录
+mkdir -p opt/mysql/conf
+mkdir -p opt/mysql/log
+mkdir -p opt/mysql/data
+
+# 创建配置文件
+vim /opt/mysql/conf/my.cnf
+[mysqld]
+# Remove leading # and set to the amount of RAM for the most important data
+# cache in MySQL. Start at 70% of total RAM for dedicated server, else 10%.
+# innodb_buffer_pool_size = 128M
+#
+# Remove the leading "# " to disable binary logging
+# Binary logging captures changes between backups and is enabled by
+# default. It's default setting is log_bin=binlog
+# disable_log_bin
+#
+# Remove leading # to set options mainly useful for reporting servers.
+# The server defaults are faster for transactions and fast SELECTs.
+# Adjust sizes as needed, experiment to find the optimal values.
+# join_buffer_size = 128M
+# sort_buffer_size = 2M
+# read_rnd_buffer_size = 2M
+#
+# Remove leading # to revert to previous value for default_authentication_plugin,
+# this will increase compatibility with older clients. For background, see:
+# https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_default_authentication_plugin
+# default-authentication-plugin=mysql_native_password
+
+datadir=/data/mysql/data
+socket=/var/lib/mysql/mysql.sock
+
+log-error=/data/mysql/log/mysqld.log
+pid-file=/var/run/mysqld/mysqld.pid
+
+lower_case_table_names=1
+# skip-grant-tables
+```
+
+```bash
+# 启动容器
+docker run -p 3306:3306 --name mysql -v /opt/mysql/log:/var/log/mysql -v /opt/mysql/data:/var/lib/mysql -v /opt/mysql/conf:/etc/mysql/conf.d -e MYSQL_ROOT_PASSWORD=root -d mysql:8.0
+
+# 进入容器，密码为root
+docker exec -it mysql mysql -uroot -p
+
+# 修改'root'@'localhost'密码、创建应用连接的用户和授权等
+```
+
+
+
 ### 配置文件
 
 ` /etc/my.cnf` > `/etc/mysql/my.cnf`
 
-查看 mysql 默认的`/etc/mysql/my.cnf`内容：
+`/etc/my.cnf`内容：
 
-![img](assets/11111Afewofwe.png)
+```bash
+[mysqld]
+# Remove leading # and set to the amount of RAM for the most important data
+# cache in MySQL. Start at 70% of total RAM for dedicated server, else 10%.
+# innodb_buffer_pool_size = 128M
+#
+# Remove the leading "# " to disable binary logging
+# Binary logging captures changes between backups and is enabled by
+# default. It's default setting is log_bin=binlog
+# disable_log_bin
+#
+# Remove leading # to set options mainly useful for reporting servers.
+# The server defaults are faster for transactions and fast SELECTs.
+# Adjust sizes as needed, experiment to find the optimal values.
+# join_buffer_size = 128M
+# sort_buffer_size = 2M
+# read_rnd_buffer_size = 2M
+#
+# Remove leading # to revert to previous value for default_authentication_plugin,
+# this will increase compatibility with older clients. For background, see:
+# https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_default_authentication_plugin
+# default-authentication-plugin=mysql_native_password
+
+# 自定义的数据目录
+datadir=/data/mysql/data
+socket=/var/lib/mysql/mysql.sock
+
+# 自定义的日志位置
+log-error=/data/mysql/log/mysqld.log
+pid-file=/var/run/mysqld/mysqld.pid
+```
 
 它包含了`/etc/mysql/conf.d/`下的配置文件，描述为自定义配置应该放在此处，所以 docker`-v`参数持久化的目录配置这个`conf.d`即可。
 
@@ -25,7 +111,7 @@ Query OK, 0 rows affected (0.02 sec)
 
 > [!NOTE]
 >
-> mysql 5.7 可以通过`grant`直接创建用户，mysql8 需要首先创建用户。
+> mysql 5.7 可以通过`grant`直接创建用户，mysql8 需要首先创建用户。如果提示`ERROR 1396 (HY000): Operation CREATE USER failed for 'root'@'%'`，说明用户已存在，直接授权即可。
 
 ### 修改密码
 
@@ -48,6 +134,19 @@ ERROR 1290 (HY000): The MySQL server is running with the --skip-grant-tables opt
 ```
 
 执行`flush privileges`后，再修改密码
+
+---
+
+##### 方法二
+
+```bash
+# 停止mysql服务
+systemctl stop mysqld
+# 无密码启动
+/usr/sbin/mysqld --skip-grant-tables --user=mysql
+```
+
+此时窗口会被阻塞，使用另一个窗口执行`mysql -uroot -p`，然后输入任意密码即可进入
 
 ### Docker mysql 导出
 
