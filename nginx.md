@@ -49,7 +49,55 @@ nginx -t
 >
 > [nginx Command-line parameters](http://nginx.org/en/docs/switches.html)
 
-### 反向代理
+### location 匹配优先级
+
+1. **精确匹配**：如果 `location` 块使用 `=` 进行精确匹配，如 `location = /exact/match/`，它将优先于任何前缀匹配。
+2. **最长前缀匹配**：如果没有精确匹配，Nginx 会选择最长的匹配前缀。例如，对于请求 `/a/b/c`，`location /a/` 和 `location /` 都匹配，但 `location /a/` 是最长匹配，因此会被优先选择。
+3. **正则表达式匹配**：如果 `location` 块使用正则表达式，如 `location ~ \.(js|css|png)$`，Nginx 会在前缀匹配之后考虑正则表达式匹配。正则表达式匹配的优先级低于相同位置的前缀匹配，但高于默认的 `location /`。
+4. **默认匹配**：如果没有找到精确匹配或最长前缀匹配，Nginx 最后会回退到 `location /` 块。
+
+### location 与 proxy_pass 路径规则
+
+**`proxy_pass`后面是否带路径**会影响路径的组装方式，假设用户访问的地址为 http://nginxip/api/user/add：
+
+- 带路径时，例如`/`，`/v1`，`/v1/`，代理后地址 = `proxy_pass` + `url`路径去掉`location`的部分
+
+| location | proxy_pass        | 代理后地址                 | 预期   |
+| -------- | ----------------- | -------------------------- | ------ |
+| /api/    | http://ip/        | http://ip/api/user/add     | 符合   |
+| /api/    | http://ip/api-v1  | http://ip/api-v1user/add   | 不符合 |
+| /api     | http://ip/api-v1  | http://ip/api-v1/user/add  | 符合   |
+| /api     | http://ip/api-v1/ | http://ip/api-v1//user/add | 不符合 |
+
+- 不带路径时，代理后地址 = `proxy_pass` + `url`路径
+
+| location | proxy_pass | 代理后地址             | 预期   |
+| -------- | ---------- | ---------------------- | ------ |
+| /api/    | http://ip  | http://ipuser/add      | 不符合 |
+| /api     | http://ip  | http://ip/api/user/add | 符合   |
+
+可以总结规律如下：
+
+关于`proxy_pass`后面是否要加路径：
+
+- 当用户访问`url`与代理后`url`**完全一致**，仅仅是`protocol://ip:port`不一致时，可以不加路径
+- 当用户访问`url`与代理后`url`**前缀不一致**，例如为了代理而特意增加的前缀`/prod-api`或改变了前缀，应该要加路径，因为需要替换掉前缀（location）
+
+关于`location`和`proxy_pass`后面最后面是否要加斜杠`/`：简单规律是，一般情况下，他们要么都有，要么都没有。具体可以根据上面的代理后地址计算公式分析。
+
+> [!TIP]
+>
+> 事实上，`location`后面的斜杠并没有什么特殊性，`/api`和`/api/`都只是普通的地址，前者地址段数为1，后者地址段数为2，所以前者是一个更大的匹配范围，它包括了后者。
+>
+> 而通常`/api`不是一个完整的地址，API 的地址应该是`/api/user/add`之类的，所以可以使用`/api/`去匹配前缀。
+>
+> 有趣的事情是，当后端完整接口地址是`/api/pic`，而你在`location`配置为`/api/pic/`，按理浏览器访问`/api/pic`是不通的，因为 2 段的地址无法匹配到 3 段的`location`，但实际上可以访问到。查看 network，发现是`/api/pic` 301 Moved Permanently（永久性移动）重定向到了`/api/pic/`，原因是：
+>
+> 当Web服务器为Nginx时，若浏览器访问的uri最后不带斜杠，如http://www.xxx.com.cn/aaa，当aaa是一个目录时，就会产生301跳转，且自动将uri补全为http://www.xxx.com.cn/aaa/，在最后添加一个/。
+>
+> [Nginx的反向代理自动301跳转避坑-阿里云开发者社区 (aliyun.com)](https://developer.aliyun.com/article/1204243)
+
+# 反向代理
 
 ```nginx
 worker_processes  1;
@@ -59,11 +107,18 @@ events {
 }
 
 http {
-    include       mime.types;
+	include       mime.types;
     default_type  application/octet-stream;
 
     sendfile        on;
+    #tcp_nopush     on;
+
+    #keepalive_timeout  0;
     keepalive_timeout  65;
+
+    # 文件上传大小限制500MB
+    client_max_body_size 500m;
+    #gzip  on;
 
     server {
         listen       443 ssl;
@@ -92,7 +147,7 @@ http {
 }
 ```
 
-##### 指定 Host
+### 指定 Host
 
 一些 http 服务需要指定域名，不然代理访问就是一片空白
 
@@ -117,7 +172,7 @@ location / {
 >
 > [When nginx is configured as reverse proxy, can it rewrite the host header to the downstream server like Apache's ProxyPreserveHost? - Server Fault](https://serverfault.com/questions/87056/when-nginx-is-configured-as-reverse-proxy-can-it-rewrite-the-host-header-to-the)
 
-##### 服务端获取用户真实 ip
+### 服务端获取用户真实 ip
 
 ```nginx
 location / {
@@ -130,7 +185,7 @@ location / {
 
 否则服务端获取的 ip 为 nginx ip。
 
-##### 根据域名代理不同的端口
+### 根据域名代理不同的端口
 
 配置多个相同端口、不同`server_name`的 http.server
 
@@ -185,7 +240,7 @@ http {
 >
 > [Server names (nginx.org)](https://nginx.org/en/docs/http/server_names.html)
 
-##### 强制 https
+### 强制 https
 
 可使用地址`rewrite`实现
 
@@ -199,7 +254,7 @@ server{
 
 
 
-### 本地目录映射
+# 本地目录映射
 
 ```nginx
 worker_processes  8;
@@ -256,7 +311,7 @@ http {
 
 > [通过nginx实现windows系统下本地目录的映射_CherishL_的专栏-CSDN博客](https://blog.csdn.net/lovelovelovelovelo/article/details/75038594)
 
-### 静态资源
+# 静态资源
 
 将静态资源放在 nginx/front 下
 
@@ -292,7 +347,7 @@ http {
 }
 ```
 
-### 负载均衡
+# 负载均衡
 
 ```nginx
 events {
@@ -317,7 +372,36 @@ http {
 }
 ```
 
-### hls 流转发
+### minio 负载均衡
+
+```nginx
+upstream minio_servers {
+    server 192.168.1.12:27376 max_fails=3 fail_timeout=30s;
+    server 192.168.1.13:27376 backup;
+}
+
+server {
+    listen 27377;
+
+    location / {
+        proxy_pass http://minio_servers;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        # proxy_set_header X-NginX-Proxy true;
+        # real_ip_header X-Real-IP;
+        # proxy_connect_timeout 300;
+        # proxy_http_version 1.1;
+        # proxy_set_header Upgrade $http_upgrade;
+        # proxy_set_header Connection "upgrade";
+    }
+}
+```
+
+
+
+# hls 流转发
 
 ```nginx
 worker_processes  1;
@@ -396,7 +480,7 @@ http {
 }
 ```
 
-### rtmp 推流
+# rtmp 推流
 
 > 需要使用`nginx-rtmp-win32`
 >
@@ -451,7 +535,7 @@ http {
 }
 ```
 
-##### 推流
+### 推流
 
 ```bash
 ffmpeg  -re -i "rtmp://rtmp.live.com/stream" -vcodec libx264 -vprofile baseline -acodec libmp3lame -ar 44100 -ac 1 -f flv rtmp://127.0.0.1:1935/hls/http8
@@ -459,7 +543,7 @@ ffmpeg  -re -i "rtmp://rtmp.live.com/stream" -vcodec libx264 -vprofile baseline 
 
 参看 [工具/ffmpeg - 推流](工具/ffmpeg.md?id=推流)
 
-##### http 流地址
+### http 流地址
 
 ```
 http://127.0.0.1:28080/hls/http8.m3u8
@@ -467,7 +551,7 @@ http://127.0.0.1:28080/hls/http8.m3u8
 
 
 
-### 代理 mysql/oracle/rtmp
+# 代理 mysql/oracle/rtmp
 > https://blog.csdn.net/jiahao1186/article/details/111501253
 
 ```nginx
@@ -519,7 +603,7 @@ stream {
 >
 > rtsp 不可以这种代理转发
 
-### 代理WebSocket
+# 代理 WebSocket
 
 ```nginx
 map $http_upgrade $connection_upgrade { 
@@ -561,7 +645,7 @@ server{
 
 
 
-### 跨域
+# 跨域
 
 https 下前台访问 http 网站接口（跨域），可以使用 nginx 代理，需要解决跨域问题
 
@@ -700,7 +784,7 @@ http {
 > [!NOTE]
 > `server`下`if`里不可以写`add_header`，在`location`下可以
 
-### 默认配置文件
+# 默认配置文件
 
 ```nginx
 
