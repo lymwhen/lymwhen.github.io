@@ -45,10 +45,13 @@ if (Build.VERSION.SDK_INT >= 21) {
 
 // 开启localStorage
 webView.getSettings().setDomStorageEnabled(true);
-webView.getSettings().setAppCacheMaxSize(1024*1024*8);
-String appCachePath = getApplicationContext().getCacheDir().getAbsolutePath();
-webView.getSettings().setAppCachePath(appCachePath);
+// 允许访问content url
+webView.getSettings().setAllowContentAccess(true);
+// 允许访问文件系统
 webView.getSettings().setAllowFileAccess(true);
+// 阻止访问图片
+webView.getSettings().setBlockNetworkImage(false);
+
 webView.getSettings().setAppCacheEnabled(true);
 
 // 默认背景，对于底色不是白色的页面可以设置
