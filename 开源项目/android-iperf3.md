@@ -123,8 +123,8 @@ libs
 ├───libIperf3.so
 ├─x86
 ├───libIperf3.so
-└─x86_64
-├───libIperf3.so
+├─x86_64
+└───libIperf3.so
 ```
 
 在 app build.gradle 中配置 jniLibs
