@@ -1,6 +1,15 @@
 # Quest2
 
+# 开发者模式
 
+1. [进入页面](https://developer.oculus.com/manage/)，注册为开发者，组织名称自己看着设就行；
+2. [进入页面](https://developer.oculus.com/downloads/package/oculus-adb-drivers/)，同意协议后即可下载驱动包；
+3. **不要双击打开压缩包，请对着压缩包右键，将压缩包解压至单独文件夹**；
+4. 进入解压出来的文件夹，找到`android_winusb.inf`，对着该文件右键，选择安装；
+5. 在手机上打开Oculus应用：`设置` > `Oculus Quest xxx ▽` > `┅ 更多设置` > `开发者模式` > `打开开关`；
+6. 使用手机的USB线（而不是Quest附送的）将Quest连接至电脑，并在VR中允许USB调试。
+
+ 如果你没有信用卡，也不用担心不能申请开发者，你可以让已经注册为开发者的玩家通过以下操作邀请你成为开发者：[点我打开页面](https://developer.oculus.com/manage/) → 左侧 `Members` → 右上 `Add Member`
 
 # 网络连接受限
 
