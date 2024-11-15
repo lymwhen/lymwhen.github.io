@@ -90,6 +90,11 @@ docker network connect [network] [container]：将容器连接到指定的 Docke
 docker network disconnect [network] [container]：将容器从指定的 Docker 网络中断开连接
 ```
 
+```bash
+# 保持容器运行，即使命令已执行完毕
+docker run -dit --name ndk android-ndk
+```
+
 
 
 # 设置镜像
@@ -436,3 +441,8 @@ docker ps
 >
 > 不重装，暂未测试成功：[docker拉取镜像错误missing signature key - 岁月淡忘了谁 - 博客园 (cnblogs.com)](https://www.cnblogs.com/henuyuxiang/p/17879277.html)
 
+# 利用 Docker 搭建编译环境
+
+Docker 除了用作 mysql 之类的服务类容器外，另一重要用途是用于搭建复杂的构建环境，产生编译后的制品。很多云平台流水线就是利用 docker 搭建 maven、node 等环境，构建生成制品。
+
+参看搭建 android-ndk 编译测速工具 iperf3：[开源项目/android-iperf3](开源项目/android-iperf3.md)
