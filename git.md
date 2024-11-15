@@ -16,16 +16,6 @@ cat ~/.ssh/id_rsa.pub
 
 将公钥配置到 git 服务器
 
-# 新工程提交到git
-
-```bash
-git init
-git remote add origin git@github.com:haiyiya/ddd.git
-git add .
-git commit -m "init"
-git push -u origin master
-```
-
 # 命令
 
 ```bash
@@ -76,34 +66,32 @@ git push origin --delete remoteBranchName
 
 > [Git 操作——如何删除本地分支和远程分支 (freecodecamp.org)](https://www.freecodecamp.org/chinese/news/how-to-delete-a-git-branch-both-locally-and-remotely/)
 
-# 冲突处理
+# 新建项目
 
-自己修改过的文件，其它人也修改并且提交了
+### 新工程提交到git
 
 ```bash
-# 查看本地修改的文件
-git status
-# 拉取
-git pull
-
-# 若报错
-# 暂存、提交
+git init
+git remote add origin git@github.com:haiyiya/ddd.git
 git add .
-git commit -m ''
-# 拉去
-git pull
-# 处理冲突信息
-# 在编辑器中合并或者手动处理<<<< HEAD 本地修改 ======= 远程修改 >>>>>>块
-
-# 提交合并
-git add .
-git commit -m 'merge'
-git push
+git commit -m "init"
+git push -u origin master
 ```
 
-> [git上多人对同一文件修改，发生冲突，如何合并_dair6的博客-CSDN博客_git 2个人同时改了一个文件,要同时合并dev,但相互又不能合并](https://blog.csdn.net/dair6/article/details/120724629)
+### 保留旧项目提交记录
 
-# 大小写不敏感问题
+更换远端地址即可
+
+```bash
+git clone xxx
+git remote remove origin
+git remote add origin 新 git 地址
+git push -u master origin
+```
+
+
+
+# 大小写重命名
 
 git 默认大小写不敏感，修改文件名大小写提交的办法
 
@@ -121,11 +109,196 @@ git mv -f src/views/List/Home.vue  src/views/list/Home.vue
 git mv -f src/views/List/About.vue  src/views/list/About.vue
 ```
 
+# 冲突处理
+
+自己修改过的文件，其它人也修改并且提交了
+
+```bash
+# 查看本地修改的文件
+git status
+# 拉取
+git pull
+
+# 若报错
+# 暂存、提交
+git add .
+git commit -m ''
+# 拉取
+git pull
+# 处理冲突信息
+# 在编辑器中合并或者手动处理<<<< HEAD 本地修改 ======= 远程修改 >>>>>>块
+
+# 提交合并
+git add .
+git commit -m 'merge'
+git push
+```
+
+> [git上多人对同一文件修改，发生冲突，如何合并_dair6的博客-CSDN博客_git 2个人同时改了一个文件,要同时合并dev,但相互又不能合并](https://blog.csdn.net/dair6/article/details/120724629)
+
+在拉取代码后，如果存在冲突，ide 或者 git 日志会提示，处理方式：
+
+IDE中，点击 git - **resolve conflicts（解决冲突）**，会弹出窗口列出有冲突的文件，选择文件，点击 merge，会弹出代码合并窗口，左侧为本地，右侧为远程，中间为合并后的代码。
+
+如果不想合并，可以点击 git - **mark as merged（视为已合并）**，但是代码中会存在`<<<< HEAD 本地修改 ======= 远程修改 >>>>>>`的冲突块，一定会引起报错，一般不这样操作。
+
+> [!TIP]
+>
+> 上述加粗的是 git 专有名词，一般在各种 IDE、github 等都通用。
+
+# 分支
+
+### 分支情况
+
+```bash
+# 查看所有分支（本地和远端）
+git branch -a
+```
+
+![image-20240315165158689](assets/image-20240315165158689.png)
+
+- 白色、绿色为本地分支，`* 绿色名称`表示当前分支
+- `remotes/`开头、红色为远程分支
+
+```bash
+# 查看所有本地分支，主要展示本地分支与远程跟踪分支的情况
+git branch -vv
+* master  7a8b9c1 [origin/master: ahead 1] 更新了README文件
+  develop 4d5e6f7 [origin/develop: behind 2] 添加了新功能
+```
+
+- 本地分支和与之关联的远程分支，如果本地分支没有，`* 绿色名称`表示当前分支
+- 本地分支与远程跟踪分支的情况，如 master 比远程跟踪分支多一个提交
+
+### 创建分支
+
+- 已有远程分支
+
+```bash
+# 创建本地分支，并跟踪远程分支
+git checkout -b dev origin/dev
+```
+
+- 没有远程分支
+
+```bash
+# 创建新分支
+git branch fix
+# 切换分支
+git checkout fix
+# 提交分支
+git push origin fix
+```
+
+> [!TIP]
+>
+> 若直接`git checkout dev`，会进入分支游离状态。
+>
+
+### 合并分支
+
+本地合并：将 fix 分支合并到 master 分支
+
+```bash
+# 更新fix分支
+git checkout fix
+git pull origin fix
+
+# 切换并更新master分支
+git checkout master
+git pull origin master
+
+# 合并，合并fix分支到当前，即master
+git merge fix
+# 取消合并
+git merge --abort
+```
+
+> [!TIP]
+>
+> 可以直接 pull 其他分支，直接合并远程分支的代码
+
+### 提交合并
+
+```bash
+# 冲突处理
+
+# 提交合并
+git add .
+git commit -m "merge fix"
+git push origin master
+```
+
+> [!TIP]
+>
+> 以上操作在idea的工具栏`git`菜单或者工程右键`git`菜单均可以操作，非常方便
+>
+> 切换分支：branchs - 选择一个分支 - checkout
+>
+> 合并分支：git - merge - 选择一个分支
+>
+> 冲突处理：git - resolve conflicts（有冲突未处理时才会出现此项）
+
+### 没有相同的祖先的合并
+
+git merge dev 报错：fatal: refusing to merge unrelated histories
+
+表示当前分支和 dev 没有相同的祖先分支，比如当前分支是一个新建的分支，git 默认不允许合并
+
+```bash
+# 允许没有相同的祖先的合并
+git merge dev --allow-unrelated-histories
+```
+
+> [!TIP]
+>
+> 执行后，需要填入一个初始化的 comment，这里类似 Linux vi 编辑器，填入后`Esc` - `wq`。
+
+### 删除分支
+
+```bash
+# 删除本地分支
+> git branch -d dev-lym
+Deleted branch dev-lym (was 32d44bf).
+# 删除远程分支
+> git push origin -d dev-lym
+To github.com:lymwhen/iperf.git
+ - [deleted]         dev-lym
+```
+
+
+
+# 撤回
+
+### 撤回 push
+
+```bash
+git log 查看提交记录（按q退出）
+本地回滚
+git reset --soft 752c8cf43498a64488fd560cd22e72d2aa361e87
+覆盖线上（覆盖后线上即无法看到之后的提交了）
+git push -f origin master
+重新 commit、push
+```
+
+> 如果仅是 commit，未 push，则 push 不需要 -f
+
+### 撤回合并
+
+`git reset --soft`提示
+
+```bash
+Cannot do a soft reset in the middle of a merge
+```
+
+```bash
+git reset --merge
+git reset --soft 752c8cf43498a64488fd560cd22e72d2aa361e87
+```
+
 # 取消文件追踪
 
-### 取消追踪
-
-- 文件未提交
+### 文件未提交
 
 即只是add
 
@@ -138,9 +311,7 @@ git reset .
 git reset --soft head
 ```
 
-
-
-- 文件已被提交
+### 文件已被提交
 
 ```bash
 # 查看取消文件追踪，只是查看，并不会产生效果
@@ -168,158 +339,7 @@ git push origin master
 >
 > 可以使用`git status`查看已被追踪或未被追踪的文件情况
 
-# 分支合并
 
-```bash
-# 查看所有分支
-git branch -a
-```
-
-> [!TIP]
->
-> ![image-20240315165158689](assets/image-20240315165158689.png)
->
-> - 白色、绿色为本地分支，`*`表示当前分支
-> - `remotes/`开头、红色为远程分支
-
-```
-# git clone从远程仓库下载代码后切换远程分支
-git checkout -b dev origin/dev
-```
-
-> [!TIP]
->
-> 表示创建本地仓库dev，并关联远程仓库dev。
->
-> 由于此时没有其他本地分支，所以如果直接`git checkout dev`，会进入分支游离状态。
->
-> **用于远程有分支，本地没有的情况**
-
-```bash
-# 创建新分支
-git branch fix
-# 切换分支
-git checkout fix
-# 提交分支
-git push origin fix
-```
-
-> [!TIP]
->
-> **用于远程没有分支，创建本地分支或将本地分支推送到远程**
-
-##### 合并分支到master
-
-本地合并
-
-```bash
-# 更新fix分支
-git checkout fix
-git pull origin fix
-
-# 切换并更新master分支
-git checkout master
-git pull origin master
-
-# 合并，合并fix分支到当前，即master
-git merge fix
-# 取消合并
-git merge --abort
-```
-
-远程合并
-
-```bash
-# 切换并更新master分支
-git checkout master
-git pull origin master
-
-# 直接pull fix分支到master
-git pull origin fix
-```
-
-提交合并
-
-```bash
-# 冲突处理
-
-# 提交合并
-git add .
-git commit -m "merge fix"
-git push origin master
-```
-
-> [!TIP]
->
-> 以上操作在idea的工具栏`git`菜单或者工程右键`git`菜单均可以操作，非常方便
->
-> 切换分支：branchs - 选择一个分支 - checkout
->
-> 合并分支：git - merge - 选择一个分支
->
-> 冲突处理：git - resolve conflicts（有冲突未处理时才会出现此项）
-
-### 问题
-
-git merge dev 报错：fatal: refusing to merge unrelated histories
-
-表示当前分支和 dev 没有相同的祖先分支，比如当前分支是一个新建的分支，git 默认不允许合并
-
-```bash
-# 允许没有相同的祖先的合并
-git merge dev --allow-unrelated-histories
-```
-
-> [!TIP]
->
-> 执行后，需要填入一个初始化的 comment，这里类似 Linux vi 编辑器，填入后`Esc` - `wq`。
-
-# 使用旧项目创建新项目保留提交记录
-
-```bash
-git remote remove origin
-git remote add origin 新 git 地址
-git push -u master origin
-```
-
-# 撤回push
-
-```bash
-git log 查看提交记录（按q退出）
-本地回滚
-git reset --soft 752c8cf43498a64488fd560cd22e72d2aa361e87
-覆盖线上（覆盖后线上即无法看到之后的提交了）
-git push -f origin master
-重新 commit、push
-```
-
-> 如果仅是 commit，未 push，则 push 不需要 -f
-
-# 撤回合并
-
-`git reset --soft`提示
-
-```bash
-Cannot do a soft reset in the middle of a merge
-```
-
-```bash
-git reset --merge
-git reset --soft 752c8cf43498a64488fd560cd22e72d2aa361e87
-```
-
-# 将分支更新到 master
-
-```bash
-# 查看分支（当前分支有*号和绿色标注）
-git branch
-# 删除分支
-git branch -D master
-# 切换到分支
-git checkout release
-# 更新当前分支到master
-git checkout -b master
-```
 
 # 不安全 https
 
