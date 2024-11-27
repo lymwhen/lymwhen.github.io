@@ -252,6 +252,7 @@
   * [Moonlight](开源项目/Moonlight.md)
   * [android-iperf3](开源项目/android-iperf3.md)
   * [bujuan](开源项目/bujuan.md)
+  * [kafka_clients代理](开源项目/kafka_clients代理.md)
 * [文档](文档/文档.md)
   * [Markdown](Markdown.md)
   * [docsify](文档/docsify.md)
