@@ -198,7 +198,7 @@ kafka 客户端会反复尝试连接集群中的各个节点，日志中的`192.
 Map<Integer, Node> nodes = metadataResponse.brokersById();
 ```
 
-这里获得的 nodes 中，就包含了 3个 node，其中的地址就是`192.168.1.`地址。可以尝试修改这些 node 中的地址为 nginx 代理地址。
+这里获得的 nodes 中，正好包含了 3个 node，其中的地址就是`192.168.1.`地址。可以尝试修改这些 node 中的地址为 nginx 代理地址。
 
 # 编译源码
 
@@ -302,6 +302,10 @@ C:\Users\user1\.gradle\wrapper\dists\gradle-7.1.1-all\xxxxxx\gradle-7.1.1\bin\gr
 ```
 
 运行一切正常，这就可以开始着手修改源码了。
+
+> [!NOTE]
+>
+> 替换同版本的 jar（实际源码不一样）后，会出现 java 文件 import 报红和无法断点调试源码的情况，需要执行`File - Invalidate Caches`，根据提示重启 IDEA。
 
 # 修改源码
 
