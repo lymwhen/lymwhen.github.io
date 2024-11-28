@@ -17,27 +17,27 @@
 
 **BUT**，众所周知，kafka 生产者客户端与 kafka 集群的交互过程为：
 
-1. **配置和初始化**：
+1. 配置和初始化：
    - 生产者客户端通过配置参数（如 `bootstrap.servers`、`key.serializer`、`value.serializer` 等）进行初始化。
    - `bootstrap.servers` 提供了 Kafka 集群中初始的 broker 列表，用于建立连接。
-2. **建立连接**：
+2. 建立连接：
    - 生产者客户端使用提供的配置参数创建与 Kafka 集群的连接。
    - 它首先连接到 `bootstrap.servers` 列表中的一个 broker。
-3. **获取元数据**：
+3. 获取元数据：
    - 生产者客户端发送元数据请求（`MetadataRequest`）到已连接的 broker。
    - 元数据请求返回集群中所有 broker 的信息，包括它们的主机和端口，以及所有主题和分区的信息。
-4. **选择分区领导者**：
+4. 选择分区领导者：
    - 如果消息需要发送到特定主题的分区，生产者客户端会根据元数据确定该分区的领导者（leader）broker。
    - Kafka 使用分区来提高并行处理能力，每个分区都有一个 leader 和可能的多个 follower。
-5. **消息发送**：
+5. 消息发送：
    - 生产者客户端将消息发送到分区的领导者 broker。
    - Kafka 生产者支持同步和异步两种发送模式：
      - **同步发送**：`send()` 方法会等待 broker 的确认响应，然后返回发送结果。
      - **异步发送**：`send()` 方法会立即返回一个 `Future` 对象，生产者可以在将来的某个时间点检查发送结果。
-6. **确认响应**：
+6. 确认响应：
    - 领导者 broker 处理消息，将其追加到分区日志中，并复制到所有 follower brokers（如果配置了副本）。
    - 一旦消息被成功处理，领导者 broker 会向生产者客户端发送确认响应。
-7. **错误处理和重试**：
+7. 错误处理和重试：
    - 如果发送失败（例如，由于网络问题或 broker 故障），生产者客户端会根据配置的重试策略进行重试。
    - 重试可能涉及重新选择分区的领导者或连接到不同的 brokers。
 
@@ -52,7 +52,7 @@ listeners=LOCAL_LISTENER://192.168.1.23:9092,INTERNAL_LISTENER://192.168.1.23:90
 advertised.listeners=INTERNAL_LISTENER://192.168.1.23:9093,EXTERNAL_LISTENER://192.168.1.23:9092
 ```
 
-一个 broker 对应客户端的一个 node（节点），客户端会使用 broker 中`advertised.listeners - EXTERNAL_LISTENER`（外部监听器）作为 node 地址，与服务端进行通信。即 **nginx 对`bootstrap.servers`的代理，仅仅用于初始化和获取元数据，后续仍然会使用服务端配置的真实地址进行通信:dog:**。
+一个 broker 对应客户端的一个 node（节点），客户端会使用 broker 中`advertised.listeners - EXTERNAL_LISTENER`（外部监听器）作为 node 地址，与服务端进行通信。即 **nginx 对`bootstrap.servers`的代理，仅仅用于初始化和获取元数据，后续仍然会使用服务端配置的真实地址进行通信**:dog:。
 
 经查询有以下解决方案：
 
