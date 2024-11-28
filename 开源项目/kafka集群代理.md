@@ -309,9 +309,11 @@ C:\Users\user1\.gradle\wrapper\dists\gradle-7.1.1-all\xxxxxx\gradle-7.1.1\bin\gr
 
 # 修改源码
 
-定位到上面找到的 Metadata 类的`List<Node>`位置，发现 Node 类中的`host`、`port`属性都是`final`修改的，将其变为可更改的，并暴漏一个修改方法
+定位到上面找到的 Metadata 类的`List<Node>`位置，发现 Node 类中的`host`、`port`属性都是`final`修饰的，即定义后不可更改。
 
 Node
+
+移除`final`修饰符，并暴漏一个修改方法：
 
 ```java
 public class Node {
