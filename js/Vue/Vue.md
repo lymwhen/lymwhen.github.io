@@ -20,7 +20,7 @@ vue create test1
 >
 > [Installation | Vue CLI (vuejs.org)](https://cli.vuejs.org/guide/installation.html)
 
-### 引入图片
+# 引入图片
 
 ```javascript
 import noPic from '@/assets/images/no-pic.png'
