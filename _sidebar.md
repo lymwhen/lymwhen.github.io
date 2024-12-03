@@ -259,4 +259,5 @@
   * [docsify](文档/docsify.md)
 * [杂谈](杂谈.md)
   * [Wi-Fi](杂谈/Wi-Fi.md)
+  * [重装系统](杂谈/重装系统.md)
 * [OTS](OTS.md)
