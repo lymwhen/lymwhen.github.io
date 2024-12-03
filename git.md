@@ -266,6 +266,31 @@ To github.com:lymwhen/iperf.git
  - [deleted]         dev-lym
 ```
 
+# Tag 标签
+
+可以用 tag 来标示一些重要的节点，且与很多功能关联
+
+- github 发布 release 需要关联 tag
+- 可以使用 tag 作为流水线、部署触发条件
+
+```bash
+git tag  # 列出tag，前面有蓝点表示已推送到远程
+git show <tagname>  # 查看标签的详细信息
+
+git tag <tagname>  # 给当前提交添加标签
+git tag <tagname> <commit>  # 给特定的提交添加标签
+git tag -a <tagname> -m "tag message"  # 创建一个带注解的标签，并添加消息
+git tag -a <tagname> <commit> -m "tag message"  # 给特定的提交创建一个带注解的标签，并添加消息
+
+git push origin <tagname>  # 推送单个标签
+git push origin --tags  # 推送所有标签
+
+git tag -d <tagname>  # 删除本地标签
+git push origin :refs/tags/<tagname>  # 删除远程标签
+
+git checkout <tagname>  # 检出标签
+```
+
 
 
 # 撤回
