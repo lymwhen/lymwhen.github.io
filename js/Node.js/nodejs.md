@@ -18,6 +18,9 @@ npm install -g yarn
 
 # 安装指定版本
 npm install --save vue@2.6.14
+
+# 卸载
+npm -g uninstall yarn
 ```
 
 ```bash

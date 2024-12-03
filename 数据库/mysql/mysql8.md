@@ -1,4 +1,4 @@
-# mysql8 新特性
+# mysql8
 
 
 
@@ -162,3 +162,27 @@ CTE 的优势：
 - CTE 可被自身引用（递归）
 - CTE 可以被其他 CTE 引用
 - CTE 位于 SQL 语句开头，可读性更高
+
+# 查看死锁和解除
+
+```sql
+# LOCK_TYPE：Table表锁，Record行锁，LOCK_STATUS：Granted: 持有锁
+select * from `performance_schema`.data_locks where object_schema in ('sac_dev') and object_name = 'sys_user';
+select * from `performance_schema`.PROCESSLIST;
+select * from information_schema.INNODB_TRX;
+# 查看使用表的线程数，Named_locked为0表示锁定状态
+show OPEN TABLES where In_use > 0;
+
+# 结束线程，
+kill 240034;
+```
+
+> [!NOTE]
+>
+> kill命令时只是对给定的THD结构打了一个标记，所以使用kill命令后，需要一段时间才能把对应的processlist_id回收。
+>
+> [当kill在MySQL中遇到不死金身killed怎么办?|Vol 16-腾讯云开发者社区-腾讯云](https://cloud.tencent.com/developer/article/1857161)
+
+> [!TIP]
+>
+> 如果执行一个简单的 update 就导致行锁，且长时间持有，且kill后长时间不释放锁，且 insert 命令也一直执行中，且测试多个表都如此，很有可能是磁盘空间满了。
