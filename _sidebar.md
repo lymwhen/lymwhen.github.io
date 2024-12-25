@@ -227,6 +227,8 @@
   * [typora](工具/typora.md)
   * [Visio](工具/Visio.md)
   * [VirtualBox](工具/VirtualBox.md)
+  * [ResourceHacker](工具/ResourceHacker.md)
+  * [360文件夹](工具/360文件夹.md)
 * [海康](海康/OpenAPI.md)
 * [开源项目](开源项目/开源项目.md)
   * [Jitsi](开源项目/Jitsi/Jitsi.md)
