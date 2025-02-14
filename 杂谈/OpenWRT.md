@@ -8,7 +8,132 @@ LAN：局域网，接家用设备
 
 引导加载程序，用于路由器刷机，每种路由器会有对应的大神开发的 uboot，会有多种版本，比如不死 uboot
 
-刷入 uboot 后，修改电脑 ip 为`192.168.1.2/24`，浏览器访问`http://192.168.1.1`，
+刷入 uboot 后，修改电脑 ip 为`192.168.1.2/24`，浏览器访问`http://192.168.1.1`。
+
+# 固件
+
+### 精简
+
+系统 - 软件包，切换到已安装，在筛选中输入关键字，卸载多余的软件包。
+
+卸载时注意，有些包被别的包依赖，报错内容会告知依赖的软件包名，如果确实没用，根据依赖顺序删除即可。
+
+搜索关键字：
+
+无线：ath、wireless、wlan、wifi、wpad、802、iw
+
+> ```bash
+> # CONFIG_ATH11K_NSS_SUPPORT is not set
+> # CONFIG_DRIVER_11AC_SUPPORT is not set
+> # CONFIG_DRIVER_11AX_SUPPORT is not set
+> # CONFIG_KERNEL_PREEMPT_RCU is not set
+> # CONFIG_NSS_DRV_WIFIOFFLOAD_ENABLE is not set
+> # CONFIG_NSS_FIRMWARE_VERSION_12_5 is not set
+> # CONFIG_PACKAGE_apk-mbedtls is not set
+> # CONFIG_PACKAGE_apk-openssl is not set
+> # CONFIG_PACKAGE_ath11k-firmware-ipq6018 is not set
+> # CONFIG_PACKAGE_ath11k-firmware-qcn9074 is not set
+> # CONFIG_PACKAGE_hostapd-common is not set
+> # CONFIG_PACKAGE_ipq-wifi-cmiot_ax18 is not set
+> # CONFIG_PACKAGE_ipq-wifi-jdcloud_re-cs-02 is not set
+> # CONFIG_PACKAGE_ipq-wifi-jdcloud_re-ss-01 is not set
+> # CONFIG_PACKAGE_ipq-wifi-qihoo_v6 is not set
+> # CONFIG_PACKAGE_ipq-wifi-redmi_ax5 is not set
+> # CONFIG_PACKAGE_ipq-wifi-redmi_ax5-jdcloud is not set
+> # CONFIG_PACKAGE_ipq-wifi-xiaomi_ax1800 is not set
+> # CONFIG_PACKAGE_ipq-wifi-zn_m2 is not set
+> # CONFIG_PACKAGE_iw is not set
+> # CONFIG_PACKAGE_kmod-ath is not set
+> # CONFIG_PACKAGE_kmod-ath11k is not set
+> # CONFIG_PACKAGE_kmod-ath11k-ahb is not set
+> # CONFIG_PACKAGE_kmod-ath11k-pci is not set
+> # CONFIG_PACKAGE_kmod-cfg80211 is not set
+> # CONFIG_PACKAGE_kmod-crypto-aead is not set
+> # CONFIG_PACKAGE_kmod-crypto-ccm is not set
+> # CONFIG_PACKAGE_kmod-crypto-cmac is not set
+> # CONFIG_PACKAGE_kmod-crypto-ctr is not set
+> # CONFIG_PACKAGE_kmod-crypto-gcm is not set
+> # CONFIG_PACKAGE_kmod-crypto-gf128 is not set
+> # CONFIG_PACKAGE_kmod-crypto-ghash is not set
+> # CONFIG_PACKAGE_kmod-crypto-hmac is not set
+> # CONFIG_PACKAGE_kmod-crypto-manager is not set
+> # CONFIG_PACKAGE_kmod-crypto-michael-mic is not set
+> # CONFIG_PACKAGE_kmod-crypto-null is not set
+> # CONFIG_PACKAGE_kmod-crypto-rng is not set
+> # CONFIG_PACKAGE_kmod-crypto-seqiv is not set
+> # CONFIG_PACKAGE_kmod-crypto-sha3 is not set
+> # CONFIG_PACKAGE_kmod-crypto-sha512 is not set
+> # CONFIG_PACKAGE_kmod-hwmon-core is not set
+> # CONFIG_PACKAGE_kmod-i2c-core is not set
+> # CONFIG_PACKAGE_kmod-mac80211 is not set
+> # CONFIG_PACKAGE_kmod-mhi-bus is not set
+> # CONFIG_PACKAGE_kmod-qrtr-mhi is not set
+> # CONFIG_PACKAGE_kmod-qrtr-smd is not set
+> # CONFIG_PACKAGE_libopenssl-conf is not set
+> # CONFIG_PACKAGE_libopenssl-legacy is not set
+> # CONFIG_PACKAGE_ucode-mod-digest is not set
+> # CONFIG_PACKAGE_ucode-mod-nl80211 is not set
+> # CONFIG_PACKAGE_ucode-mod-rtnl is not set
+> # CONFIG_PACKAGE_ucode-mod-uloop is not set
+> # CONFIG_PACKAGE_wifi-scripts is not set
+> # CONFIG_PACKAGE_wireless-regdb is not set
+> # CONFIG_PACKAGE_wpad-openssl is not set
+> # CONFIG_TARGET_ROOTFS_INITRAMFS is not set
+> # CONFIG_USE_APK is not set
+> # CONFIG_MBEDTLS_ARIA_C is not set
+> # CONFIG_MBEDTLS_CAMELLIA_C is not set
+> # CONFIG_MBEDTLS_CCM_C is not set
+> # CONFIG_MBEDTLS_CIPHER_MODE_OFB is not set
+> # CONFIG_MBEDTLS_CIPHER_MODE_XTS is not set
+> # CONFIG_MBEDTLS_DEBUG_C is not set
+> # CONFIG_MBEDTLS_DEPRECATED_WARNING is not set
+> # CONFIG_MBEDTLS_ECP_DP_BP256R1_ENABLED is not set
+> # CONFIG_MBEDTLS_ECP_DP_BP384R1_ENABLED is not set
+> # CONFIG_MBEDTLS_ECP_DP_BP512R1_ENABLED is not set
+> # CONFIG_MBEDTLS_ECP_DP_CURVE448_ENABLED is not set
+> # CONFIG_MBEDTLS_ECP_DP_SECP192K1_ENABLED is not set
+> # CONFIG_MBEDTLS_ECP_DP_SECP192R1_ENABLED is not set
+> # CONFIG_MBEDTLS_ECP_DP_SECP224K1_ENABLED is not set
+> # CONFIG_MBEDTLS_ECP_DP_SECP224R1_ENABLED is not set
+> # CONFIG_MBEDTLS_KEY_EXCHANGE_DHE_PSK_ENABLED is not set
+> # CONFIG_MBEDTLS_KEY_EXCHANGE_DHE_RSA_ENABLED is not set
+> # CONFIG_MBEDTLS_KEY_EXCHANGE_ECDH_ECDSA_ENABLED is not set
+> # CONFIG_MBEDTLS_KEY_EXCHANGE_ECDH_RSA_ENABLED is not set
+> # CONFIG_MBEDTLS_KEY_EXCHANGE_RSA_ENABLED is not set
+> # CONFIG_MBEDTLS_KEY_EXCHANGE_RSA_PSK_ENABLED is not set
+> # CONFIG_MBEDTLS_PLATFORM_C is not set
+> # CONFIG_MBEDTLS_RIPEMD160_C is not set
+> # CONFIG_MBEDTLS_SELF_TEST is not set
+> # CONFIG_MBEDTLS_SSL_RENEGOTIATION is not set
+> # CONFIG_MBEDTLS_VERSION_C is not set
+> # CONFIG_MBEDTLS_VERSION_FEATURES is not set
+> ```
+>
+> 参考大佬的无 wifi 配置，无线包含在这里面的包都可以放心卸载了
+>
+> [openwrt-ci/configs/ipq60xx-6.12-nowifi.config at main · breeze303/openwrt-ci](https://github.com/breeze303/openwrt-ci/blob/main/configs/ipq60xx-6.12-nowifi.config)
+
+
+
+quickstart：quick
+
+istore：store
+
+lucky：lucky
+
+mosdns：mosdns
+
+smartdns：smartdns
+
+adGuard：adguard
+
+samba：samba
+
+passwall：passwall
+
+KMS服务器：vlmcsd
+
+自动重启：autoreboot
 
 # 修改局域网网段
 
