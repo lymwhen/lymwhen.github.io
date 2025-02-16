@@ -262,4 +262,6 @@
 * [杂谈](杂谈.md)
   * [Wi-Fi](杂谈/Wi-Fi.md)
   * [重装系统](杂谈/重装系统.md)
+  * [京东云亚瑟](杂谈/京东云亚瑟.md)
+  * [OpenWRT](杂谈/OpenWRT.md)
 * [OTS](OTS.md)
