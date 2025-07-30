@@ -54,6 +54,8 @@ git clone https://gitee.com/kekingcn/file-online-preview.git
 
 ### 2. 使用maven编译打包
 
+对应主工程
+
 ```bash
 cd file-online-preview
 mvn clean package -DskipTests
@@ -61,12 +63,16 @@ mvn clean package -DskipTests
 
 ### 3. 构建镜像kkfileview-base依赖镜像
 
+对应 docker 目录
+
 ```
 cd docker\kkfileview-base
 docker build -t keking/kkfileview-base:v4.4.0 .
 ```
 
 ### 4. 使用docker构建镜像
+
+对应主工程
 
 ```bash
 docker build -t keking/kkfileview:v4.4.0 .
