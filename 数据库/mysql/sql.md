@@ -134,6 +134,22 @@ WHERE
     )
 ```
 
+# 乐观锁
+
+库存减扣
+
+第一种
+
+update goods set amount = amount - 1 where amount > 0 and id = xx
+
+第一种：
+
+select * from goods where id = xx
+
+update goods set amount = amount - 1 where amount > 0 and version = xx
+
+> [乐观锁的10种实现方式及其共性分析（基于版本号、时间戳、标记字段、CAS、唯一索引、多字段校验、基于CheckSum校验、ETag和校验码、业务逻辑加锁、版本号+组合字段）_乐观锁的实现-CSDN博客](https://blog.csdn.net/hyc010110/article/details/143312111)
+
 # 函数
 
 ### ITEM_IN_SET
