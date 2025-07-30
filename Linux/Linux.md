@@ -38,6 +38,12 @@ su -l oracle
 exit
 ```
 
+| 命令      | 默认目标用户 | 是否加载目标用户配置 | 环境变量更新 | 使用场景                                         |
+| --------- | ------------ | -------------------- | ------------ | ------------------------------------------------ |
+| su        | root         | 否                   | 否           | 切换到其他用户，保留当前环境变量。               |
+| su root   | root         | 否                   | 否           | 显式切换到 root 用户，保留当前环境变量。         |
+| su - root | root         | 是                   | 是           | 切换到 root 用户并加载其配置文件，更新环境变量。 |
+
 # 环境变量
 
 ```bash
@@ -117,6 +123,8 @@ tar -zcvf repo.tar.gz /usr/local/repo
 > 表示扩展模式匹配操作符，就可以使用更多的通配符。
 >
 > [linux mv命令排除某个文件或文件夹_庭前荷雨的博客-CSDN博客_mv 排除](https://blog.csdn.net/motingqian/article/details/84308629)
+
+> [Linux 下使用 tar 命令打包指定目录下的所有文件,不包含路径方法_tar压缩文件夹下所有文件 不包含目录-CSDN博客](https://blog.csdn.net/banzhuantuqiang/article/details/131258045)
 
 # 服务管理
 
