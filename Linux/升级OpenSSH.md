@@ -106,6 +106,38 @@ SSHp1, OpenSSL 3.4.0 22 Oct 2024
 systemctl restart sshd
 ```
 
+```
+# 解压目录可指定其他
+tar -zxvf openssh-9.0p1.tar.gz -C /opt
+cd /opt/openssh-8.9p1
+
+vim version.h
+#define SSH_VERSION     "welcome"
+
+./configure   --prefix=/usr   --sysconfdir=/etc/ssh    --with-md5-passwords   --with-pam --with-zlib   --with-tcp-wrappers    --with-ssl-dir=/usr/local/openssl   --without-hardening
+
+make
+chmod 600 /etc/ssh/ssh_host_rsa_key /etc/ssh/ssh_host_ecdsa_key /etc/ssh/ssh_host_ed25519_key
+make install
+
+cp -a contrib/redhat/sshd.init  /etc/init.d/sshd
+cp -a contrib/redhat/sshd.pam /etc/pam.d/sshd.pam
+chmod u+x /etc/init.d/sshd
+vim /etc/ssh/sshd_config 
+# 禁止密码登录
+PermitRootLogin no
+# 密码认证
+PasswordAuthentication yes
+# 加密算法
+Ciphers aes128-ctr,aes192-ctr,aes256-ctr
+
+chkconfig --add sshd
+chkconfig sshd on
+systemctl restart sshd
+```
+
+
+
 > [!ATTENTION]
 >
 > 在卸载原 openssh 之后，将无法进行新的 ssh 连接，但不会影响已有的的连接，所以卸载之前，最好：
