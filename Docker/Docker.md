@@ -431,6 +431,16 @@ systemctl restart docker
 docker ps
 ```
 
+# save、export 与 load、import
+
+docker save和docker export的区别：
+
+1. docker save保存的是一个或多个镜像（image），docker export保存的是一个容器（container）；
+2. docker load用来载入镜像包，docker import用来载入容器包，但两者都会恢复为镜像；
+3. docker load不能对载入的镜像重命名，而docker import可以为镜像指定新名称。
+
+> [docker save与docker export的区别_docker save docker export版本差异-CSDN博客](https://blog.csdn.net/liukuan73/article/details/78089138)
+
 # 磁盘空间清理
 
 `df -h` 发现[overlay](https://so.csdn.net/so/search?q=overlay&spm=1001.2101.3001.7020)占用较高。
