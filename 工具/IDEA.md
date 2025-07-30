@@ -1,6 +1,6 @@
 # IDEA
 
-# 注释作者
+# 快捷键添加注释
 
 File - Settings - Editor - Live Templates
 
