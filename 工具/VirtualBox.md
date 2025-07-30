@@ -86,6 +86,14 @@ ip addr
 - enp0s3：NAT 网络（192.168.2.0段），用于虚拟机上网，可以随便给它配置一个 ip，与主机互访用不到
 - enp0s8：Host-Only 网络（192.168.3.0段），用于与主机互访，需要配置一个我们记得的 ip
 
+> [!NOTE]
+>
+> 上述网络管理器 - Host-Only 的配置中，我们并没有启用 DHCP 服务器，所以默认不会有 Host-Only 网卡的 IP 地址。
+>
+> 当然我们可以启用 DHCP 服务器，这样主机就可以直接访问虚拟机了，只是我们更希望自己给它设置一个静态 IP，便于以后访问。各系统设置静态 IP 的方式参看下文。 
+
+##### CentOS 7
+
 ```properties
 vim /etc/sysconfig/network-scripts/ifcfg-enp0s3
 ```
@@ -118,17 +126,54 @@ BOOTPROTO=static
 DEFROUTE=yes
 IPADDR="192.168.3.201"
 NETMASK="255.255.255.0"
-GATEWAY="192.168.3.1"
-DNS1="114.114.114.114"
-DNS2="4.2.2.1"
 NAME=enp0s8
 DEVICE=enp0s8
 ONBOOT=yes
 ```
 
+> [!NOTE]
+>
+> Host-Only 模式对应的网卡`enp0s8`，不应改配置默认网关和 DNS 服务器，因为它仅仅用于跟主机通信。参看下面的问题版块。
+
 > [!TIP]
 >
 > 如果在`/etc/sysconfig/network-scripts`下找不到对应网卡的配置文件，可以复制其他网卡的配置文件，**注意文件名后缀、`NAME`、`DEVICE`**与`ip addr`中的网卡名对应。
+
+##### ubuntu 22.04.5
+
+网卡配置文件位于`/etc/netplan/`下，名称各不一样，注意看它里面应该包含有 NAT 网卡`enp0s3`的配置。
+
+```yml
+sudo vim /etc/netplan/01-network-manager-all.yaml
+# This file is generated from information provided by the datasource.  Changes
+# to it will not persist across an instance reboot.  To disable cloud-init's
+# network configuration capabilities, write a file
+# /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg with the following:
+# network: {config: disabled}
+network:
+    ethernets:
+        enp0s3:
+            dhcp4: true
+        enp0s8:
+            addresses:
+              - 192.168.3.12/24
+    version: 2
+```
+
+文件中有说明，该配置重启后会被覆盖，可以在`/etc/cloud/cloud.cfg.d/99-disable-network-config.cfg`中配置`network: {config: disabled}`
+
+```bash
+sudo /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg
+network: {config: disabled}
+```
+
+不知两者能否同时生效，实测这样是生效的：
+
+修改`99-disable-network-config.cfg` → 重启 → 修改`netplan`配置 → 重启
+
+> [Ubuntu Server 22.04.5 LTS重启后IP被重置问题_ubuntu server修改ip地址重启恢复-CSDN博客](https://blog.csdn.net/hjl_and_djj/article/details/144293107)
+
+##### 最终
 
 主机访问虚拟机：192.168.3.201
 
@@ -147,3 +192,20 @@ systemctl restart sshd
 ```
 
 > [解决: ssh 远程登录虚拟机 Linux 速度很慢的问题 · Issue #136 · jwenjian/ghiblog (github.com)](https://github.com/jwenjian/ghiblog/issues/136)
+
+### 虚拟机中已配置 Host-Only 静态 IP，但是主机连接不到，主机中也无法 ping 通自己（192.168.3.1）
+
+可能是一段时间不用，各种配置出问题了，打开 VirtualBox - 管理 - 工具 - 网络管理器
+
+- 将 Host-Only 网卡全部删除，然后重新配置
+- 打开虚拟机网络配置，将 Host-Only 网卡取消勾选，保存，然后重新配置 Host-Only 网卡
+
+### 虚拟机中网络慢，无法打开某些网址
+
+```bash
+# 测试情况比较诡异，百度通，但是github不通
+curl https://www.baidu.com
+curl https://github.com
+```
+
+虚拟机中 Host-Only 网卡不应该配置默认网关和 DNS，因为它仅用于跟主机通信。配置 IP 和子网掩码即可。
