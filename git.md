@@ -218,6 +218,10 @@ git merge --abort
 >
 > 可以直接 pull 其他分支，直接合并远程分支的代码
 
+> [!TIP]
+>
+> 
+
 ### 提交合并
 
 ```bash
@@ -478,3 +482,63 @@ git config --global user.name "lyml"
 git config --global user.email "10743187@qq.com"
 ```
 
+# 更新上游
+
+```bash
+# 克隆自己的仓库，查看分支
+git clone git@github.com:lymwhen/wrt_release.git
+git branch -a
+# 添加上游分支
+git remote add upstream https://github.com/ZqinKing/wrt_release.git
+git branch -a
+# 拉取上游分支
+git fetch upstream
+# 切换到用于合并的分支
+git chechout main
+# 合并上游的更新
+git merge upstream/main
+```
+
+如果存在冲突，git命令行会提示：
+
+```
+$ git merge upstream/main
+Auto-merging .github/workflows/release_wrt.yml
+Auto-merging update.sh
+CONFLICT (content): Merge conflict in update.sh
+Automatic merge failed; fix conflicts and then commit the result.
+```
+
+可打开IDE处理冲突
+
+![image-20250316181350846](assets/image-20250316181350846.png)
+
+Merge Changes：合并更改，即合并时存在冲突，需要手动处理的文件
+
+Stated Changes：暂存的更改，来自上游的没有冲突的文件
+
+Changes：更改，没有`add`的更改，比如自己在编辑器进行的更改，不在此次合并范围内
+
+打开需要处理冲突的文件，IDE中会显示Current Changes（当前分支的更改）、Incoming Changes（来自合并的更改），根据需要选择需要保留的部分，当然也可以全都保留，并手动编辑
+
+处理完毕后，点击Merge Changes或具体文件右侧的`+`号，它将会变为Stated Changes，期间编辑器可能会问你是否确定暂存更改，如何确认冲突处理完毕了，那么就可以点击确定
+
+![image-20250316182048641](assets/image-20250316182048641.png)
+
+当Merge Changes中没有文件，即表示冲突处理完毕，可以 commit、push了
+
+### 在 github 中操作
+
+在仓库分支上会看到自己 fork 的分支相对上游的情况：
+
+![image-20250325103210339](assets/image-20250325103210339.png)
+
+此时代表自己领先 11 个提交，9个提交落后
+
+点击`9 commits behind`，可以看到上游新增的 9 个提交，可以创建 PR 用于更新上游的提交。如果没有冲突，可以自动合并完成，如果有冲突，会提示：
+
+![image-20250325103451648](assets/image-20250325103451648.png)
+
+![image-20250325103507078](assets/image-20250325103507078.png)
+
+此时需要`Files Changed`tab页中，手动处理
