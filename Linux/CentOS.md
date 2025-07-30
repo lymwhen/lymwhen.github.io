@@ -29,7 +29,7 @@ U盘盘符名称与安装脚本不一致
 # 设置静态IP
 
 ```bash
-vim /etc/sysconfig/network-scripts/ifcfg-enp
+vim /etc/sysconfig/network-scripts/ifcfg-enp0s3
 
 BOOTPROTO=static
 IPADDR="19.37.33.66 # 设置的静态IP地址
@@ -44,6 +44,12 @@ systemctl restart network
 ```
 
 > 貌似可以不用引号
+
+如果服务器新加了网卡，可以`ip addr`看一下网卡名称：
+
+![image-20250427111254601](assets/image-20250427111254601.png)
+
+然后`vim ifcfg-enp0s8`配置网卡信息。
 
 # 系统信息
 
