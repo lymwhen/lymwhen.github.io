@@ -431,7 +431,52 @@ systemctl restart docker
 docker ps
 ```
 
+# 磁盘空间清理
 
+`df -h` 发现[overlay](https://so.csdn.net/so/search?q=overlay&spm=1001.2101.3001.7020)占用较高。
+
+![在这里插入图片描述](assets/9d6bc28c2ac9ccaedec2dfad2a8cadc1.png)
+
+### 清除资源
+
+```bash
+docker system prune -a
+```
+
+> `prune`指令默认会清除所有如下资源：
+>
+> - 已停止的容器（container）
+> - 未被任何容器所使用的卷（volume）
+> - 未被任何容器所关联的网络（network）
+> - 所有悬空镜像（未被容器引用的镜像）（image）。
+
+### 清除日志
+
+> 每次创建一个容器时，都会有一些文件和目录被创建，例如：
+>
+> /var/lib/docker/containers/ID目录，如果容器使用了默认的日志模式，他的所有日志都会以JSON形式保存到此目录下。
+> /var/lib/docker/overlay2 目录下含有容器的读写层，如果容器使用自己的文件系统保存了数据，那么就会写到此目录下。
+> 进入到/var/lib/docker/containers 目录下 通过 du -h --max-depth=1 查找大文件占用,发现这些文件中占用空间最大的是***-json.log**文件。而此文件的内容为docker生成的日志文件。
+
+```sh
+#!/bin/bash
+echo "======== start clean docker containers logs ========"
+logs=$(find /var/lib/docker/containers/ -name *-json.log)
+for log in $logs
+        do
+                fileSizeByte=$(wc -c $log |awk '{print $1}')
+                ((fileSizeKB=$fileSizeByte/1024))
+                echo "clean logs :$fileSizeByte Bytes $fileSizeKB KB - $log"
+                cat /dev/null > $log
+        done
+echo "======== end clean docker containers logs ========"
+```
+
+> [!TIP]
+>
+> 不会影响当前使用的镜像和容器。
+
+> [亲测有效：docker清理Overlay2占用磁盘空间_docker overlay 清理-CSDN博客](https://blog.csdn.net/Small_StarOne/article/details/123655176)
 
 # 问题
 
