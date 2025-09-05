@@ -42,41 +42,7 @@
 
 # 备份基带
 
-> [MIX2S刷入WOA导致QCN丢失的恢复方法 - Chr_小屋 (chrxw.com)](https://blog.chrxw.com/archives/2021/09/26/1616.html)
->
-> 可能有用的教程：
->
-> [[GUIDE\] Backup, edit and restore QCN. Fixing lost IMEI. | XDA Forums](https://xdaforums.com/t/guide-backup-edit-and-restore-qcn-fixing-lost-imei.4101611/)
->
-> [小米 MIX2S polaris QCN 备份分享 - General chit-chat 日常闲聊 - Renegade Project (renegade-project.tech)](https://forum.renegade-project.tech/t/mix2s-polaris-qcn/1268)
-
-### root 手机
-
-提取 boot.img → Magisk 修补 → 刷入 boot
-
-### 打开 Diagnostics 模式
-
-```bash
-adb shell
-# 提权，手机上magisk点击同意
-$> su
-# 打开Diagnostics模式
-#> setprop sys.usb.config diag,adb
-```
-
-备管理器里的`端口(COM 和 LPT)`中显示如下说明成功了，如果没显示的话说明需要打高通的HS-USB驱动。
-
-![设备管理器](1508615702.png)
-
-### 使用 QFIL 备份基带
-
-下载 QFIL tool：[QFIL Tool v2.0.3.5 (all version) - Gsm Official](https://www.gsmofficial.com/qfil-tool/)
-
-打开 QFIL，点击`SelectPort...`，选择`Qualcomm HS-USB Android DIAG xxx`
-
-点击`Tools - QCN Backup Restore`，勾选`Enable Multi-SIM`，点击`Backup QCN`，等待完成。
-
-注意妥善保存备份的 qcn 文件。
+参看备份基带。
 
 # 刷入 rec
 
