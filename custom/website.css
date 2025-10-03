@@ -165,3 +165,7 @@ strong {
     font-style: italic;
     font-weight: bold;
 }
+
+.sidebar, body {
+    background-color: transparent;
+}
