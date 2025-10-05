@@ -91,3 +91,54 @@ docker build -t keking/kkfileview:v4.4.0 .
 > 2. 本地 maven、docker构建后，docker save 镜像后到服务器 docker load
 >
 >    这个方式更好一些，服务器不需要准备 maven 环境，也不需要构建 kkfileview-base 镜像，同时一次构建可以在多个服务器快速部署（保持同架构即可，如 intel 和 海光 CPU 都是 x86_64 架构，是可以通用的）
+
+# 不安全 https
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```
+root@7afb5d8e0cb1:/tmp# find / -name "cacerts"
+/etc/default/cacerts
+/etc/ssl/certs/java/cacerts
+/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/security/cacerts
+keytool -import -alias ztlzt -file server.crt -keystore /etc/default/cacerts -storepass changeit
+无效keystore
+keytool -import -alias ztlzt -file server.crt -keystore /etc/ssl/certs/java/cacerts -storepass changeit
+成功
+keytool -import -alias ztlzt -file server.crt -keystore /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/security/cacerts -storepass changeit
+已存在
+```
+
+
+
+> [解决 kkfileview:预览自签名证书https word文件 出现unable to find valid certification path to requested target的问题_kkfileview unable to find valid certification path-CSDN博客](https://blog.csdn.net/wx912820/article/details/140531343)
