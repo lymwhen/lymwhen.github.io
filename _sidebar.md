@@ -135,6 +135,7 @@
     * [sql](数据库/mysql/sql.md)
     * [mysql8](数据库/mysql/mysql8.md)
     * [内存调整](数据库/mysql/内存调整.md)
+    * [分区归档](数据库/mysql/分区归档.md)
     * [疑难问题](数据库/mysql/疑难问题.md)
   * [oracle](数据库/oracle/README.md)
     * [sqlplus](数据库/oracle/sqlplus.md)
