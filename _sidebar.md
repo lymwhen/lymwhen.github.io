@@ -163,6 +163,7 @@
   * [minio](Docker/minio.md)
   * [mysql8](Docker/mysql8.md)
 * [k8s](k8s/k8s.md)
+  * [minikube](k8s/minikube.md)
 * [nginx](nginx.md)
 * [web容器](web容器/web容器.md)
   * [Tomcat](web容器/Tomcat.md)
